@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Tienda - VetCT{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="mb-0">Catálogo de Productos</h1>
+        <p class="text-muted mb-0">Gestión de suministros y productos veterinarios.</p>
+    </div>
+    <div class="d-grid gap-2 d-md-flex">
+        <button class="btn btn-primary" type="button">Nuevo Producto</button>
+    </div>
+</div>
+
+<div class="row row-cols-1 row-cols-md-4 g-4">
+    {% for producto in productos %}
+    <div class="col">
+        <div class="card h-100 border text-center">
+            {% if producto.imagen %}
+            <img src="{{ producto.imagen.url }}" class="card-img-top border-bottom" alt="{{ producto.nombre }}"
+                style="height: 180px; object-fit: cover;">
+            {% else %}
+            <div class="bg-light text-center py-5 border-bottom">
+                <span class="text-secondary">Producto</span>
+            </div>
+            {% endif %}
+            <div class="card-body">
+                <h5 class="card-title h6 fw-bold">{{ producto.nombre }}</h5>
+                <p class="text-success fw-bold">{{ producto.precio }} €</p>
+                <p class="small text-muted mb-0">Stock: {{ producto.stock }}</p>
+            </div>
+            <div class="card-footer bg-white border-0 py-3">
+                <button class="btn btn-outline-primary btn-sm w-100">Añadir al Carro</button>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center py-5">
+        <p class="alert alert-warning">No hay productos disponibles por ahora.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+
+{% block title %}Urgencias 24h - VetCT{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Urgencias 24h</h1>
+    <div class="d-grid gap-2 d-md-flex">
+        <a href="{% url 'crear_urgencia' %}" class="btn btn-danger">Nueva Urgencia</a>
+    </div>
+</div>
+
+<div class="card shadow-sm border-danger">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Paciente</th>
+                        <th>Prioridad</th>
+                        <th>Fecha/Hora</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for urgencia in urgencias %}
+                    <tr
+                        class="{% if urgencia.prioridad == 'Crítica' %}table-danger{% elif urgencia.prioridad == 'Alta' %}table-warning{% endif %}">
+                        <td>{{ urgencia.paciente }}</td>
+                        <td>
+                            <span
+                                class="badge {% if urgencia.prioridad == 'Crítica' %}bg-danger{% elif urgencia.prioridad == 'Alta' %}bg-warning text-dark{% else %}bg-info{% endif %}">
+                                {{ urgencia.prioridad }}
+                            </span>
+                        </td>
+                        <td>{{ urgencia.fecha|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            {% if urgencia.estado == 'Atendido' %}
+                            <span class="badge bg-success">Atendido</span>
+                            {% elif urgencia.estado == 'En Proceso' %}
+                            <span class="badge bg-warning text-dark">En Proceso</span>
+                            {% elif urgencia.estado == 'En Espera' %}
+                            <span class="badge bg-info text-dark">En Espera</span>
+                            {% else %}
+                            <span class="badge bg-secondary">Pendiente</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="d-grid gap-2 d-md-flex">
+                                <a href="#" class="btn btn-sm btn-outline-dark">Gestionar</a>
+                                {% if user.is_staff %}
+                                <form action="{% url 'actualizar_estado_urgencia' urgencia.id %}" method="POST"
+                                    class="d-inline">
+                                    {% csrf_token %}
+                                    <select name="estado" class="form-select form-select-sm" onchange="this.form.submit()">
+                                        <option value="Pendiente" {% if urgencia.estado == 'Pendiente' %}selected{% endif %}>Pendiente</option>
+                                        <option value="En Proceso" {% if urgencia.estado == 'En Proceso' %}selected{% endif %}>En Proceso</option>
+                                        <option value="En Espera" {% if urgencia.estado == 'En Espera' %}selected{% endif %}>En Espera</option>
+                                        <option value="Atendido" {% if urgencia.estado == 'Atendido' %}selected{% endif %}>Atendido</option>
+                                    </select>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">No hay urgencias activas.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

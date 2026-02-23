@@ -1,0 +1,68 @@
+# Docker Compose para VetCT - Clínica Veterinaria
+# Arquitectura sencilla: 3 contenedores básicos
+
+version: '3.8'
+
+services:
+  # Base de datos PostgreSQL
+  db:
+    image: postgres:13
+    container_name: vetct_db
+    environment:
+      POSTGRES_DB: vetct_db
+      POSTGRES_USER: vetct_user
+      POSTGRES_PASSWORD: vetct_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+
+  # Redis para WebSockets y caché
+  redis:
+    image: redis:alpine
+    container_name: vetct_redis
+    restart: always
+
+  # Aplicación web Django
+  web:
+    build: .
+    container_name: vetct_web
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             gunicorn vetct_web.wsgi:application --bind 0.0.0.0:8000"
+    volumes:
+      - .:/app
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+    environment:
+      - DEBUG=False
+      - SECRET_KEY=clave-secreta-tfg-daw-2026
+      - DB_HOST=db
+      - DB_NAME=vetct_db
+      - DB_USER=vetct_user
+      - DB_PASS=vetct_password
+      - REDIS_URL=redis://redis:6379/1
+    depends_on:
+      - db
+      - redis
+    restart: always
+
+  # Servidor web Nginx
+  nginx:
+    image: nginx:latest
+    container_name: vetct_nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+    depends_on:
+      - web
+    restart: always
+
+# Volúmenes para guardar datos
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:

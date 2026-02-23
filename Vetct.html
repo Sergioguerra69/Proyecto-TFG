@@ -471,7 +471,7 @@
         // Añadir al carrito
         document.querySelectorAll('.product .btn').forEach(button => {
             button.addEventListener('click', function() {
-                this.textContent = 'Añadido ✓';
+                this.textContent = 'Añadido';
                 this.style.background = '#38a169';
                 setTimeout(() => {
                     this.textContent = 'Añadir al Carrito';
@@ -484,7 +484,7 @@
         document.querySelector('.planner .btn').addEventListener('click', function() {
             const name = document.querySelector('.form input').value || 'tu mascota';
             document.querySelector('.plan-preview h3').textContent = `Plan para ${name}`;
-            this.textContent = 'Plan Generado ✓';
+            this.textContent = 'Plan Generado';
             this.style.background = '#38a169';
             setTimeout(() => {
                 this.textContent = 'Generar Plan';

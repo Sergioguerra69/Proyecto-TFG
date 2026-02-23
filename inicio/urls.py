@@ -1,3 +1,4 @@
+# URLs: enlazamos las rutas del navegador con las funciones de views.py
 
 from django.urls import path
 from . import views

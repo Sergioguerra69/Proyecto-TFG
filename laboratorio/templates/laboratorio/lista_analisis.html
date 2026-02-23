@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+
+{% block title %}Laboratorio Clínico - VetCT{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Laboratorio Clínico</h1>
+    <div class="d-grid gap-2 d-md-flex">
+        <a href="{% url 'crear_analisis' %}" class="btn btn-primary">Nuevo Análisis</a>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Análisis</th>
+                        <th>Paciente</th>
+                        <th>Fecha</th>
+                        <th>Resultado</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in analisis %}
+                    <tr>
+                        <td>{{ a.nombre }}</td>
+                        <td>{{ a.paciente }}</td>
+                        <td>{{ a.fecha }}</td>
+                        <td>
+                            {% if a.resultado %}
+                            <a href="{{ a.resultado.url }}" class="btn btn-sm btn-link">PDF</a>
+                            {% else %}
+                            <span class="text-muted">Pendiente</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if a.estado == 'Completado' %}
+                            <span class="badge bg-success">Completado</span>
+                            {% elif a.estado == 'En Proceso' %}
+                            <span class="badge bg-warning text-dark">En Proceso</span>
+                            {% else %}
+                            <span class="badge bg-secondary">Pendiente</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="d-grid gap-2 d-md-flex">
+                                <a href="#" class="btn btn-sm btn-outline-info">Ver</a>
+                                {% if user.is_staff %}
+                                <form action="{% url 'actualizar_estado_analisis' a.id %}" method="POST" class="d-inline">
+                                    {% csrf_token %}
+                                    <select name="estado" class="form-select form-select-sm" onchange="this.form.submit()">
+                                        <option value="Pendiente"{% if a.estado == 'Pendiente' %} selected{% endif %}>Pendiente</option>
+                                        <option value="En Proceso"{% if a.estado == 'En Proceso' %} selected{% endif %}>En Proceso</option>
+                                        <option value="Completado"{% if a.estado == 'Completado' %} selected{% endif %}>Completado</option>
+                                    </select>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center">No hay análisis registrados.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

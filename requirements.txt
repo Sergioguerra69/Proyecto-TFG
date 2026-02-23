@@ -1,10 +1,42 @@
-asgiref==3.11.0
-Django==6.0
-django-allauth==65.13.1
-django-crispy-forms==2.5
-pillow==12.0.0
-python-decouple==3.8
-sqlparse==0.5.4
-tzdata==2025.2
+# =============================================================================
+# ARCHIVO DE DEPENDENCIAS - TFG DAW 2025-2026
+# VetCT: Sistema de Gestión Veterinaria con Arquitectura Moderna
+# =============================================================================
+# 
+# Este archivo define las dependencias Python para producción:
+# - Django 5.1.6: Framework web principal (última versión estable)
+# - Django Channels: WebSockets para notificaciones en tiempo real
+# - DRF: API REST para futuras integraciones móviles
+# - Redis: Sistema de caché y mensajería
+# - Gunicorn: Servidor WSGI para producción
+# - Whitenoise: Servición de archivos estáticos optimizado
+#
+# Compatible con Python 3.11+ (Requisito del módulo de Despliegue)
+# =============================================================================
+
+# Framework principal y componentes web
+Django==5.1.6
 whitenoise==6.11.0
-whitenoise
+gunicorn==21.2.0
+
+# Base de datos PostgreSQL
+psycopg2-binary==2.9.10
+
+# Sistema de plantillas y manejo de archivos
+pillow==12.0.0
+
+# Configuración y utilidades
+python-decouple==3.8
+tzdata==2025.2
+sqlparse==0.5.4
+
+# API REST y comunicaciones (Futuras expansiones)
+djangorestframework==3.15.2
+
+# WebSockets y tiempo real (Característica innovadora)
+channels==4.1.0
+channels-redis==4.2.0
+
+# Caché y sesiones distribuidas
+django-redis==5.4.0
+redis==5.0.1

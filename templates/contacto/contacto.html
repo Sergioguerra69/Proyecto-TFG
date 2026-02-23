@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}Contacto - VetCT{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 mb-4">
+        <h1 class="border-bottom pb-2">Canales de Comunicación</h1>
+        <p class="text-muted">Utilice este formulario para enviarnos sus dudas o solicitudes de información.</p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Formulario de Contacto -->
+    <div class="col-md-7">
+        <div class="card border">
+            <div class="card-header bg-white py-3">
+                <h2 class="h5 card-title mb-0">Enviar Mensaje</h2>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+
+                    {% if form.errors %}
+                    <div class="alert alert-danger py-2 small">Existen errores en los datos enviados.</div>
+                    {% endif %}
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label small fw-bold">Nombre Completo</label>
+                            {{ form.nombre }}
+                            {% if form.nombre.errors %}
+                            <div class="text-danger x-small mt-1">{{ form.nombre.errors|striptags }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label small fw-bold">Correo Electrónico</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                            <div class="text-danger x-small mt-1">{{ form.email.errors|striptags }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Asunto de la Consulta</label>
+                        {{ form.asunto }}
+                        {% if form.asunto.errors %}
+                        <div class="text-danger x-small mt-1">{{ form.asunto.errors|striptags }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold">Descripción del Mensaje</label>
+                        {{ form.mensaje }}
+                        {% if form.mensaje.errors %}
+                        <div class="text-danger x-small mt-1">{{ form.mensaje.errors|striptags }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-grid shadow-sm">
+                        <button type="submit" class="btn btn-primary btn-lg">Enviar Formulario Técnico</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información de la Empresa -->
+    <div class="col-md-5">
+        <div class="card border bg-light h-100">
+            <div class="card-body">
+                <h3 class="h5 fw-bold border-bottom pb-2 mb-4">Información del Centro</h3>
+
+                <div class="mb-4">
+                    <p class="fw-bold text-primary mb-1 small">Dirección Postal</p>
+                    <p class="mb-0">Avenida de la Veterinaria, 123</p>
+                    <p class="text-muted small">28001 Madrid, España</p>
+                </div>
+
+                <div class="mb-4">
+                    <p class="fw-bold text-primary mb-1 small">Atención al Cliente</p>
+                    <p class="h5 fw-bold text-dark">+34 912 345 678</p>
+                    <p class="text-muted small">Horario: Lunes a Viernes (09:00 - 20:00)</p>
+                </div>
+
+                <div class="mb-4">
+                    <p class="fw-bold text-primary mb-1 small">Email Oficial</p>
+                    <p class="text-dark">atencion@vetct.com</p>
+                </div>
+
+                <div class="alert alert-danger border-0 py-3 mt-4">
+                    <p class="fw-bold mb-1 small text-uppercase">Urgencias 24h</p>
+                    <p class="h4 fw-bold mb-0">+34 600 123 456</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

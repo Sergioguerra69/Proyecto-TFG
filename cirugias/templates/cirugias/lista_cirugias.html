@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+
+{% block title %}Panel de Quirófano - VetCT{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Gestión de Cirugías (Admin)</h1>
+    <div class="d-grid gap-2 d-md-flex">
+        <a href="{% url 'crear_cirugia' %}" class="btn btn-primary">Programar Cirugía</a>
+    </div>
+</div>
+
+<div class="card shadow-sm border-primary">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Listado de Intervenciones</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Paciente</th>
+                        <th>Tipo de Cirugía</th>
+                        <th>Fecha/Hora</th>
+                        <th>Estado</th>
+                        <th>Quirófano</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in cirugias %}
+                    <tr>
+                        <td class="fw-bold">{{ c.paciente }}</td>
+                        <td>{{ c.tipo_cirugia }}</td>
+                        <td>{{ c.fecha|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            {% if c.estado == 'Completado' %}
+                            <span class="badge bg-success">Completado</span>
+                            {% elif c.estado == 'En Proceso' %}
+                            <span class="badge bg-warning text-dark">En Proceso</span>
+                            {% else %}
+                            <span class="badge bg-secondary">Pendiente</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ c.quirofano }}</td>
+                        <td>
+                            <div class="d-grid gap-2 d-md-flex">
+                                <a href="#" class="btn btn-sm btn-outline-primary">Editar</a>
+                                {% if user.is_staff %}
+                                <form action="{% url 'actualizar_estado_cirugia' c.id %}" method="POST"
+                                    class="d-inline">
+                                    {% csrf_token %}
+                                    <select name="estado" class="form-select form-select-sm" onchange="this.form.submit()">
+                                        <option value="Pendiente" {% if c.estado == 'Pendiente' %}selected{% endif %}>Pendiente</option>
+                                        <option value="En Proceso" {% if c.estado == 'En Proceso' %}selected{% endif %}>En Proceso</option>
+                                        <option value="Completado" {% if c.estado == 'Completado' %}selected{% endif %}>Completado</option>
+                                    </select>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">No hay cirugías registradas.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

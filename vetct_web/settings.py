@@ -19,6 +19,10 @@ import os
 from pathlib import Path
 from decouple import config  # pip install python-decouple
 
+# Creamos la carpeta 'data' si no existe (Para el SQLite y el volumen de Docker)
+# Lo hacemos aquí arriba para que no falle luego el servidor.
+os.makedirs(os.path.join(Path(__file__).resolve().parent.parent, 'data'), exist_ok=True)
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -28,7 +32,7 @@ SECRET_KEY = config('SECRET_KEY', default='clave-secreta-desarrollo-vetct-2024')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.vetct.com']
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
 
 # Application definition - VETCT APPS
 INSTALLED_APPS = [
@@ -39,8 +43,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'crispy_forms',
-    'crispy_bootstrap4',
     
     # VetCT Apps - NUESTRAS APLICACIONES
     'inicio',           # Página principal
@@ -54,6 +56,11 @@ INSTALLED_APPS = [
     'tienda',           # Tienda online
     'contacto',         # Formularios de contacto
     'users',
+    'metricas',         # Métricas del sistema
+
+    # Librerías necesarias para Websockets y API (Cumplir requisito)
+    'rest_framework',
+    'channels',
 ]
 
 
@@ -111,14 +118,31 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'vetct_web.wsgi.application'
+ASGI_APPLICATION = 'vetct_web.asgi.application'
 
-# Database
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# Base de Datos (Muy importante explicar esto)
+# Si estamos en Docker usamos PostgreSQL, si estamos en local (PowerShell) usamos SQLite
+# Esto es para que el profesor pueda probarlo sin instalar nada si quiere.
+if config('DB_HOST', default=None):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': config('DB_NAME'),
+            'USER': config('DB_USER'),
+            'PASSWORD': config('DB_PASS'),
+            'HOST': config('DB_HOST'),
+            'PORT': config('DB_PORT', default='5432'),
+        }
     }
-}
+else:
+    # Si estamos en local (nuestro PC), creamos una carpeta 'data' para el archivo de la base de datos
+    # Esto es para que en Docker el volumen guarde los datos y no se borren
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'data' / 'db.sqlite3',
+        }
+    }
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -136,11 +160,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Internationalization
+# Configuración del Idioma y la Hora (Para que salga en Español)
 LANGUAGE_CODE = 'es-es'
 TIME_ZONE = 'Europe/Madrid'
-USE_I18N = True
-USE_TZ = True
+USE_I18N = True # Activa la traducción
+USE_TZ = True   # Activa el uso de zona horaria
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = 'static/'
@@ -153,11 +177,44 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# Configuración de Redis y WebSockets
+# Si Redis está disponible, lo usamos. Si no, usamos memoria local.
+
+# Configuración por defecto sin Redis (desarrollo local)
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "vetct-local-cache",
+    }
+}
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
+
+# Si tenemos Redis configurado Y estamos en Docker, lo usamos
+redis_url = config('REDIS_URL', default=None)
+if redis_url and 'redis:' in redis_url and config('DEBUG', default=True, cast=bool) == False:
+    # Solo usamos Redis en producción (DEBUG=False)
+    # Configuración con Redis para producción
+    CACHES = {
+        "default": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": redis_url,
+        }
+    }
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": [redis_url],
+            },
+        },
+    }
+
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# Crispy Forms
-CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 # Email configuration
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  
@@ -167,4 +224,5 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'inicio'
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'home'
