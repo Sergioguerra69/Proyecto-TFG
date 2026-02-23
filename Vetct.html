@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VetCT - Veterinaria y Tienda</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Estilos básicos */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        /* Header simple */
+        header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2a9d8f;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .nav-links a:hover {
+            color: #2a9d8f;
+        }
+        
+        .btn {
+            background: #2a9d8f;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn:hover {
+            background: #238276;
+        }
+        
+        /* Hero simple */
+        .hero {
+            background: linear-gradient(rgba(42, 157, 143, 0.9), rgba(42, 157, 143, 0.9)), url('https://images.unsplash.com/photo-1513360371669-4adf3dd7dff8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80');
+            background-size: cover;
+            color: white;
+            text-align: center;
+            padding: 150px 0 80px;
+            margin-top: 60px;
+        }
+        
+        .hero h1 {
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+        
+        /* Secciones */
+        section {
+            padding: 60px 0;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .section-title h2 {
+            color: #264653;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        /* Tienda */
+        .shop {
+            background: #f8f9fa;
+        }
+        
+        .products {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        .product {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        .product img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+        
+        .product-info {
+            padding: 20px;
+        }
+        
+        .product h3 {
+            color: #264653;
+            margin-bottom: 10px;
+        }
+        
+        .price {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2a9d8f;
+            margin: 10px 0;
+        }
+        
+        /* Plan de tratamientos */
+        .planner {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 40px;
+            align-items: flex-start;
+        }
+        
+        .form {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .form input, .form select, .form textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        .plan-preview {
+            flex: 1;
+            min-width: 300px;
+            background: #264653;
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+        }
+        
+        /* Testimonios */
+        .testimonials {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+            justify-content: center;
+        }
+        
+        .testimonial {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            max-width: 350px;
+        }
+        
+        /* Footer */
+        footer {
+            background: #264653;
+            color: white;
+            padding: 50px 0 20px;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 28px;
+            }
+            
+            .section-title h2 {
+                font-size: 26px;
+            }
+            
+            .planner {
+                flex-direction: column;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 24px;
+            }
+            
+            section {
+                padding: 40px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav class="nav">
+                <div class="logo">
+                    <i class="fas fa-paw"></i>
+                    VetCT
+                </div>
+                <div class="nav-links">
+                    <a href="#inicio">Inicio</a>
+                    <a href="#tienda">Tienda</a>
+                    <a href="#tratamientos">Tratamientos</a>
+                    <a href="#testimonios">Testimonios</a>
+                </div>
+                <a href="#contacto" class="btn">Reservar Cita</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero" id="inicio">
+        <div class="container">
+            <h1>Cuidado integral para tu mascota</h1>
+            <p>Veterinaria especializada con tienda de alimentos y planes de tratamiento personalizados</p>
+            <div style="margin-top: 30px;">
+                <a href="#tienda" class="btn" style="margin-right: 10px;">Ver Tienda</a>
+                <a href="#tratamientos" class="btn" style="background: #e9c46a; color: #333;">Plan de Tratamiento</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tienda -->
+    <section class="shop" id="tienda">
+        <div class="container">
+            <div class="section-title">
+                <h2>Nutrición Especializada</h2>
+                <p>Alimentos de calidad seleccionados por veterinarios</p>
+            </div>
+            
+            <div class="products">
+                <!-- Producto 1 -->
+                <div class="product">
+                    <img src="https://images.unsplash.com/photo-1568640347023-a616a30bc3bd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1070&q=80" alt="Comida perros">
+                    <div class="product-info">
+                        <h3>VetCT Digestive Care</h3>
+                        <p>Para perros con digestión sensible</p>
+                        <div class="price">€42.90</div>
+                        <button class="btn" style="width: 100%;">Añadir al Carrito</button>
+                    </div>
+                </div>
+                
+                <!-- Producto 2 -->
+                <div class="product">
+                    <img src="https://images.unsplash.com/photo-1592194996308-7b43878e84a6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1072&q=80" alt="Comida gatos">
+                    <div class="product-info">
+                        <h3>VetCT Urinary Health</h3>
+                        <p>Para gatos con problemas urinarios</p>
+                        <div class="price">€36.50</div>
+                        <button class="btn" style="width: 100%;">Añadir al Carrito</button>
+                    </div>
+                </div>
+                
+                <!-- Producto 3 -->
+                <div class="product">
+                    <img src="https://images.unsplash.com/photo-1589923186741-7d1d6ccee3c3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" alt="Suplementos">
+                    <div class="product-info">
+                        <h3>Joint Support Complex</h3>
+                        <p>Para articulaciones de perros senior</p>
+                        <div class="price">€28.75</div>
+                        <button class="btn" style="width: 100%;">Añadir al Carrito</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Plan de Tratamientos -->
+    <section id="tratamientos">
+        <div class="container">
+            <div class="section-title">
+                <h2>Planificador de Tratamientos</h2>
+                <p>Crea un plan personalizado para tu mascota</p>
+            </div>
+            
+            <div class="planner">
+                <div class="form">
+                    <h3>Perfil de tu Mascota</h3>
+                    <input type="text" placeholder="Nombre de tu mascota">
+                    <select>
+                        <option>Selecciona especie</option>
+                        <option>Perro</option>
+                        <option>Gato</option>
+                        <option>Otra mascota</option>
+                    </select>
+                    <select>
+                        <option>Edad</option>
+                        <option>Cachorro (0-1 año)</option>
+                        <option>Adulto (1-7 años)</option>
+                        <option>Senior (7+ años)</option>
+                    </select>
+                    <textarea placeholder="Necesidades especiales" rows="3"></textarea>
+                    <button class="btn" style="width: 100%;">Generar Plan</button>
+                </div>
+                
+                <div class="plan-preview">
+                    <h3>Plan Recomendado</h3>
+                    <div style="margin-top: 20px;">
+                        <p><i class="fas fa-check"></i> Vacunación anual completa</p>
+                        <p><i class="fas fa-check"></i> Desparasitación trimestral</p>
+                        <p><i class="fas fa-check"></i> Dieta especializada</p>
+                        <p><i class="fas fa-check"></i> Limpieza dental anual</p>
+                    </div>
+                    <p style="margin-top: 20px; font-size: 14px;">
+                        <i class="fas fa-info-circle"></i> Este plan se ajusta al perfil de tu mascota
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonios -->
+    <section class="shop" id="testimonios">
+        <div class="container">
+            <div class="section-title">
+                <h2>Lo que dicen nuestros clientes</h2>
+                <p>Historias reales de mascotas felices</p>
+            </div>
+            
+            <div class="testimonials">
+                <!-- Testimonio 1 -->
+                <div class="testimonial">
+                    <p>"Mi gato Milo tiene diabetes y en VetCT le ayudaron muchísimo. Ahora está estable y feliz."</p>
+                    <div style="display: flex; align-items: center; margin-top: 15px;">
+                        <i class="fas fa-user-circle" style="font-size: 30px; margin-right: 10px; color: #2a9d8f;"></i>
+                        <div>
+                            <strong>Laura Martínez</strong>
+                            <p style="font-size: 14px;">Dueña de Milo, 8 años</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Testimonio 2 -->
+                <div class="testimonial">
+                    <p>"Nuestro perro Thor tenía problemas en las articulaciones. Con el tratamiento de VetCT ahora corre como antes."</p>
+                    <div style="display: flex; align-items: center; margin-top: 15px;">
+                        <i class="fas fa-user-circle" style="font-size: 30px; margin-right: 10px; color: #2a9d8f;"></i>
+                        <div>
+                            <strong>Carlos y Ana</strong>
+                            <p style="font-size: 14px;">Dueños de Thor, 7 años</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Testimonio 3 -->
+                <div class="testimonial">
+                    <p>"La comida especial de VetCT resolvió los problemas digestivos de mi gata Luna. Recomiendo 100%."</p>
+                    <div style="display: flex; align-items: center; margin-top: 15px;">
+                        <i class="fas fa-user-circle" style="font-size: 30px; margin-right: 10px; color: #2a9d8f;"></i>
+                        <div>
+                            <strong>Sofía González</strong>
+                            <p style="font-size: 14px;">Dueña de Luna, 5 años</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contacto">
+        <div class="container">
+            <div class="footer-content">
+                <div>
+                    <div class="logo" style="color: white; margin-bottom: 15px;">
+                        <i class="fas fa-paw"></i>
+                        VetCT
+                    </div>
+                    <p>Veterinaria integral con tienda especializada. Cuidamos de tu mascota como si fuera nuestra.</p>
+                </div>
+                
+                <div>
+                    <h4>Contacto</h4>
+                    <p><i class="fas fa-map-marker-alt"></i> Calle Veterinaria 123</p>
+                    <p><i class="fas fa-phone"></i> +34 912 345 678</p>
+                    <p><i class="fas fa-envelope"></i> info@vetct.com</p>
+                </div>
+                
+                <div>
+                    <h4>Horario</h4>
+                    <p>Lunes a Viernes: 9:00-20:00</p>
+                    <p>Sábados: 10:00-14:00</p>
+                    <p>Emergencias 24/7</p>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2023 VetCT - Todos los derechos reservados</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Scroll suave
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                if(targetId === '#') return;
+                const targetElement = document.querySelector(targetId);
+                if(targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 70,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+        
+        // Añadir al carrito
+        document.querySelectorAll('.product .btn').forEach(button => {
+            button.addEventListener('click', function() {
+                this.textContent = 'Añadido ✓';
+                this.style.background = '#38a169';
+                setTimeout(() => {
+                    this.textContent = 'Añadir al Carrito';
+                    this.style.background = '';
+                }, 2000);
+            });
+        });
+        
+        // Formulario de plan
+        document.querySelector('.planner .btn').addEventListener('click', function() {
+            const name = document.querySelector('.form input').value || 'tu mascota';
+            document.querySelector('.plan-preview h3').textContent = `Plan para ${name}`;
+            this.textContent = 'Plan Generado ✓';
+            this.style.background = '#38a169';
+            setTimeout(() => {
+                this.textContent = 'Generar Plan';
+                this.style.background = '';
+            }, 2000);
+        });
+    </script>
+</body>
+</html>

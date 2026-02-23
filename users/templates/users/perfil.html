@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+{% extends 'inicio/base.html' %}
+
+{% block title %}Mi Perfil - VetCT{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card card-vetct">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-user-circle me-2"></i>Mi Perfil</h5>
+                </div>
+                <div class="card-body text-center">
+                    <i class="fas fa-user-circle fa-5x text-primary mb-3"></i>
+                    <h4>{{ user.username }}</h4>
+                    <p class="text-muted">{{ user.email }}</p>
+                    <p><span class="badge bg-success">{{ perfil.get_rol_display }}</span></p>
+                    
+                    <a href="{% url 'logout' %}" class="btn btn-danger btn-sm mt-3">
+                        <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card card-vetct">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-edit me-2"></i>Información Personal</h5>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Teléfono</label>
+                            <input type="text" name="telefono" class="form-control" value="{{ form.telefono.value|default:'' }}">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Dirección</label>
+                            <textarea name="direccion" class="form-control" rows="3">{{ form.direccion.value|default:'' }}</textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Guardar Cambios
+                        </button>
+                    </form>
+                    
+                    <hr>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Miembro desde:</strong> {{ user.date_joined|date:"d/m/Y" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Último acceso:</strong> {{ user.last_login|date:"d/m/Y H:i" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

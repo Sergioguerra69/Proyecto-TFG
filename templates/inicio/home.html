@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VetCT - Clínica Veterinaria</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Barra de navegación -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">VetCT</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Inicio</a>
+                    </li>
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'perfil' %}">Perfil</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'logout' %}">Cerrar Sesión</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}">Iniciar Sesión</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'registro' %}">Registrarse</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido principal -->
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-8 offset-md-2 text-center">
+                <h1 class="display-4">Bienvenido a VetCT</h1>
+                <p class="lead">Tu clínica veterinaria de confianza</p>
+                
+                {% if user.is_authenticated %}
+                    <div class="alert alert-success">
+                        ¡Hola {{ user.username }}! Nos alegra verte de nuevo.
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        Por favor, inicia sesión o regístrate para acceder a todos los servicios.
+                    </div>
+                    <div class="mt-4">
+                        <a href="{% url 'login' %}" class="btn btn-primary btn-lg me-2">Iniciar Sesión</a>
+                        <a href="{% url 'registro' %}" class="btn btn-success btn-lg">Registrarse</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

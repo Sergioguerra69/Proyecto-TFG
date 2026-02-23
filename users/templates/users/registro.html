@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+{% extends 'inicio/base.html' %}
+
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Registro</h2>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        {% for campo in form %}
+        <div class="mb-3">
+            <label>{{ campo.label }}</label>
+            {{ campo }}
+            {% if campo.errors %}
+                <small class="text-danger">{{ campo.errors|striptags }}</small>
+            {% endif %}
+        </div>
+        {% endfor %}
+        
+        <button type="submit" class="btn btn-primary">Registrarme</button>
+    </form>
+    
+    <p class="mt-3">¿Ya tienes cuenta? <a href="{% url 'login' %}">Inicia sesión</a></p>
+</div>
+{% endblock %}
