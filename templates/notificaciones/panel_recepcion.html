@@ -1,0 +1,445 @@
+{% extends 'base.html' %}
+{% load notificaciones_filters %}
+
+{% block title %}Panel de Recepción - VetCT{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <div class="bg-white rounded-lg shadow-sm p-6 border-l-4 border-blue-500">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-clipboard-list text-3xl text-blue-500"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h1 class="text-2xl font-bold text-gray-900">Panel de Recepción</h1>
+                            <p class="text-gray-600 mt-1">Gestiona las solicitudes de los clientes</p>
+                        </div>
+                    </div>
+                    <button onclick="mostrarFormularioNuevaCita()" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition duration-150 ease-in-out">
+                        <i class="fas fa-plus mr-2"></i>Nueva Cita
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulario para añadir nueva cita (oculto por defecto) -->
+        <div id="formularioNuevaCita" class="hidden mb-8">
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Añadir Nueva Cita</h3>
+                <form method="post" action="{% url 'crear_cita' %}">
+                    {% csrf_token %}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de Cita</label>
+                            <select name="tipo" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                <option value="">Seleccionar tipo</option>
+                                <option value="consulta">Consulta</option>
+                                <option value="analisis">Análisis</option>
+                                <option value="cirugia">Cirugía</option>
+                                <option value="urgencia">Urgencia</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Paciente</label>
+                            <input type="text" name="paciente" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Fecha</label>
+                            <input type="datetime-local" name="fecha" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Motivo</label>
+                            <input type="text" name="motivo" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                    </div>
+                    <div class="mt-4 flex justify-end space-x-3">
+                        <button type="button" onclick="ocultarFormularioNuevaCita()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium py-2 px-4 rounded-lg transition duration-150 ease-in-out">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-150 ease-in-out">
+                            <i class="fas fa-save mr-2"></i>Guardar Cita
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Pestañas con Tailwind -->
+        <div class="bg-white rounded-lg shadow-sm">
+            <div class="border-b border-gray-200">
+                <nav class="flex -mb-px">
+                    <button class="tab-button px-6 py-3 border-b-2 border-blue-500 font-medium text-sm text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-tab="consultas">
+                        <i class="fas fa-stethoscope mr-2"></i>Consultas
+                    </button>
+                    <button class="tab-button px-6 py-3 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ml-8" data-tab="analisis">
+                        <i class="fas fa-flask mr-2"></i>Análisis
+                    </button>
+                    <button class="tab-button px-6 py-3 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ml-8" data-tab="cirugias">
+                        <i class="fas fa-procedures mr-2"></i>Cirugías
+                    </button>
+                    <button class="tab-button px-6 py-3 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ml-8" data-tab="urgencias">
+                        <i class="fas fa-ambulance mr-2"></i>Urgencias
+                    </button>
+                </nav>
+            </div>
+
+        <div class="p-6">
+                <!-- Contenido de las pestañas -->
+                <div class="tab-content">
+                    <!-- Consultas -->
+                    <div class="tab-content" id="consultas-content">
+                        <div class="flex items-center mb-4">
+                            <i class="fas fa-stethoscope text-blue-500 text-xl mr-3"></i>
+                            <h3 class="text-lg font-semibold text-gray-900">Consultas Pendientes</h3>
+                        </div>
+                        {% if consultas %}
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Paciente</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Motivo</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200">
+                                        {% for consulta in consultas %}
+                                        <tr class="hover:bg-gray-50">
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ consulta.paciente }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ consulta.fecha|date:"d/m/Y H:i" }}</td>
+                                            <td class="px-6 py-4 text-sm text-gray-500">{{ consulta.motivo|truncatechars:50 }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                <div class="flex items-center space-x-2">
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                                        {% if consulta.estado == 'Pendiente' %}bg-yellow-100 text-yellow-800
+                                                        {% elif consulta.estado == 'En Proceso' %}bg-green-100 text-green-800
+                                                        {% else %}bg-red-100 text-red-800{% endif %}">
+                                                        {{ consulta.estado }}
+                                                    </span>
+                                                    {% if consulta.estado == 'Pendiente' %}
+                                                        <div class="flex space-x-1">
+                                                            <form method="post" action="{% url 'aceptar_cita' 'consulta' consulta.id %}" class="inline">
+                                                                {% csrf_token %}
+                                                                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white text-xs font-medium px-2 py-1 rounded transition duration-150 ease-in-out">
+                                                                    <i class="fas fa-check"></i>
+                                                                </button>
+                                                            </form>
+                                                            <form method="post" action="{% url 'rechazar_cita' 'consulta' consulta.id %}" class="inline" onsubmit="return confirm('¿Rechazar esta consulta?');">
+                                                                {% csrf_token %}
+                                                                <button type="submit" class="bg-red-600 hover:bg-red-700 text-white text-xs font-medium px-2 py-1 rounded transition duration-150 ease-in-out">
+                                                                    <i class="fas fa-times"></i>
+                                                                </button>
+                                                            </form>
+                                                            <form method="post" action="{% url 'eliminar_cita' 'consulta' consulta.id %}" class="inline" onsubmit="return confirm('¿Eliminar esta consulta?');">
+                                                                {% csrf_token %}
+                                                                <button type="submit" class="bg-gray-600 hover:bg-gray-700 text-white text-xs font-medium px-2 py-1 rounded transition duration-150 ease-in-out">
+                                                                    <i class="fas fa-trash"></i>
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    {% elif consulta.estado == 'En Proceso' %}
+                                                        <span class="text-green-600 text-xs font-medium">
+                                                            <i class="fas fa-check-circle mr-1"></i>Aceptada
+                                                        </span>
+                                                    {% else %}
+                                                        <span class="text-red-600 text-xs font-medium">
+                                                            <i class="fas fa-times-circle mr-1"></i>Rechazada
+                                                        </span>
+                                                    {% endif %}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="text-center py-12">
+                                <i class="fas fa-stethoscope text-6xl text-gray-300 mb-4"></i>
+                                <h3 class="text-lg font-medium text-gray-900 mb-2">No hay consultas pendientes</h3>
+                                <p class="text-gray-500">Todas las consultas han sido procesadas</p>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                <!-- Análisis -->
+                    <div class="tab-content hidden" id="analisis-content">
+                        <div class="flex items-center mb-4">
+                            <i class="fas fa-flask text-green-500 text-xl mr-3"></i>
+                            <h3 class="text-lg font-semibold text-gray-900">Análisis Pendientes</h3>
+                        </div>
+                        {% if analisis %}
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Paciente</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200">
+                                        {% for analisis_obj in analisis %}
+                                        <tr class="hover:bg-gray-50">
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ analisis_obj.paciente }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ analisis_obj.fecha|date:"d/m/Y H:i" }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ analisis_obj.tipo }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                <div class="flex items-center space-x-2">
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                                        {% if analisis_obj.estado == 'Pendiente' %}bg-yellow-100 text-yellow-800
+                                                        {% elif analisis_obj.estado == 'En Proceso' %}bg-green-100 text-green-800
+                                                        {% else %}bg-red-100 text-red-800{% endif %}">
+                                                        {{ analisis_obj.estado }}
+                                                    </span>
+                                                    {% if analisis_obj.estado == 'Pendiente' %}
+                                                        <div class="flex space-x-1">
+                                                            <form method="post" action="{% url 'aceptar_cita' 'analisis' analisis_obj.id %}" class="inline">
+                                                                {% csrf_token %}
+                                                                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white text-xs font-medium px-2 py-1 rounded transition duration-150 ease-in-out">
+                                                                    <i class="fas fa-check"></i>
+                                                                </button>
+                                                            </form>
+                                                            <form method="post" action="{% url 'rechazar_cita' 'analisis' analisis_obj.id %}" class="inline" onsubmit="return confirm('¿Rechazar este análisis?');">
+                                                                {% csrf_token %}
+                                                                <button type="submit" class="bg-red-600 hover:bg-red-700 text-white text-xs font-medium px-2 py-1 rounded transition duration-150 ease-in-out">
+                                                                    <i class="fas fa-times"></i>
+                                                                </button>
+                                                            </form>
+                                                            <form method="post" action="{% url 'eliminar_cita' 'analisis' analisis_obj.id %}" class="inline" onsubmit="return confirm('¿Eliminar este análisis?');">
+                                                                {% csrf_token %}
+                                                                <button type="submit" class="bg-gray-600 hover:bg-gray-700 text-white text-xs font-medium px-2 py-1 rounded transition duration-150 ease-in-out">
+                                                                    <i class="fas fa-trash"></i>
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    {% elif analisis_obj.estado == 'En Proceso' %}
+                                                        <span class="text-green-600 text-xs font-medium">
+                                                            <i class="fas fa-check-circle mr-1"></i>Aceptada
+                                                        </span>
+                                                    {% else %}
+                                                        <span class="text-red-600 text-xs font-medium">
+                                                            <i class="fas fa-times-circle mr-1"></i>Rechazada
+                                                        </span>
+                                                    {% endif %}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="text-center py-12">
+                                <i class="fas fa-flask text-6xl text-gray-300 mb-4"></i>
+                                <h3 class="text-lg font-medium text-gray-900 mb-2">No hay análisis pendientes</h3>
+                                <p class="text-gray-500">Todos los análisis han sido procesados</p>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                <!-- Cirugías -->
+                    <div class="tab-content hidden" id="cirugias-content">
+                        <div class="flex items-center mb-4">
+                            <i class="fas fa-procedures text-purple-500 text-xl mr-3"></i>
+                            <h3 class="text-lg font-semibold text-gray-900">Cirugías Pendientes</h3>
+                        </div>
+                        {% if cirugias %}
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Paciente</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200">
+                                        {% for cirugia in cirugias %}
+                                        <tr class="hover:bg-gray-50">
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ cirugia.paciente }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ cirugia.fecha|date:"d/m/Y H:i" }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ cirugia.tipo }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                <div class="flex items-center space-x-2">
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                                        {% if cirugia.estado == 'Pendiente' %}bg-yellow-100 text-yellow-800
+                                                        {% elif cirugia.estado == 'En Proceso' %}bg-green-100 text-green-800
+                                                        {% else %}bg-red-100 text-red-800{% endif %}">
+                                                        {{ cirugia.estado }}
+                                                    </span>
+                                                    {% if cirugia.estado == 'Pendiente' %}
+                                                        <div class="flex space-x-1">
+                                                            <form method="post" action="{% url 'aceptar_cita' 'cirugia' cirugia.id %}" class="inline">
+                                                                {% csrf_token %}
+                                                                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white text-xs font-medium px-2 py-1 rounded transition duration-150 ease-in-out">
+                                                                    <i class="fas fa-check"></i>
+                                                                </button>
+                                                            </form>
+                                                            <form method="post" action="{% url 'rechazar_cita' 'cirugia' cirugia.id %}" class="inline" onsubmit="return confirm('¿Rechazar esta cirugía?');">
+                                                                {% csrf_token %}
+                                                                <button type="submit" class="bg-red-600 hover:bg-red-700 text-white text-xs font-medium px-2 py-1 rounded transition duration-150 ease-in-out">
+                                                                    <i class="fas fa-times"></i>
+                                                                </button>
+                                                            </form>
+                                                            <form method="post" action="{% url 'eliminar_cita' 'cirugia' cirugia.id %}" class="inline" onsubmit="return confirm('¿Eliminar esta cirugía?');">
+                                                                {% csrf_token %}
+                                                                <button type="submit" class="bg-gray-600 hover:bg-gray-700 text-white text-xs font-medium px-2 py-1 rounded transition duration-150 ease-in-out">
+                                                                    <i class="fas fa-trash"></i>
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    {% elif cirugia.estado == 'En Proceso' %}
+                                                        <span class="text-green-600 text-xs font-medium">
+                                                            <i class="fas fa-check-circle mr-1"></i>Aceptada
+                                                        </span>
+                                                    {% else %}
+                                                        <span class="text-red-600 text-xs font-medium">
+                                                            <i class="fas fa-times-circle mr-1"></i>Rechazada
+                                                        </span>
+                                                    {% endif %}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="text-center py-12">
+                                <i class="fas fa-procedures text-6xl text-gray-300 mb-4"></i>
+                                <h3 class="text-lg font-medium text-gray-900 mb-2">No hay cirugías pendientes</h3>
+                                <p class="text-gray-500">Todas las cirugías han sido procesadas</p>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Urgencias -->
+                    <div class="tab-content hidden" id="urgencias-content">
+                        <div class="flex items-center mb-4">
+                            <i class="fas fa-ambulance text-red-500 text-xl mr-3"></i>
+                            <h3 class="text-lg font-semibold text-gray-900">Urgencias Pendientes</h3>
+                        </div>
+                        {% if urgencias %}
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Paciente</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Motivo</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200">
+                                        {% for urgencia in urgencias %}
+                                        <tr class="hover:bg-gray-50">
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ urgencia.paciente }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ urgencia.fecha|date:"d/m/Y H:i" }}</td>
+                                            <td class="px-6 py-4 text-sm text-gray-500">{{ urgencia.motivo|truncatechars:50 }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                <div class="flex items-center space-x-2">
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                                        {% if urgencia.estado == 'Pendiente' %}bg-yellow-100 text-yellow-800
+                                                        {% elif urgencia.estado == 'En Proceso' %}bg-green-100 text-green-800
+                                                        {% else %}bg-red-100 text-red-800{% endif %}">
+                                                        {{ urgencia.estado }}
+                                                    </span>
+                                                    {% if urgencia.estado == 'Pendiente' %}
+                                                        <div class="flex space-x-1">
+                                                            <form method="post" action="{% url 'aceptar_cita' 'urgencia' urgencia.id %}" class="inline">
+                                                                {% csrf_token %}
+                                                                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white text-xs font-medium px-2 py-1 rounded transition duration-150 ease-in-out">
+                                                                    <i class="fas fa-check"></i>
+                                                                </button>
+                                                            </form>
+                                                            <form method="post" action="{% url 'rechazar_cita' 'urgencia' urgencia.id %}" class="inline" onsubmit="return confirm('¿Rechazar esta urgencia?');">
+                                                                {% csrf_token %}
+                                                                <button type="submit" class="bg-red-600 hover:bg-red-700 text-white text-xs font-medium px-2 py-1 rounded transition duration-150 ease-in-out">
+                                                                    <i class="fas fa-times"></i>
+                                                                </button>
+                                                            </form>
+                                                            <form method="post" action="{% url 'eliminar_cita' 'urgencia' urgencia.id %}" class="inline" onsubmit="return confirm('¿Eliminar esta urgencia?');">
+                                                                {% csrf_token %}
+                                                                <button type="submit" class="bg-gray-600 hover:bg-gray-700 text-white text-xs font-medium px-2 py-1 rounded transition duration-150 ease-in-out">
+                                                                    <i class="fas fa-trash"></i>
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    {% elif urgencia.estado == 'En Proceso' %}
+                                                        <span class="text-green-600 text-xs font-medium">
+                                                            <i class="fas fa-check-circle mr-1"></i>Aceptada
+                                                        </span>
+                                                    {% else %}
+                                                        <span class="text-red-600 text-xs font-medium">
+                                                            <i class="fas fa-times-circle mr-1"></i>Rechazada
+                                                        </span>
+                                                    {% endif %}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="text-center py-12">
+                                <i class="fas fa-ambulance text-6xl text-gray-300 mb-4"></i>
+                                <h3 class="text-lg font-medium text-gray-900 mb-2">No hay urgencias pendientes</h3>
+                                <p class="text-gray-500">Todas las urgencias han sido procesadas</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript para las pestañas y formulario -->
+<script>
+function mostrarFormularioNuevaCita() {
+    document.getElementById('formularioNuevaCita').classList.remove('hidden');
+}
+
+function ocultarFormularioNuevaCita() {
+    document.getElementById('formularioNuevaCita').classList.add('hidden');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const targetTab = this.getAttribute('data-tab');
+            
+            // Resetear todos los botones
+            tabButtons.forEach(btn => {
+                btn.classList.remove('border-blue-500', 'text-blue-600');
+                btn.classList.add('border-transparent', 'text-gray-500');
+            });
+            
+            // Activar botón actual
+            this.classList.remove('border-transparent', 'text-gray-500');
+            this.classList.add('border-blue-500', 'text-blue-600');
+            
+            // Ocultar todos los contenidos
+            tabContents.forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            // Mostrar contenido actual
+            document.getElementById(targetTab + '-content').classList.remove('hidden');
+        });
+    });
+});
+</script>
+{% endblock %}

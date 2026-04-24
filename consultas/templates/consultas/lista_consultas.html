@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+
+{% block title %}Gestión de Consultas - VetCT{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Gestión de Consultas</h1>
+    <div class="d-grid gap-2 d-md-flex">
+        <a href="{% url 'crear_consulta' %}" class="btn btn-primary">Nueva Consulta</a>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Paciente</th>
+                        <th>Veterinario</th>
+                        <th>Fecha</th>
+                        <th>Motivo</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for consulta in consultas %}
+                    <tr>
+                        <td>{{ consulta.paciente }}</td>
+                        <td>{{ consulta.veterinario }}</td>
+                        <td>{{ consulta.fecha|date:"d/m/Y H:i" }}</td>
+                        <td>{{ consulta.motivo|truncatechars:50 }}</td>
+                        <td>
+                            {% if consulta.estado == 'Completado' %}
+                            <span class="badge bg-success">Completado</span>
+                            {% elif consulta.estado == 'En Proceso' %}
+                            <span class="badge bg-warning text-dark">En Proceso</span>
+                            {% else %}
+                            <span class="badge bg-secondary">Pendiente</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="d-grid gap-2 d-md-flex">
+                                <a href="#" class="btn btn-sm btn-outline-info">Ver</a>
+                                {% if user.is_staff %}
+                                <form action="{% url 'actualizar_estado_consulta' consulta.id %}" method="POST"
+                                    class="d-inline">
+                                    {% csrf_token %}
+                                    <select name="estado" class="form-select form-select-sm" onchange="this.form.submit()">
+                                        <option value="Pendiente" {% if consulta.estado == 'Pendiente' %}selected{% endif %}>Pendiente</option>
+                                        <option value="En Proceso" {% if consulta.estado == 'En Proceso' %}selected{% endif %}>En Proceso</option>
+                                        <option value="Completado" {% if consulta.estado == 'Completado' %}selected{% endif %}>Completado</option>
+                                    </select>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center">No hay consultas registradas.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

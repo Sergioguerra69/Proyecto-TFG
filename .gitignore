@@ -1,0 +1,52 @@
+# Django
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Entorno y Secretos
+.env
+.venv
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Base de datos local (SQLite) - Opcional, pero recomendado en Git
+db.sqlite3
+db.sqlite3-journal
+
+# Estáticos y Media locales
+staticfiles/
+media/
+
+# Docker
+.dockerignore
+# Ignoramos datos de volúmenes si los creas localmente
+postgres_data/
+redis_data/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo

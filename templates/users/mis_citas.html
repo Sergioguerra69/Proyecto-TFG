@@ -1,0 +1,233 @@
+{% extends 'base.html' %}
+
+{% block title %}Mis Citas y Solicitudes - VetCT{% endblock %}
+
+{% block content %}
+{# Página de citas y solicitudes del usuario #}
+<section class="py-16 bg-gradient-to-br from-cyan-50 via-white to-blue-50 min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {# Cabecera de la página #}
+        <div class="text-center mb-12">
+            <div class="inline-flex items-center justify-center mb-4">
+                <div class="w-12 h-12 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-xl flex items-center justify-center mr-4 shadow-lg">
+                    <i class="fas fa-calendar-check text-white text-xl"></i>
+                </div>
+                <h1 class="font-montserrat font-black text-4xl text-gray-900">Mis Citas y Solicitudes</h1>
+            </div>
+            <p class="text-gray-600 max-w-2xl mx-auto">Aquí puedes ver todas tus citas, análisis, cirugías y urgencias programadas</p>
+        </div>
+
+        {# Resumen de servicios #}
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+            {# Tarjeta Consultas #}
+            <div class="bg-white rounded-xl shadow-md p-4 text-center border-2 border-blue-100">
+                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <i class="fas fa-stethoscope text-blue-600 text-xl"></i>
+                </div>
+                <p class="text-2xl font-bold text-gray-900">{{ consultas|length }}</p>
+                <p class="text-sm text-gray-600">Consultas</p>
+            </div>
+
+            {# Tarjeta Análisis #}
+            <div class="bg-white rounded-xl shadow-md p-4 text-center border-2 border-green-100">
+                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <i class="fas fa-flask text-green-600 text-xl"></i>
+                </div>
+                <p class="text-2xl font-bold text-gray-900">{{ analisis|length }}</p>
+                <p class="text-sm text-gray-600">Análisis</p>
+            </div>
+
+            {# Tarjeta Cirugías #}
+            <div class="bg-white rounded-xl shadow-md p-4 text-center border-2 border-purple-100">
+                <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <i class="fas fa-procedures text-purple-600 text-xl"></i>
+                </div>
+                <p class="text-2xl font-bold text-gray-900">{{ cirugias|length }}</p>
+                <p class="text-sm text-gray-600">Cirugías</p>
+            </div>
+
+            {# Tarjeta Urgencias #}
+            <div class="bg-white rounded-xl shadow-md p-4 text-center border-2 border-red-100">
+                <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <i class="fas fa-ambulance text-red-600 text-xl"></i>
+                </div>
+                <p class="text-2xl font-bold text-gray-900">{{ urgencias|length }}</p>
+                <p class="text-sm text-gray-600">Urgencias</p>
+            </div>
+        </div>
+
+        {# Botones para solicitar nuevos servicios #}
+        <div class="flex flex-wrap justify-center gap-3 mb-12">
+            <a href="{% url 'solicitar_consulta' %}" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg flex items-center">
+                <i class="fas fa-plus mr-2"></i>Solicitar Consulta
+            </a>
+            <a href="{% url 'solicitar_analisis' %}" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg flex items-center">
+                <i class="fas fa-plus mr-2"></i>Solicitar Análisis
+            </a>
+            <a href="{% url 'solicitar_cirugia' %}" class="bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg flex items-center">
+                <i class="fas fa-plus mr-2"></i>Solicitar Cirugía
+            </a>
+            <a href="{% url 'solicitar_urgencia' %}" class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg flex items-center">
+                <i class="fas fa-plus mr-2"></i>Solicitar Urgencia
+            </a>
+        </div>
+
+        {# Sección Consultas #}
+        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-8">
+            <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4 flex justify-between items-center">
+                <h2 class="font-montserrat font-bold text-xl flex items-center">
+                    <i class="fas fa-stethoscope mr-3"></i>Mis Consultas
+                </h2>
+                <span class="bg-white/20 px-3 py-1 rounded-full text-sm">{{ consultas|length }} total</span>
+            </div>
+            <div class="p-6">
+                {% if consultas %}
+                <div class="space-y-4">
+                    {% for consulta in consultas %}
+                    <div class="bg-gray-50 rounded-xl p-4 border-l-4 border-blue-500">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
+                            <div>
+                                <h3 class="font-bold text-gray-900">{{ consulta.motivo|default:"Consulta general" }}</h3>
+                                <p class="text-gray-600 text-sm">{{ consulta.fecha|date:"d/m/Y H:i" }}</p>
+                            </div>
+                            <span class="px-3 py-1 rounded-full text-xs font-bold {% if consulta.estado == 'Pendiente' %}bg-yellow-100 text-yellow-800{% elif consulta.estado == 'En Proceso' %}bg-blue-100 text-blue-800{% elif consulta.estado == 'Completada' %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                                {{ consulta.estado }}
+                            </span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-8">
+                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <i class="fas fa-stethoscope text-gray-400 text-2xl"></i>
+                    </div>
+                    <p class="text-gray-500">No tienes consultas registradas</p>
+                    <a href="{% url 'solicitar_consulta' %}" class="inline-block mt-3 text-blue-500 hover:text-blue-600 font-semibold">
+                        Solicitar Consulta →
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {# Sección Análisis #}
+        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-8">
+            <div class="bg-gradient-to-r from-green-500 to-green-600 text-white p-4 flex justify-between items-center">
+                <h2 class="font-montserrat font-bold text-xl flex items-center">
+                    <i class="fas fa-flask mr-3"></i>Mis Análisis
+                </h2>
+                <span class="bg-white/20 px-3 py-1 rounded-full text-sm">{{ analisis|length }} total</span>
+            </div>
+            <div class="p-6">
+                {% if analisis %}
+                <div class="space-y-4">
+                    {% for analisis_item in analisis %}
+                    <div class="bg-gray-50 rounded-xl p-4 border-l-4 border-green-500">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
+                            <div>
+                                <h3 class="font-bold text-gray-900">{{ analisis_item.tipo|default:"Análisis general" }}</h3>
+                                <p class="text-gray-600 text-sm">{{ analisis_item.fecha|date:"d/m/Y H:i" }}</p>
+                            </div>
+                            <span class="px-3 py-1 rounded-full text-xs font-bold {% if analisis_item.estado == 'Pendiente' %}bg-yellow-100 text-yellow-800{% elif analisis_item.estado == 'En Proceso' %}bg-blue-100 text-blue-800{% elif analisis_item.estado == 'Completada' %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                                {{ analisis_item.estado }}
+                            </span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-8">
+                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <i class="fas fa-flask text-gray-400 text-2xl"></i>
+                    </div>
+                    <p class="text-gray-500">No tienes análisis registrados</p>
+                    <a href="{% url 'solicitar_analisis' %}" class="inline-block mt-3 text-green-500 hover:text-green-600 font-semibold">
+                        Solicitar Análisis →
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {# Sección Cirugías #}
+        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-8">
+            <div class="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-4 flex justify-between items-center">
+                <h2 class="font-montserrat font-bold text-xl flex items-center">
+                    <i class="fas fa-procedures mr-3"></i>Mis Cirugías
+                </h2>
+                <span class="bg-white/20 px-3 py-1 rounded-full text-sm">{{ cirugias|length }} total</span>
+            </div>
+            <div class="p-6">
+                {% if cirugias %}
+                <div class="space-y-4">
+                    {% for cirugia in cirugias %}
+                    <div class="bg-gray-50 rounded-xl p-4 border-l-4 border-purple-500">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
+                            <div>
+                                <h3 class="font-bold text-gray-900">{{ cirugia.tipo|default:"Cirugía programada" }}</h3>
+                                <p class="text-gray-600 text-sm">{{ cirugia.fecha|date:"d/m/Y H:i" }}</p>
+                                <p class="text-gray-700 text-sm mt-1"><strong>Paciente:</strong> {{ cirugia.paciente|default:"No especificado" }}</p>
+                            </div>
+                            <span class="px-3 py-1 rounded-full text-xs font-bold {% if cirugia.estado == 'Pendiente' %}bg-yellow-100 text-yellow-800{% elif cirugia.estado == 'En Proceso' %}bg-blue-100 text-blue-800{% elif cirugia.estado == 'Completada' %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                                {{ cirugia.estado }}
+                            </span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-8">
+                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <i class="fas fa-procedures text-gray-400 text-2xl"></i>
+                    </div>
+                    <p class="text-gray-500">No tienes cirugías registradas</p>
+                    <a href="{% url 'solicitar_cirugia' %}" class="inline-block mt-3 text-purple-500 hover:text-purple-600 font-semibold">
+                        Solicitar Cirugía →
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {# Sección Urgencias #}
+        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-8">
+            <div class="bg-gradient-to-r from-red-500 to-red-600 text-white p-4 flex justify-between items-center">
+                <h2 class="font-montserrat font-bold text-xl flex items-center">
+                    <i class="fas fa-ambulance mr-3"></i>Mis Urgencias
+                </h2>
+                <span class="bg-white/20 px-3 py-1 rounded-full text-sm">{{ urgencias|length }} total</span>
+            </div>
+            <div class="p-6">
+                {% if urgencias %}
+                <div class="space-y-4">
+                    {% for urgencia in urgencias %}
+                    <div class="bg-gray-50 rounded-xl p-4 border-l-4 border-red-500">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
+                            <div>
+                                <h3 class="font-bold text-gray-900">{{ urgencia.motivo|default:"Urgencia" }}</h3>
+                                <p class="text-gray-600 text-sm">{{ urgencia.fecha|date:"d/m/Y H:i" }}</p>
+                            </div>
+                            <span class="px-3 py-1 rounded-full text-xs font-bold {% if urgencia.estado == 'Pendiente' %}bg-yellow-100 text-yellow-800{% elif urgencia.estado == 'En Proceso' %}bg-blue-100 text-blue-800{% elif urgencia.estado == 'Atendida' %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                                {{ urgencia.estado }}
+                            </span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-8">
+                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <i class="fas fa-ambulance text-gray-400 text-2xl"></i>
+                    </div>
+                    <p class="text-gray-500">No tienes urgencias registradas</p>
+                    <a href="{% url 'solicitar_urgencia' %}" class="inline-block mt-3 text-red-500 hover:text-red-600 font-semibold">
+                        Solicitar Urgencia →
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

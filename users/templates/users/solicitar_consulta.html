@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Solicitar Consulta - VetCT{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/registro.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- Formulario de solicitud de consulta -->
+<div class="row">
+    <div class="col-12 col-md-8 col-lg-6 mx-auto">
+        <div class="card border shadow-sm mt-4">
+            <div class="card-header bg-white py-3">
+                <h1 class="h4 card-title mb-0">Solicitar Consulta Veterinaria</h1>
+            </div>
+            <div class="card-body">
+                <p class="text-muted small">Complete el formulario para solicitar una consulta para su mascota.</p>
+
+                <!-- Alerta de errores -->
+                <div id="js-alerta" class="alert alert-danger d-none" role="alert"></div>
+
+                <form method="post" id="form-solicitud" novalidate>
+                    {% csrf_token %}
+
+                    <!-- Campos del formulario -->
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <label for="{{ form.paciente.id_for_label }}" class="form-label fw-bold small">
+                                {{ form.paciente.label }} *
+                            </label>
+                            {{ form.paciente }}
+                            {% if form.paciente.help_text %}
+                            <div class="form-text small">{{ form.paciente.help_text|safe }}</div>
+                            {% endif %}
+                            {% if form.paciente.errors %}
+                            <div class="text-danger small">{{ form.paciente.errors|striptags }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-12 mb-3">
+                            <label for="{{ form.fecha.id_for_label }}" class="form-label fw-bold small">
+                                {{ form.fecha.label }} *
+                            </label>
+                            {{ form.fecha }}
+                            {% if form.fecha.help_text %}
+                            <div class="form-text small">{{ form.fecha.help_text|safe }}</div>
+                            {% endif %}
+                            {% if form.fecha.errors %}
+                            <div class="text-danger small">{{ form.fecha.errors|striptags }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-12 mb-3">
+                            <label for="{{ form.motivo.id_for_label }}" class="form-label fw-bold small">
+                                {{ form.motivo.label }} *
+                            </label>
+                            {{ form.motivo }}
+                            {% if form.motivo.help_text %}
+                            <div class="form-text small">{{ form.motivo.help_text|safe }}</div>
+                            {% endif %}
+                            {% if form.motivo.errors %}
+                            <div class="text-danger small">{{ form.motivo.errors|striptags }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Botones -->
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary">Enviar Solicitud</button>
+                        <a href="{% url 'home' %}" class="btn btn-link btn-sm text-decoration-none text-muted">
+                            Cancelar y volver al inicio
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

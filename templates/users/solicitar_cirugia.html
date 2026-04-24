@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}Solicitar Cirugía - VetCT{% endblock %}
+
+{% block content %}
+<!-- Formulario de cirugia -->
+<section class="py-16 bg-gradient-to-br from-purple-50 via-white to-pink-50 min-h-screen">
+    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Titulo -->
+        <div class="text-center mb-10">
+            <div class="inline-flex items-center justify-center mb-4">
+                <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center mr-4 shadow-lg">
+                    <i class="fas fa-procedures text-white text-xl"></i>
+                </div>
+                <h1 class="font-montserrat font-black text-3xl text-gray-900">Solicitar Cirugía</h1>
+            </div>
+            <p class="text-gray-600">Complete el formulario para solicitar una cirugía para su mascota.</p>
+        </div>
+
+        <!-- Formulario -->
+        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
+            <form method="post">
+                {% csrf_token %}
+                
+                <!-- Campos del formulario -->
+                <div class="space-y-6">
+                    <!-- Paciente -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Nombre de la mascota</label>
+                        <input type="text" name="paciente" required
+                               class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none"
+                               placeholder="Ej: Bella">
+                    </div>
+                    
+                    <!-- Tipo de animal -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2"><i class="fas fa-paw mr-2 text-purple-500"></i>Tipo de animal</label>
+                        <select name="tipo_animal" id="tipo_animal_select" required
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none bg-white">
+                            <option value="Perro">Perro</option>
+                            <option value="Gato">Gato</option>
+                            <option value="Ave">Ave</option>
+                            <option value="Roedor">Roedor</option>
+                            <option value="Reptil">Reptil</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Especificar otro animal (oculto por defecto) -->
+                    <div id="otro_animal_div" style="display: none;">
+                        <label class="block text-sm font-bold text-gray-700 mb-2"><i class="fas fa-question-circle mr-2 text-purple-500"></i>Especifique el animal</label>
+                        <input type="text" name="tipo_animal_otro" id="tipo_animal_otro_input"
+                               class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none"
+                               placeholder="Ej: Conejo, Hurón, Tortuga...">
+                    </div>
+                    
+                    <!-- Tipo de cirugia -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Tipo de cirugia</label>
+                        <input type="text" name="tipo_cirugia" required
+                               class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none"
+                               placeholder="Ej: Esterilizacion">
+                    </div>
+                    
+                    <!-- Fecha -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Fecha y hora</label>
+                        <input type="datetime-local" name="fecha" required
+                               class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none">
+                    </div>
+                    
+                    <!-- Quirofano -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Quirófano</label>
+                        <select name="quirofano" required
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none bg-white">
+                            <option value="">Seleccione un quirofano</option>
+                            <option value="A">Quirófano A</option>
+                            <option value="B">Quirófano B</option>
+                            <option value="C">Quirófano C</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Botones -->
+                <div class="flex gap-4 mt-8">
+                    <a href="{% url 'home' %}" 
+                       class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-6 rounded-xl text-center transition-all duration-300">
+                        Cancelar
+                    </a>
+                    <button type="submit" 
+                            class="flex-1 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl">
+                                                Enviar Solicitud
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}
