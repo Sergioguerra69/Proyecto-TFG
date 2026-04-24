@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Lista de Agentes - Clínica{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/agentes.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/agentes.js' %}" defer></script>
+{% endblock %}
+
+{% block content %}
+<!-- Header principal -->
+<div class="container mt-4">
+    <div class="text-center mb-5">
+        <h1 class="display-4 text-primary fw-bold">
+            <i class="fas fa-users"></i> Personal de la Clínica
+        </h1>
+        <p class="lead text-muted">Conoce a nuestro equipo de profesionales</p>
+    </div>
+    
+    <!-- Grid de agentes -->
+    <div class="row">
+        {% for agente in agentes %}
+            <div class="col-md-4 mb-4">
+                <div class="card agent-card h-100">
+                    <div class="card-header bg-primary text-white text-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-user-md"></i> 
+                            {{ agente.get_full_name|default:agente.username }}
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="agent-info">
+                            {% if agente.email %}
+                                <div class="info-item">
+                                    <i class="fas fa-envelope text-info"></i>
+                                    <span>{{ agente.email }}</span>
+                                </div>
+                            {% endif %}
+                            
+                            {% if agente.perfil.telefono %}
+                                <div class="info-item">
+                                    <i class="fas fa-phone text-success"></i>
+                                    <span>{{ agente.perfil.telefono }}</span>
+                                </div>
+                            {% endif %}
+                            
+                            {% if agente.perfil.especialidad %}
+                                <div class="info-item">
+                                    <i class="fas fa-stethoscope text-warning"></i>
+                                    <span>{{ agente.perfil.especialidad }}</span>
+                                </div>
+                            {% endif %}
+                            
+                            {% if agente.perfil.es_veterinario %}
+                                <div class="info-item highlight">
+                                    <i class="fas fa-heartbeat text-danger"></i>
+                                    <span class="badge bg-danger">Veterinario</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="card-footer text-center">
+                        <small class="text-muted">
+                            <i class="fas fa-clock"></i>
+                            Miembro desde {{ agente.date_joined|date:"d/m/Y" }}
+                        </small>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info text-center">
+                    <i class="fas fa-info-circle fa-2x mb-3"></i>
+                    <h4>No hay agentes registrados</h4>
+                    <p>No hay personal disponible en este momento.</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

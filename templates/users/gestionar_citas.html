@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+
+{% block title %}Gestionar Citas - VetCT{% endblock %}
+
+{% block content %}
+{# Página para gestionar todas las citas del sistema #}
+<section class="py-16 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {# Cabecera #}
+        <div class="mb-8">
+            <a href="{% url 'panel_admin' %}" class="inline-flex items-center text-gray-600 hover:text-gray-900 mb-4">
+                <i class="fas fa-arrow-left mr-2"></i>Volver al panel
+            </a>
+            <div class="flex items-center">
+                <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center mr-4 shadow-lg">
+                    <i class="fas fa-calendar-alt text-white text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-montserrat font-black text-3xl text-gray-900">Gestionar Citas</h1>
+                    <p class="text-gray-600">Ver todas las consultas, análisis, cirugías y urgencias</p>
+                </div>
+            </div>
+        </div>
+
+        {# Pestañas de navegación #}
+        <div class="flex flex-wrap gap-2 mb-8">
+            <button onclick="mostrarSeccion('consultas')" id="btn-consultas" class="px-6 py-3 rounded-xl font-bold text-sm transition-all duration-300 bg-blue-500 text-white shadow-lg">
+                <i class="fas fa-stethoscope mr-2"></i>Consultas
+            </button>
+            <button onclick="mostrarSeccion('analisis')" id="btn-analisis" class="px-6 py-3 rounded-xl font-bold text-sm transition-all duration-300 bg-gray-200 text-gray-700 hover:bg-gray-300">
+                <i class="fas fa-flask mr-2"></i>Análisis
+            </button>
+            <button onclick="mostrarSeccion('cirugias')" id="btn-cirugias" class="px-6 py-3 rounded-xl font-bold text-sm transition-all duration-300 bg-gray-200 text-gray-700 hover:bg-gray-300">
+                <i class="fas fa-procedures mr-2"></i>Cirugías
+            </button>
+            <button onclick="mostrarSeccion('urgencias')" id="btn-urgencias" class="px-6 py-3 rounded-xl font-bold text-sm transition-all duration-300 bg-gray-200 text-gray-700 hover:bg-gray-300">
+                <i class="fas fa-ambulance mr-2"></i>Urgencias
+            </button>
+        </div>
+
+        {# Sección Consultas #}
+        <div id="seccion-consultas" class="seccion-citas">
+            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+                <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4">
+                    <h2 class="font-montserrat font-bold text-xl flex items-center">
+                        <i class="fas fa-stethoscope mr-3"></i>Consultas Médicas
+                    </h2>
+                </div>
+                <div class="p-6">
+                    {% if consultas %}
+                    <div class="space-y-4">
+                        {% for consulta in consultas %}
+                        <div class="bg-gray-50 rounded-xl p-4 border-l-4 border-blue-500">
+                            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
+                                <div>
+                                    <h3 class="font-bold text-gray-900">{{ consulta.motivo|default:"Consulta general" }}</h3>
+                                    <p class="text-gray-600 text-sm">
+                                        <i class="fas fa-user mr-1"></i> {{ consulta.usuario.first_name }} {{ consulta.usuario.last_name }} 
+                                        | <i class="fas fa-calendar mr-1"></i> {{ consulta.fecha|date:"d/m/Y H:i" }}
+                                    </p>
+                                </div>
+                                <span class="px-3 py-1 rounded-full text-xs font-bold {% if consulta.estado == 'Pendiente' %}bg-yellow-100 text-yellow-800{% elif consulta.estado == 'En Proceso' %}bg-blue-100 text-blue-800{% elif consulta.estado == 'Completada' %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                                    {{ consulta.estado }}
+                                </span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-8">
+                        <p class="text-gray-500">No hay consultas registradas</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        {# Sección Análisis #}
+        <div id="seccion-analisis" class="seccion-citas hidden">
+            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+                <div class="bg-gradient-to-r from-green-500 to-green-600 text-white p-4">
+                    <h2 class="font-montserrat font-bold text-xl flex items-center">
+                        <i class="fas fa-flask mr-3"></i>Análisis de Laboratorio
+                    </h2>
+                </div>
+                <div class="p-6">
+                    {% if analisis %}
+                    <div class="space-y-4">
+                        {% for analisis_item in analisis %}
+                        <div class="bg-gray-50 rounded-xl p-4 border-l-4 border-green-500">
+                            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
+                                <div>
+                                    <h3 class="font-bold text-gray-900">{{ analisis_item.tipo|default:"Análisis general" }}</h3>
+                                    <p class="text-gray-600 text-sm">
+                                        <i class="fas fa-user mr-1"></i> {{ analisis_item.usuario.first_name }} {{ analisis_item.usuario.last_name }}
+                                        | <i class="fas fa-calendar mr-1"></i> {{ analisis_item.fecha|date:"d/m/Y H:i" }}
+                                    </p>
+                                </div>
+                                <span class="px-3 py-1 rounded-full text-xs font-bold {% if analisis_item.estado == 'Pendiente' %}bg-yellow-100 text-yellow-800{% elif analisis_item.estado == 'En Proceso' %}bg-blue-100 text-blue-800{% elif analisis_item.estado == 'Completada' %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                                    {{ analisis_item.estado }}
+                                </span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-8">
+                        <p class="text-gray-500">No hay análisis registrados</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        {# Sección Cirugías #}
+        <div id="seccion-cirugias" class="seccion-citas hidden">
+            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+                <div class="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-4">
+                    <h2 class="font-montserrat font-bold text-xl flex items-center">
+                        <i class="fas fa-procedures mr-3"></i>Cirugías Programadas
+                    </h2>
+                </div>
+                <div class="p-6">
+                    {% if cirugias %}
+                    <div class="space-y-4">
+                        {% for cirugia in cirugias %}
+                        <div class="bg-gray-50 rounded-xl p-4 border-l-4 border-purple-500">
+                            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
+                                <div>
+                                    <h3 class="font-bold text-gray-900">{{ cirugia.tipo|default:"Cirugía" }}</h3>
+                                    <p class="text-gray-600 text-sm">
+                                        <i class="fas fa-user mr-1"></i> {{ cirugia.usuario.first_name }} {{ cirugia.usuario.last_name }}
+                                        | <i class="fas fa-paw mr-1"></i> {{ cirugia.paciente|default:"Sin especificar" }}
+                                        | <i class="fas fa-calendar mr-1"></i> {{ cirugia.fecha|date:"d/m/Y H:i" }}
+                                    </p>
+                                </div>
+                                <span class="px-3 py-1 rounded-full text-xs font-bold {% if cirugia.estado == 'Pendiente' %}bg-yellow-100 text-yellow-800{% elif cirugia.estado == 'En Proceso' %}bg-blue-100 text-blue-800{% elif cirugia.estado == 'Completada' %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                                    {{ cirugia.estado }}
+                                </span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-8">
+                        <p class="text-gray-500">No hay cirugías registradas</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        {# Sección Urgencias #}
+        <div id="seccion-urgencias" class="seccion-citas hidden">
+            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+                <div class="bg-gradient-to-r from-red-500 to-red-600 text-white p-4">
+                    <h2 class="font-montserrat font-bold text-xl flex items-center">
+                        <i class="fas fa-ambulance mr-3"></i>Urgencias
+                    </h2>
+                </div>
+                <div class="p-6">
+                    {% if urgencias %}
+                    <div class="space-y-4">
+                        {% for urgencia in urgencias %}
+                        <div class="bg-gray-50 rounded-xl p-4 border-l-4 border-red-500">
+                            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
+                                <div>
+                                    <h3 class="font-bold text-gray-900">{{ urgencia.motivo|default:"Urgencia" }}</h3>
+                                    <p class="text-gray-600 text-sm">
+                                        <i class="fas fa-user mr-1"></i> {{ urgencia.usuario.first_name }} {{ urgencia.usuario.last_name }}
+                                        | <i class="fas fa-calendar mr-1"></i> {{ urgencia.fecha|date:"d/m/Y H:i" }}
+                                    </p>
+                                </div>
+                                <span class="px-3 py-1 rounded-full text-xs font-bold {% if urgencia.estado == 'Pendiente' %}bg-yellow-100 text-yellow-800{% elif urgencia.estado == 'En Proceso' %}bg-blue-100 text-blue-800{% elif urgencia.estado == 'Atendida' %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                                    {{ urgencia.estado }}
+                                </span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-8">
+                        <p class="text-gray-500">No hay urgencias registradas</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{# JavaScript para cambiar entre secciones #}
+<script>
+function mostrarSeccion(seccion) {
+    // Ocultar todas las secciones
+    document.querySelectorAll('.seccion-citas').forEach(function(el) {
+        el.classList.add('hidden');
+    });
+    
+    // Mostrar la sección seleccionada
+    document.getElementById('seccion-' + seccion).classList.remove('hidden');
+    
+    // Actualizar botones
+    document.querySelectorAll('[id^="btn-"]').forEach(function(btn) {
+        btn.classList.remove('bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-red-500', 'text-white', 'shadow-lg');
+        btn.classList.add('bg-gray-200', 'text-gray-700');
+    });
+    
+    // Resaltar botón activo
+    var btnActivo = document.getElementById('btn-' + seccion);
+    btnActivo.classList.remove('bg-gray-200', 'text-gray-700');
+    if (seccion === 'consultas') btnActivo.classList.add('bg-blue-500', 'text-white', 'shadow-lg');
+    else if (seccion === 'analisis') btnActivo.classList.add('bg-green-500', 'text-white', 'shadow-lg');
+    else if (seccion === 'cirugias') btnActivo.classList.add('bg-purple-500', 'text-white', 'shadow-lg');
+    else if (seccion === 'urgencias') btnActivo.classList.add('bg-red-500', 'text-white', 'shadow-lg');
+}
+</script>
+{% endblock %}

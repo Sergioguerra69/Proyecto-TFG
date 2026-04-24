@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %}Servicios - VetCT{% endblock %}
+
+{% block content %}
+{# Redirección a la página principal de servicios #}
+<script>window.location.href = "{% url 'servicios' %}";</script>
+<div class="py-20 text-center">
+    <p class="text-gray-600">Redirigiendo a la página de servicios...</p>
+    <a href="{% url 'servicios' %}" class="text-cyan-500 hover:underline">Haz clic aquí si no te redirige</a>
+</div>
+{% endblock %}

@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}Solicitar Análisis - VetCT{% endblock %}
+
+{% block content %}
+<!-- Formulario de analisis -->
+<section class="py-16 bg-gradient-to-br from-green-50 via-white to-emerald-50 min-h-screen">
+    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Titulo -->
+        <div class="text-center mb-10">
+            <div class="inline-flex items-center justify-center mb-4">
+                <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center mr-4 shadow-lg">
+                    <i class="fas fa-flask text-white text-xl"></i>
+                </div>
+                <h1 class="font-montserrat font-black text-3xl text-gray-900">Solicitar Análisis Clínico</h1>
+            </div>
+            <p class="text-gray-600">Complete el formulario para solicitar un análisis para su mascota.</p>
+        </div>
+
+        <!-- Formulario -->
+        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
+            <form method="post">
+                {% csrf_token %}
+                
+                <!-- Campos del formulario -->
+                <div class="space-y-6">
+                    <!-- Tipo de analisis -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Tipo de analisis</label>
+                        <input type="text" name="nombre" required
+                               class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-green-500 focus:outline-none"
+                               placeholder="Ej: Hemograma, Analisis de orina">
+                    </div>
+                    
+                    <!-- Paciente -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Nombre de la mascota</label>
+                        <input type="text" name="paciente" required
+                               class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-green-500 focus:outline-none"
+                               placeholder="Ej: Max">
+                    </div>
+                    
+                    <!-- Tipo de animal -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2"><i class="fas fa-paw mr-2 text-green-500"></i>Tipo de animal</label>
+                        <select name="tipo_animal" id="tipo_animal_select" required
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-green-500 focus:outline-none bg-white">
+                            <option value="Perro">Perro</option>
+                            <option value="Gato">Gato</option>
+                            <option value="Ave">Ave</option>
+                            <option value="Roedor">Roedor</option>
+                            <option value="Reptil">Reptil</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Especificar otro animal (oculto por defecto) -->
+                    <div id="otro_animal_div" style="display: none;">
+                        <label class="block text-sm font-bold text-gray-700 mb-2"><i class="fas fa-question-circle mr-2 text-green-500"></i>Especifique el animal</label>
+                        <input type="text" name="tipo_animal_otro" id="tipo_animal_otro_input"
+                               class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-green-500 focus:outline-none"
+                               placeholder="Ej: Conejo, Hurón, Tortuga...">
+                    </div>
+                    
+                    <!-- Fecha -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Fecha</label>
+                        <input type="date" name="fecha" required
+                               class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-green-500 focus:outline-none">
+                    </div>
+                    
+                    <!-- Notas -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Notas adicionales</label>
+                        <textarea name="notas" rows="3"
+                                  class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-green-500 focus:outline-none"
+                                  placeholder="Comentarios adicionales"></textarea>
+                    </div>
+                </div>
+
+                <!-- Botones -->
+                <div class="flex gap-4 mt-8">
+                    <a href="{% url 'home' %}" 
+                       class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-6 rounded-xl text-center transition-all duration-300">
+                        Cancelar
+                    </a>
+                    <button type="submit" 
+                            class="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl">
+                                                Enviar Solicitud
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

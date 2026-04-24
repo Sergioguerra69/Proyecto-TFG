@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %}Tienda - VetCT{% endblock %}
+
+{% block content %}
+{# Redirección a la página principal de tienda #}
+<script>window.location.href = "{% url 'tienda' %}";</script>
+<div class="py-20 text-center">
+    <p class="text-gray-600">Redirigiendo a la página de tienda...</p>
+    <a href="{% url 'tienda' %}" class="text-cyan-500 hover:underline">Haz clic aquí si no te redirige</a>
+</div>
+{% endblock %}

@@ -1,0 +1,249 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mis Citas - VetCT{% endblock %}
+
+{% block content %}
+<!-- Header de mis citas -->
+<div class="row">
+    <div class="col-12 mb-4">
+        <h1 class="border-bottom pb-2 text-primary">Mis Citas y Solicitudes</h1>
+        <p class="text-muted">Aquí puedes ver todas tus citas, análisis, cirugías y urgencias.</p>
+    </div>
+</div>
+
+<!-- Tabs para organizar las solicitudes -->
+<ul class="nav nav-tabs mb-4" id="myTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="consultas-tab" data-bs-toggle="tab" data-bs-target="#consultas" type="button" role="tab">Consultas</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="analisis-tab" data-bs-toggle="tab" data-bs-target="#analisis" type="button" role="tab">Análisis</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="cirugias-tab" data-bs-toggle="tab" data-bs-target="#cirugias" type="button" role="tab">Cirugías</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="urgencias-tab" data-bs-toggle="tab" data-bs-target="#urgencias" type="button" role="tab">Urgencias</button>
+    </li>
+</ul>
+
+<!-- Contenido de los tabs -->
+<div class="tab-content" id="myTabContent">
+    <!-- Consultas -->
+    <div class="tab-pane fade show active" id="consultas" role="tabpanel">
+        <div class="card">
+            <div class="card-header bg-light text-dark">
+                <h5 class="mb-0">Mis Consultas</h5>
+            </div>
+            <div class="card-body">
+                {% if consultas %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Paciente</th>
+                                <th>Fecha</th>
+                                <th>Motivo</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for consulta in consultas %}
+                            <tr>
+                                <td class="fw-bold">{{ consulta.paciente }}</td>
+                                <td>{{ consulta.fecha|date:"d/m/Y H:i" }}</td>
+                                <td>{{ consulta.motivo|truncatewords:10 }}</td>
+                                <td>
+                                    {% if consulta.estado == 'Completado' %}
+                                    <span class="badge bg-success">Completado</span>
+                                    {% elif consulta.estado == 'En Proceso' %}
+                                    <span class="badge bg-warning text-dark">En Proceso</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">Pendiente</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="#" class="btn btn-sm btn-outline-primary">Ver detalles</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <p class="text-muted">No tienes consultas registradas.</p>
+                    <a href="{% url 'solicitar_consulta' %}" class="btn btn-primary">Solicitar Consulta</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Análisis -->
+    <div class="tab-pane fade" id="analisis" role="tabpanel">
+        <div class="card">
+            <div class="card-header bg-light text-dark">
+                <h5 class="mb-0">Mis Análisis</h5>
+            </div>
+            <div class="card-body">
+                {% if analisis %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Paciente</th>
+                                <th>Fecha</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in analisis %}
+                            <tr>
+                                <td class="fw-bold">{{ item.nombre }}</td>
+                                <td>{{ item.paciente }}</td>
+                                <td>{{ item.fecha|date:"d/m/Y" }}</td>
+                                <td>
+                                    {% if item.estado == 'Completado' %}
+                                    <span class="badge bg-success">Completado</span>
+                                    {% elif item.estado == 'En Proceso' %}
+                                    <span class="badge bg-warning text-dark">En Proceso</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">Pendiente</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="#" class="btn btn-sm btn-outline-primary">Ver detalles</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <p class="text-muted">No tienes análisis registrados.</p>
+                    <a href="{% url 'solicitar_analisis' %}" class="btn btn-info">Solicitar Análisis</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Cirugías -->
+    <div class="tab-pane fade" id="cirugias" role="tabpanel">
+        <div class="card">
+            <div class="card-header bg-light text-dark">
+                <h5 class="mb-0">Mis Cirugías</h5>
+            </div>
+            <div class="card-body">
+                {% if cirugias %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Paciente</th>
+                                <th>Tipo de Cirugía</th>
+                                <th>Fecha</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cirugia in cirugias %}
+                            <tr>
+                                <td class="fw-bold">{{ cirugia.paciente }}</td>
+                                <td>{{ cirugia.tipo_cirugia }}</td>
+                                <td>{{ cirugia.fecha|date:"d/m/Y H:i" }}</td>
+                                <td>
+                                    {% if cirugia.estado == 'Completado' %}
+                                    <span class="badge bg-success">Completado</span>
+                                    {% elif cirugia.estado == 'En Proceso' %}
+                                    <span class="badge bg-warning text-dark">En Proceso</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">Pendiente</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="#" class="btn btn-sm btn-outline-primary">Ver detalles</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <p class="text-muted">No tienes cirugías registradas.</p>
+                    <a href="{% url 'solicitar_cirugia' %}" class="btn btn-warning">Solicitar Cirugía</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Urgencias -->
+    <div class="tab-pane fade" id="urgencias" role="tabpanel">
+        <div class="card">
+            <div class="card-header bg-light text-dark">
+                <h5 class="mb-0">Mis Urgencias</h5>
+            </div>
+            <div class="card-body">
+                {% if urgencias %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Paciente</th>
+                                <th>Prioridad</th>
+                                <th>Fecha</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for urgencia in urgencias %}
+                            <tr>
+                                <td class="fw-bold">{{ urgencia.paciente }}</td>
+                                <td>
+                                    {% if urgencia.prioridad == 'Crítica' %}
+                                    <span class="badge bg-danger">{{ urgencia.prioridad }}</span>
+                                    {% elif urgencia.prioridad == 'Alta' %}
+                                    <span class="badge bg-warning text-dark">{{ urgencia.prioridad }}</span>
+                                    {% else %}
+                                    <span class="badge bg-info text-dark">{{ urgencia.prioridad }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ urgencia.fecha|date:"d/m/Y H:i" }}</td>
+                                <td>
+                                    {% if urgencia.estado == 'Completado' %}
+                                    <span class="badge bg-success">Completado</span>
+                                    {% elif urgencia.estado == 'En Proceso' %}
+                                    <span class="badge bg-warning text-dark">En Proceso</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">Pendiente</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="#" class="btn btn-sm btn-outline-primary">Ver detalles</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <p class="text-muted">No tienes urgencias registradas.</p>
+                    <a href="{% url 'solicitar_urgencia' %}" class="btn btn-danger">Solicitar Urgencia</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

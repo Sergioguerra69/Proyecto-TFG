@@ -1,0 +1,38 @@
+# =============================================================================
+# DEPENDENCIAS VETCT TFG DAW2 - Solo las necesarias
+# =============================================================================
+# Django y componentes esenciales para el proyecto actual
+Django==5.1.6
+whitenoise==6.11.0
+gunicorn==21.2.0
+
+# Base de datos
+psycopg2-binary==2.9.10
+
+# Imágenes y archivos estáticos
+pillow==12.0.0
+
+# Configuración y variables de entorno
+python-decouple==3.8
+python-dotenv==1.0.1
+
+# WebSockets para notificaciones (ya usas en tus views)
+channels==4.1.0
+channels-redis==4.2.0
+asgiref==3.8.1
+
+# Redis para caché y WebSockets (ya lo usas)
+django-redis==5.4.0
+redis==5.0.1
+
+# API REST (para futuras expansiones)
+djangorestframework==3.15.2
+
+# APIs externas para veterinarias (nuevo para TFG)
+requests==2.32.3
+
+# Utilidades de fechas y configuración
+tzdata==2025.2
+sqlparse==0.5.4
+python-dateutil==2.9.0.post0
+pytz==2025.2
