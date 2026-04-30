@@ -3,66 +3,130 @@
 {% block title %}Nuevo Producto - VetCT{% endblock %}
 
 {% block content %}
-<!-- Formulario para crear producto -->
-<section class="py-16 bg-gradient-to-br from-green-50 via-white to-cyan-50 min-h-screen">
-    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- Titulo -->
-        <div class="text-center mb-10">
-            <div class="inline-flex items-center justify-center mb-4">
-                <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-cyan-600 rounded-xl flex items-center justify-center mr-4 shadow-lg">
-                    <i class="fas fa-plus text-white text-xl"></i>
-                </div>
-                <h1 class="font-montserrat font-black text-3xl text-gray-900">Nuevo Producto</h1>
-            </div>
-            <p class="text-gray-600">Añade un producto a la tienda</p>
-        </div>
 
-        <!-- Formulario -->
-        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-            <form method="post" enctype="multipart/form-data">
+<style>
+    .fade-up {
+        opacity: 0;
+        transform: translateY(40px);
+        transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+    }
+    .fade-up.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    .delay-1 { transition-delay: 0.1s; }
+    .delay-2 { transition-delay: 0.2s; }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
+    .float-animation { animation: float 4s ease-in-out infinite; }
+    
+    .input-field {
+        transition: all 0.3s ease;
+    }
+    .input-field:focus {
+        transform: translateY(-1px);
+    }
+</style>
+
+{# HERO #}
+<section class="relative py-24 md:py-32 overflow-hidden bg-gradient-to-br from-slate-900 via-blue-950 to-cyan-950">
+    <div class="absolute inset-0">
+        <div class="absolute top-20 right-20 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl float-animation"></div>
+        <div class="absolute bottom-10 left-10 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl" style="animation: float 5s ease-in-out infinite 1s;"></div>
+    </div>
+    
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <span class="inline-block bg-cyan-500/20 text-cyan-300 text-sm font-semibold uppercase tracking-widest px-4 py-2 rounded-full mb-6 border border-cyan-500/30 fade-up">
+            <i class="fas fa-box mr-2"></i>Gestión de Tienda
+        </span>
+        <h1 class="font-montserrat font-black text-4xl md:text-5xl lg:text-6xl text-white mb-4 tracking-tight drop-shadow-lg fade-up delay-1">
+            Nuevo <span class="bg-gradient-to-r from-cyan-300 to-blue-400 bg-clip-text text-transparent">Producto</span>
+        </h1>
+        <p class="text-lg md:text-xl text-white/90 max-w-2xl mx-auto fade-up delay-2 drop-shadow">
+            Añade un nuevo producto al catálogo de la tienda veterinaria.
+        </p>
+    </div>
+    <div class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent"></div>
+</section>
+
+{# FORMULARIO #}
+<section class="py-20 bg-slate-50">
+    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 p-8 md:p-10 fade-up">
+            <div class="flex items-center gap-3 mb-8">
+                <div class="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center shadow-md shadow-cyan-500/20">
+                    <i class="fas fa-plus text-white"></i>
+                </div>
+                <h2 class="font-montserrat font-extrabold text-2xl text-slate-800">Datos del Producto</h2>
+            </div>
+            
+            <form method="post" enctype="multipart/form-data" class="space-y-6">
                 {% csrf_token %}
                 
-                <!-- Nombre -->
-                <div class="mb-6">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Nombre del producto</label>
+                {# Nombre #}
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">
+                        <i class="fas fa-tag text-cyan-500 mr-1"></i>Nombre del producto <span class="text-red-400">*</span>
+                    </label>
                     <input type="text" name="nombre" required
-                           class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-300"
-                           placeholder="Ej: Pienso para perros">
+                           class="input-field w-full px-4 py-3.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent bg-slate-50 text-slate-800 placeholder-slate-400"
+                           placeholder="Ej: Pienso premium para perros">
                 </div>
 
-                <!-- Precio -->
-                <div class="mb-6">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Precio (€)</label>
-                    <input type="number" name="precio" step="0.01" min="0" required
-                           class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-300"
-                           placeholder="Ej: 25.99">
+                {# Precio #}
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">
+                        <i class="fas fa-euro-sign text-cyan-500 mr-1"></i>Precio <span class="text-red-400">*</span>
+                    </label>
+                    <div class="relative">
+                        <input type="number" name="precio" step="0.01" min="0" required
+                               class="input-field w-full pl-4 pr-16 py-3.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent bg-slate-50 text-slate-800 placeholder-slate-400"
+                               placeholder="25.99">
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 font-semibold text-sm">€</span>
+                    </div>
                 </div>
 
-                <!-- Stock -->
-                <div class="mb-6">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Stock (unidades)</label>
+                {# Stock #}
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">
+                        <i class="fas fa-cubes text-cyan-500 mr-1"></i>Stock <span class="text-red-400">*</span>
+                    </label>
                     <input type="number" name="stock" min="0" required
-                           class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-300"
-                           placeholder="Ej: 50">
+                           class="input-field w-full px-4 py-3.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent bg-slate-50 text-slate-800 placeholder-slate-400"
+                           placeholder="Unidades disponibles">
                 </div>
 
-                <!-- Imagen -->
-                <div class="mb-6">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Imagen del producto</label>
-                    <input type="file" name="imagen" accept="image/*"
-                           class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-300">
-                    <p class="text-xs text-gray-500 mt-1">Opcional. Formatos: JPG, PNG</p>
+                {# Imagen #}
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">
+                        <i class="fas fa-image text-cyan-500 mr-1"></i>Imagen del producto
+                    </label>
+                    <div class="relative border-2 border-dashed border-slate-200 rounded-xl p-8 text-center hover:border-cyan-400 transition-colors cursor-pointer group"
+                         onclick="document.getElementById('imagen-input').click()">
+                        <input type="file" name="imagen" accept="image/*" id="imagen-input" class="hidden" onchange="previewImagen(this)">
+                        <div id="upload-placeholder">
+                            <div class="w-16 h-16 bg-cyan-100 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                                <i class="fas fa-cloud-upload-alt text-2xl text-cyan-600"></i>
+                            </div>
+                            <p class="text-slate-600 font-medium">Arrastra una imagen o haz clic aquí</p>
+                            <p class="text-slate-400 text-sm mt-1">PNG, JPG (opcional)</p>
+                        </div>
+                        <img id="preview-img" src="#" alt="Vista previa" class="hidden max-h-48 mx-auto rounded-xl object-cover">
+                    </div>
                 </div>
 
-                <!-- Botones -->
-                <div class="flex gap-4">
+                {# Botones #}
+                <div class="flex gap-4 pt-4">
                     <a href="{% url 'tienda' %}" 
-                       class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-6 rounded-xl text-center transition-all duration-300">
-                        Cancelar
+                       class="flex-1 border-2 border-slate-300 text-slate-600 font-bold py-3.5 px-6 rounded-xl text-center hover:bg-slate-50 hover:border-slate-400 transition-all duration-300">
+                        <i class="fas fa-arrow-left mr-2"></i>Cancelar
                     </a>
                     <button type="submit" 
-                            class="flex-1 bg-gradient-to-r from-green-500 to-cyan-600 hover:from-green-600 hover:to-cyan-700 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl">
-                        <i class="fas fa-save mr-2"></i>
+                            class="flex-1 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold py-3.5 px-6 rounded-xl hover:from-cyan-600 hover:to-blue-700 transition-all duration-500 shadow-lg hover:shadow-2xl hover:shadow-cyan-500/30 hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                        <i class="fas fa-save"></i>
                         Guardar Producto
                     </button>
                 </div>
@@ -70,4 +134,35 @@
         </div>
     </div>
 </section>
+
+<script>
+function previewImagen(input) {
+    const preview = document.getElementById('preview-img');
+    const placeholder = document.getElementById('upload-placeholder');
+    
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.classList.remove('hidden');
+            placeholder.classList.add('hidden');
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+// Animaciones
+const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -30px 0px' };
+const observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+        }
+    });
+}, observerOptions);
+
+document.querySelectorAll('.fade-up').forEach(function(el) {
+    observer.observe(el);
+});
+</script>
 {% endblock %}

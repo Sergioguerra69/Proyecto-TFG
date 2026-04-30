@@ -3,94 +3,150 @@
 {% block title %}Mis Citas y Solicitudes - VetCT{% endblock %}
 
 {% block content %}
-{# Página de citas y solicitudes del usuario #}
-<section class="py-16 bg-gradient-to-br from-cyan-50 via-white to-blue-50 min-h-screen">
+
+<style>
+    .fade-up {
+        opacity: 0;
+        transform: translateY(40px);
+        transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+    }
+    .fade-up.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    .delay-1 { transition-delay: 0.1s; }
+    .delay-2 { transition-delay: 0.2s; }
+    .delay-3 { transition-delay: 0.3s; }
+    .delay-4 { transition-delay: 0.4s; }
+    .delay-5 { transition-delay: 0.5s; }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
+    .float-animation { animation: float 4s ease-in-out infinite; }
+    
+    @keyframes soft-pulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(8, 145, 178, 0.3); }
+        50% { box-shadow: 0 0 0 15px rgba(8, 145, 178, 0); }
+    }
+    .icon-pulse { animation: soft-pulse 3s infinite; }
+    
+    @keyframes countUp {
+        from { opacity: 0; transform: scale(0.5); }
+        to { opacity: 1; transform: scale(1); }
+    }
+    .count-anim {
+        animation: countUp 0.6s ease-out forwards;
+    }
+    
+    .section-card {
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .section-card:hover {
+        transform: translateY(-2px);
+    }
+</style>
+
+{# HERO #}
+<section class="relative py-24 md:py-32 overflow-hidden bg-gradient-to-br from-slate-900 via-blue-950 to-cyan-950">
+    <div class="absolute inset-0">
+        <div class="absolute top-20 right-20 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl float-animation"></div>
+        <div class="absolute bottom-10 left-10 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl" style="animation: float 5s ease-in-out infinite 1s;"></div>
+    </div>
+    
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <span class="inline-block bg-cyan-500/20 text-cyan-300 text-sm font-semibold uppercase tracking-widest px-4 py-2 rounded-full mb-6 border border-cyan-500/30 fade-up">
+            <i class="fas fa-calendar-check mr-2"></i>Gestión de Citas
+        </span>
+        <h1 class="font-montserrat font-black text-4xl md:text-5xl lg:text-6xl text-white mb-4 tracking-tight drop-shadow-lg fade-up delay-1">
+            Mis <span class="bg-gradient-to-r from-cyan-300 to-blue-400 bg-clip-text text-transparent">Citas y Solicitudes</span>
+        </h1>
+        <p class="text-lg md:text-xl text-white/90 max-w-3xl mx-auto fade-up delay-2 drop-shadow">
+            Consulta, gestiona y solicita todos tus servicios veterinarios desde un solo lugar.
+        </p>
+    </div>
+    <div class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent"></div>
+</section>
+
+{# CONTENIDO PRINCIPAL #}
+<section class="py-20 bg-slate-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {# Cabecera de la página #}
-        <div class="text-center mb-12">
-            <div class="inline-flex items-center justify-center mb-4">
-                <div class="w-12 h-12 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-xl flex items-center justify-center mr-4 shadow-lg">
-                    <i class="fas fa-calendar-check text-white text-xl"></i>
+        
+        {# RESUMEN - Tarjetas de contadores #}
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-5 mb-14">
+            <div class="fade-up delay-1 bg-white rounded-2xl shadow-md shadow-slate-200/50 border border-slate-100 p-5 text-center relative overflow-hidden group hover:shadow-xl hover:shadow-cyan-100/20 hover:-translate-y-1 transition-all duration-500">
+                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-400 to-blue-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+                <div class="w-12 h-12 bg-cyan-100 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-stethoscope text-cyan-600 text-xl"></i>
                 </div>
-                <h1 class="font-montserrat font-black text-4xl text-gray-900">Mis Citas y Solicitudes</h1>
+                <p class="text-3xl font-black text-slate-800 count-anim">{{ consultas|length }}</p>
+                <p class="text-sm text-slate-500 font-medium">Consultas</p>
             </div>
-            <p class="text-gray-600 max-w-2xl mx-auto">Aquí puedes ver todas tus citas, análisis, cirugías y urgencias programadas</p>
-        </div>
-
-        {# Resumen de servicios #}
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
-            {# Tarjeta Consultas #}
-            <div class="bg-white rounded-xl shadow-md p-4 text-center border-2 border-blue-100">
-                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                    <i class="fas fa-stethoscope text-blue-600 text-xl"></i>
+            <div class="fade-up delay-2 bg-white rounded-2xl shadow-md shadow-slate-200/50 border border-slate-100 p-5 text-center relative overflow-hidden group hover:shadow-xl hover:shadow-emerald-100/20 hover:-translate-y-1 transition-all duration-500">
+                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-400 to-teal-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+                <div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-flask text-emerald-600 text-xl"></i>
                 </div>
-                <p class="text-2xl font-bold text-gray-900">{{ consultas|length }}</p>
-                <p class="text-sm text-gray-600">Consultas</p>
+                <p class="text-3xl font-black text-slate-800 count-anim">{{ analisis|length }}</p>
+                <p class="text-sm text-slate-500 font-medium">Análisis</p>
             </div>
-
-            {# Tarjeta Análisis #}
-            <div class="bg-white rounded-xl shadow-md p-4 text-center border-2 border-green-100">
-                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                    <i class="fas fa-flask text-green-600 text-xl"></i>
-                </div>
-                <p class="text-2xl font-bold text-gray-900">{{ analisis|length }}</p>
-                <p class="text-sm text-gray-600">Análisis</p>
-            </div>
-
-            {# Tarjeta Cirugías #}
-            <div class="bg-white rounded-xl shadow-md p-4 text-center border-2 border-purple-100">
-                <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2">
+            <div class="fade-up delay-3 bg-white rounded-2xl shadow-md shadow-slate-200/50 border border-slate-100 p-5 text-center relative overflow-hidden group hover:shadow-xl hover:shadow-purple-100/20 hover:-translate-y-1 transition-all duration-500">
+                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-400 to-violet-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+                <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
                     <i class="fas fa-procedures text-purple-600 text-xl"></i>
                 </div>
-                <p class="text-2xl font-bold text-gray-900">{{ cirugias|length }}</p>
-                <p class="text-sm text-gray-600">Cirugías</p>
+                <p class="text-3xl font-black text-slate-800 count-anim">{{ cirugias|length }}</p>
+                <p class="text-sm text-slate-500 font-medium">Cirugías</p>
             </div>
-
-            {# Tarjeta Urgencias #}
-            <div class="bg-white rounded-xl shadow-md p-4 text-center border-2 border-red-100">
-                <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-2">
+            <div class="fade-up delay-4 bg-white rounded-2xl shadow-md shadow-slate-200/50 border border-slate-100 p-5 text-center relative overflow-hidden group hover:shadow-xl hover:shadow-red-100/20 hover:-translate-y-1 transition-all duration-500">
+                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-400 to-rose-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+                <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
                     <i class="fas fa-ambulance text-red-600 text-xl"></i>
                 </div>
-                <p class="text-2xl font-bold text-gray-900">{{ urgencias|length }}</p>
-                <p class="text-sm text-gray-600">Urgencias</p>
+                <p class="text-3xl font-black text-slate-800 count-anim">{{ urgencias|length }}</p>
+                <p class="text-sm text-slate-500 font-medium">Urgencias</p>
             </div>
         </div>
 
-        {# Botones para solicitar nuevos servicios #}
-        <div class="flex flex-wrap justify-center gap-3 mb-12">
-            <a href="{% url 'solicitar_consulta' %}" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg flex items-center">
-                <i class="fas fa-plus mr-2"></i>Solicitar Consulta
+        {# BOTONES DE ACCIÓN #}
+        <div class="flex flex-wrap justify-center gap-3 mb-14 fade-up delay-5">
+            <a href="{% url 'solicitar_consulta' %}" class="group bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold text-sm uppercase tracking-wider px-6 py-3.5 rounded-full transition-all duration-500 hover:shadow-2xl hover:shadow-cyan-500/30 hover:-translate-y-1 inline-flex items-center gap-2">
+                <i class="fas fa-plus-circle group-hover:rotate-90 transition-transform duration-500"></i>Solicitar Consulta
             </a>
-            <a href="{% url 'solicitar_analisis' %}" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg flex items-center">
-                <i class="fas fa-plus mr-2"></i>Solicitar Análisis
+            <a href="{% url 'solicitar_analisis' %}" class="group bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold text-sm uppercase tracking-wider px-6 py-3.5 rounded-full transition-all duration-500 hover:shadow-2xl hover:shadow-emerald-500/30 hover:-translate-y-1 inline-flex items-center gap-2">
+                <i class="fas fa-plus-circle group-hover:rotate-90 transition-transform duration-500"></i>Solicitar Análisis
             </a>
-            <a href="{% url 'solicitar_cirugia' %}" class="bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg flex items-center">
-                <i class="fas fa-plus mr-2"></i>Solicitar Cirugía
+            <a href="{% url 'solicitar_cirugia' %}" class="group bg-gradient-to-r from-purple-500 to-violet-600 text-white font-bold text-sm uppercase tracking-wider px-6 py-3.5 rounded-full transition-all duration-500 hover:shadow-2xl hover:shadow-purple-500/30 hover:-translate-y-1 inline-flex items-center gap-2">
+                <i class="fas fa-plus-circle group-hover:rotate-90 transition-transform duration-500"></i>Solicitar Cirugía
             </a>
-            <a href="{% url 'solicitar_urgencia' %}" class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg flex items-center">
-                <i class="fas fa-plus mr-2"></i>Solicitar Urgencia
+            <a href="{% url 'solicitar_urgencia' %}" class="group bg-gradient-to-r from-red-500 to-rose-600 text-white font-bold text-sm uppercase tracking-wider px-6 py-3.5 rounded-full transition-all duration-500 hover:shadow-2xl hover:shadow-red-500/30 hover:-translate-y-1 inline-flex items-center gap-2 animate-pulse">
+                <i class="fas fa-exclamation-triangle group-hover:rotate-12 transition-transform duration-500"></i>Solicitar Urgencia
             </a>
         </div>
 
-        {# Sección Consultas #}
-        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-8">
-            <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4 flex justify-between items-center">
-                <h2 class="font-montserrat font-bold text-xl flex items-center">
-                    <i class="fas fa-stethoscope mr-3"></i>Mis Consultas
+        {# SECCIÓN CONSULTAS #}
+        <div class="section-card bg-white rounded-3xl shadow-lg shadow-slate-200/50 border border-slate-100 overflow-hidden mb-8 fade-up">
+            <div class="bg-gradient-to-r from-cyan-500 to-blue-600 text-white p-5 flex justify-between items-center">
+                <h2 class="font-montserrat font-extrabold text-lg flex items-center gap-2">
+                    <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-stethoscope text-sm"></i>
+                    </div>
+                    Mis Consultas
                 </h2>
-                <span class="bg-white/20 px-3 py-1 rounded-full text-sm">{{ consultas|length }} total</span>
+                <span class="bg-white/20 px-3 py-1 rounded-full text-sm font-bold">{{ consultas|length }} total</span>
             </div>
             <div class="p-6">
                 {% if consultas %}
-                <div class="space-y-4">
+                <div class="space-y-3">
                     {% for consulta in consultas %}
-                    <div class="bg-gray-50 rounded-xl p-4 border-l-4 border-blue-500">
+                    <div class="bg-slate-50 rounded-xl p-4 border-l-4 border-cyan-500 hover:shadow-md transition-shadow group">
                         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
                             <div>
-                                <h3 class="font-bold text-gray-900">{{ consulta.motivo|default:"Consulta general" }}</h3>
-                                <p class="text-gray-600 text-sm">{{ consulta.fecha|date:"d/m/Y H:i" }}</p>
+                                <h3 class="font-bold text-slate-800 group-hover:text-cyan-700 transition-colors">{{ consulta.motivo|default:"Consulta general" }}</h3>
+                                <p class="text-slate-500 text-sm flex items-center gap-1"><i class="fas fa-calendar text-cyan-400 text-xs"></i>{{ consulta.fecha|date:"d/m/Y H:i" }}</p>
                             </div>
-                            <span class="px-3 py-1 rounded-full text-xs font-bold {% if consulta.estado == 'Pendiente' %}bg-yellow-100 text-yellow-800{% elif consulta.estado == 'En Proceso' %}bg-blue-100 text-blue-800{% elif consulta.estado == 'Completada' %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold {% if consulta.estado == 'Pendiente' %}bg-amber-100 text-amber-700{% elif consulta.estado == 'En Proceso' %}bg-blue-100 text-blue-700{% elif consulta.estado == 'Completada' %}bg-emerald-100 text-emerald-700{% else %}bg-slate-100 text-slate-600{% endif %}">
                                 {{ consulta.estado }}
                             </span>
                         </div>
@@ -98,38 +154,41 @@
                     {% endfor %}
                 </div>
                 {% else %}
-                <div class="text-center py-8">
-                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                        <i class="fas fa-stethoscope text-gray-400 text-2xl"></i>
+                <div class="text-center py-10">
+                    <div class="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-stethoscope text-3xl text-slate-300"></i>
                     </div>
-                    <p class="text-gray-500">No tienes consultas registradas</p>
-                    <a href="{% url 'solicitar_consulta' %}" class="inline-block mt-3 text-blue-500 hover:text-blue-600 font-semibold">
-                        Solicitar Consulta →
+                    <p class="text-slate-500 font-medium mb-4">No tienes consultas registradas</p>
+                    <a href="{% url 'solicitar_consulta' %}" class="text-cyan-600 font-semibold hover:text-cyan-700 transition-colors">
+                        <i class="fas fa-arrow-right mr-1"></i>Solicitar Consulta
                     </a>
                 </div>
                 {% endif %}
             </div>
         </div>
 
-        {# Sección Análisis #}
-        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-8">
-            <div class="bg-gradient-to-r from-green-500 to-green-600 text-white p-4 flex justify-between items-center">
-                <h2 class="font-montserrat font-bold text-xl flex items-center">
-                    <i class="fas fa-flask mr-3"></i>Mis Análisis
+        {# SECCIÓN ANÁLISIS #}
+        <div class="section-card bg-white rounded-3xl shadow-lg shadow-slate-200/50 border border-slate-100 overflow-hidden mb-8 fade-up">
+            <div class="bg-gradient-to-r from-emerald-500 to-teal-600 text-white p-5 flex justify-between items-center">
+                <h2 class="font-montserrat font-extrabold text-lg flex items-center gap-2">
+                    <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-flask text-sm"></i>
+                    </div>
+                    Mis Análisis
                 </h2>
-                <span class="bg-white/20 px-3 py-1 rounded-full text-sm">{{ analisis|length }} total</span>
+                <span class="bg-white/20 px-3 py-1 rounded-full text-sm font-bold">{{ analisis|length }} total</span>
             </div>
             <div class="p-6">
                 {% if analisis %}
-                <div class="space-y-4">
+                <div class="space-y-3">
                     {% for analisis_item in analisis %}
-                    <div class="bg-gray-50 rounded-xl p-4 border-l-4 border-green-500">
+                    <div class="bg-slate-50 rounded-xl p-4 border-l-4 border-emerald-500 hover:shadow-md transition-shadow group">
                         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
                             <div>
-                                <h3 class="font-bold text-gray-900">{{ analisis_item.tipo|default:"Análisis general" }}</h3>
-                                <p class="text-gray-600 text-sm">{{ analisis_item.fecha|date:"d/m/Y H:i" }}</p>
+                                <h3 class="font-bold text-slate-800 group-hover:text-emerald-700 transition-colors">{{ analisis_item.tipo|default:"Análisis general" }}</h3>
+                                <p class="text-slate-500 text-sm flex items-center gap-1"><i class="fas fa-calendar text-emerald-400 text-xs"></i>{{ analisis_item.fecha|date:"d/m/Y H:i" }}</p>
                             </div>
-                            <span class="px-3 py-1 rounded-full text-xs font-bold {% if analisis_item.estado == 'Pendiente' %}bg-yellow-100 text-yellow-800{% elif analisis_item.estado == 'En Proceso' %}bg-blue-100 text-blue-800{% elif analisis_item.estado == 'Completada' %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold {% if analisis_item.estado == 'Pendiente' %}bg-amber-100 text-amber-700{% elif analisis_item.estado == 'En Proceso' %}bg-blue-100 text-blue-700{% elif analisis_item.estado == 'Completada' %}bg-emerald-100 text-emerald-700{% else %}bg-slate-100 text-slate-600{% endif %}">
                                 {{ analisis_item.estado }}
                             </span>
                         </div>
@@ -137,39 +196,42 @@
                     {% endfor %}
                 </div>
                 {% else %}
-                <div class="text-center py-8">
-                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                        <i class="fas fa-flask text-gray-400 text-2xl"></i>
+                <div class="text-center py-10">
+                    <div class="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-flask text-3xl text-slate-300"></i>
                     </div>
-                    <p class="text-gray-500">No tienes análisis registrados</p>
-                    <a href="{% url 'solicitar_analisis' %}" class="inline-block mt-3 text-green-500 hover:text-green-600 font-semibold">
-                        Solicitar Análisis →
+                    <p class="text-slate-500 font-medium mb-4">No tienes análisis registrados</p>
+                    <a href="{% url 'solicitar_analisis' %}" class="text-emerald-600 font-semibold hover:text-emerald-700 transition-colors">
+                        <i class="fas fa-arrow-right mr-1"></i>Solicitar Análisis
                     </a>
                 </div>
                 {% endif %}
             </div>
         </div>
 
-        {# Sección Cirugías #}
-        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-8">
-            <div class="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-4 flex justify-between items-center">
-                <h2 class="font-montserrat font-bold text-xl flex items-center">
-                    <i class="fas fa-procedures mr-3"></i>Mis Cirugías
+        {# SECCIÓN CIRUGÍAS #}
+        <div class="section-card bg-white rounded-3xl shadow-lg shadow-slate-200/50 border border-slate-100 overflow-hidden mb-8 fade-up">
+            <div class="bg-gradient-to-r from-purple-500 to-violet-600 text-white p-5 flex justify-between items-center">
+                <h2 class="font-montserrat font-extrabold text-lg flex items-center gap-2">
+                    <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-procedures text-sm"></i>
+                    </div>
+                    Mis Cirugías
                 </h2>
-                <span class="bg-white/20 px-3 py-1 rounded-full text-sm">{{ cirugias|length }} total</span>
+                <span class="bg-white/20 px-3 py-1 rounded-full text-sm font-bold">{{ cirugias|length }} total</span>
             </div>
             <div class="p-6">
                 {% if cirugias %}
-                <div class="space-y-4">
+                <div class="space-y-3">
                     {% for cirugia in cirugias %}
-                    <div class="bg-gray-50 rounded-xl p-4 border-l-4 border-purple-500">
+                    <div class="bg-slate-50 rounded-xl p-4 border-l-4 border-purple-500 hover:shadow-md transition-shadow group">
                         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
                             <div>
-                                <h3 class="font-bold text-gray-900">{{ cirugia.tipo|default:"Cirugía programada" }}</h3>
-                                <p class="text-gray-600 text-sm">{{ cirugia.fecha|date:"d/m/Y H:i" }}</p>
-                                <p class="text-gray-700 text-sm mt-1"><strong>Paciente:</strong> {{ cirugia.paciente|default:"No especificado" }}</p>
+                                <h3 class="font-bold text-slate-800 group-hover:text-purple-700 transition-colors">{{ cirugia.tipo|default:"Cirugía programada" }}</h3>
+                                <p class="text-slate-500 text-sm flex items-center gap-1"><i class="fas fa-calendar text-purple-400 text-xs"></i>{{ cirugia.fecha|date:"d/m/Y H:i" }}</p>
+                                <p class="text-slate-600 text-xs mt-1"><i class="fas fa-paw text-purple-400 mr-1"></i>{{ cirugia.paciente|default:"No especificado" }}</p>
                             </div>
-                            <span class="px-3 py-1 rounded-full text-xs font-bold {% if cirugia.estado == 'Pendiente' %}bg-yellow-100 text-yellow-800{% elif cirugia.estado == 'En Proceso' %}bg-blue-100 text-blue-800{% elif cirugia.estado == 'Completada' %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold {% if cirugia.estado == 'Pendiente' %}bg-amber-100 text-amber-700{% elif cirugia.estado == 'En Proceso' %}bg-blue-100 text-blue-700{% elif cirugia.estado == 'Completada' %}bg-emerald-100 text-emerald-700{% else %}bg-slate-100 text-slate-600{% endif %}">
                                 {{ cirugia.estado }}
                             </span>
                         </div>
@@ -177,38 +239,41 @@
                     {% endfor %}
                 </div>
                 {% else %}
-                <div class="text-center py-8">
-                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                        <i class="fas fa-procedures text-gray-400 text-2xl"></i>
+                <div class="text-center py-10">
+                    <div class="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-procedures text-3xl text-slate-300"></i>
                     </div>
-                    <p class="text-gray-500">No tienes cirugías registradas</p>
-                    <a href="{% url 'solicitar_cirugia' %}" class="inline-block mt-3 text-purple-500 hover:text-purple-600 font-semibold">
-                        Solicitar Cirugía →
+                    <p class="text-slate-500 font-medium mb-4">No tienes cirugías registradas</p>
+                    <a href="{% url 'solicitar_cirugia' %}" class="text-purple-600 font-semibold hover:text-purple-700 transition-colors">
+                        <i class="fas fa-arrow-right mr-1"></i>Solicitar Cirugía
                     </a>
                 </div>
                 {% endif %}
             </div>
         </div>
 
-        {# Sección Urgencias #}
-        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-8">
-            <div class="bg-gradient-to-r from-red-500 to-red-600 text-white p-4 flex justify-between items-center">
-                <h2 class="font-montserrat font-bold text-xl flex items-center">
-                    <i class="fas fa-ambulance mr-3"></i>Mis Urgencias
+        {# SECCIÓN URGENCIAS #}
+        <div class="section-card bg-white rounded-3xl shadow-lg shadow-slate-200/50 border border-slate-100 overflow-hidden mb-8 fade-up">
+            <div class="bg-gradient-to-r from-red-500 to-rose-600 text-white p-5 flex justify-between items-center">
+                <h2 class="font-montserrat font-extrabold text-lg flex items-center gap-2">
+                    <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-ambulance text-sm"></i>
+                    </div>
+                    Mis Urgencias
                 </h2>
-                <span class="bg-white/20 px-3 py-1 rounded-full text-sm">{{ urgencias|length }} total</span>
+                <span class="bg-white/20 px-3 py-1 rounded-full text-sm font-bold">{{ urgencias|length }} total</span>
             </div>
             <div class="p-6">
                 {% if urgencias %}
-                <div class="space-y-4">
+                <div class="space-y-3">
                     {% for urgencia in urgencias %}
-                    <div class="bg-gray-50 rounded-xl p-4 border-l-4 border-red-500">
+                    <div class="bg-slate-50 rounded-xl p-4 border-l-4 border-red-500 hover:shadow-md transition-shadow group">
                         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
                             <div>
-                                <h3 class="font-bold text-gray-900">{{ urgencia.motivo|default:"Urgencia" }}</h3>
-                                <p class="text-gray-600 text-sm">{{ urgencia.fecha|date:"d/m/Y H:i" }}</p>
+                                <h3 class="font-bold text-slate-800 group-hover:text-red-700 transition-colors">{{ urgencia.motivo|default:"Urgencia" }}</h3>
+                                <p class="text-slate-500 text-sm flex items-center gap-1"><i class="fas fa-calendar text-red-400 text-xs"></i>{{ urgencia.fecha|date:"d/m/Y H:i" }}</p>
                             </div>
-                            <span class="px-3 py-1 rounded-full text-xs font-bold {% if urgencia.estado == 'Pendiente' %}bg-yellow-100 text-yellow-800{% elif urgencia.estado == 'En Proceso' %}bg-blue-100 text-blue-800{% elif urgencia.estado == 'Atendida' %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold {% if urgencia.estado == 'Pendiente' %}bg-amber-100 text-amber-700{% elif urgencia.estado == 'En Proceso' %}bg-blue-100 text-blue-700{% elif urgencia.estado == 'Atendida' %}bg-emerald-100 text-emerald-700{% else %}bg-slate-100 text-slate-600{% endif %}">
                                 {{ urgencia.estado }}
                             </span>
                         </div>
@@ -216,13 +281,13 @@
                     {% endfor %}
                 </div>
                 {% else %}
-                <div class="text-center py-8">
-                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                        <i class="fas fa-ambulance text-gray-400 text-2xl"></i>
+                <div class="text-center py-10">
+                    <div class="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-ambulance text-3xl text-slate-300"></i>
                     </div>
-                    <p class="text-gray-500">No tienes urgencias registradas</p>
-                    <a href="{% url 'solicitar_urgencia' %}" class="inline-block mt-3 text-red-500 hover:text-red-600 font-semibold">
-                        Solicitar Urgencia →
+                    <p class="text-slate-500 font-medium mb-4">No tienes urgencias registradas</p>
+                    <a href="{% url 'solicitar_urgencia' %}" class="text-red-600 font-semibold hover:text-red-700 transition-colors">
+                        <i class="fas fa-arrow-right mr-1"></i>Solicitar Urgencia
                     </a>
                 </div>
                 {% endif %}
@@ -230,4 +295,19 @@
         </div>
     </div>
 </section>
+
+<script>
+const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -30px 0px' };
+const observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+        }
+    });
+}, observerOptions);
+
+document.querySelectorAll('.fade-up').forEach(function(el) {
+    observer.observe(el);
+});
+</script>
 {% endblock %}

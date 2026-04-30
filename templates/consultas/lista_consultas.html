@@ -3,179 +3,247 @@
 {% block title %}Consultas Médicas - VetCT{% endblock %}
 
 {% block content %}
-{# Cabecera de la página #}
-<section class="py-16 text-center bg-gradient-to-r from-blue-50 to-cyan-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 class="mb-6 font-bold text-4xl md:text-5xl text-gray-900">
-            <i class="fas fa-stethoscope mr-3 text-blue-500"></i>
-            Consultas Médicas
+
+<style>
+    .fade-up {
+        opacity: 0;
+        transform: translateY(40px);
+        transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+    }
+    .fade-up.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    .delay-1 { transition-delay: 0.1s; }
+    .delay-2 { transition-delay: 0.2s; }
+    .delay-3 { transition-delay: 0.3s; }
+    .delay-4 { transition-delay: 0.4s; }
+    .delay-5 { transition-delay: 0.5s; }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
+    .float-animation { animation: float 4s ease-in-out infinite; }
+    
+    @keyframes soft-pulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(8, 145, 178, 0.3); }
+        50% { box-shadow: 0 0 0 15px rgba(8, 145, 178, 0); }
+    }
+    .icon-pulse { animation: soft-pulse 3s infinite; }
+    
+    @keyframes emergency-pulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+        50% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
+    }
+    .emergency-pulse { animation: emergency-pulse 2s infinite; }
+    
+    .card-hover {
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .card-hover:hover {
+        transform: translateY(-4px);
+    }
+</style>
+
+{# HERO CONSULTAS #}
+<section class="relative py-24 md:py-32 overflow-hidden bg-gradient-to-br from-slate-900 via-blue-950 to-cyan-950">
+    <div class="absolute inset-0">
+        <div class="absolute top-20 right-20 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl float-animation"></div>
+        <div class="absolute bottom-10 left-10 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl" style="animation: float 5s ease-in-out infinite 1s;"></div>
+    </div>
+    
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <span class="inline-block bg-cyan-500/20 text-cyan-300 text-sm font-semibold uppercase tracking-widest px-4 py-2 rounded-full mb-6 border border-cyan-500/30 fade-up">
+            <i class="fas fa-stethoscope mr-2"></i>Atención Médica
+        </span>
+        <h1 class="font-montserrat font-black text-4xl md:text-5xl lg:text-6xl text-white mb-6 tracking-tight drop-shadow-lg fade-up delay-1">
+            Consultas <span class="bg-gradient-to-r from-cyan-300 to-blue-400 bg-clip-text text-transparent">Médicas</span>
         </h1>
-        <p class="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-            Gestiona las consultas médicas con servicios veterinarios integrados
+        <p class="text-lg md:text-xl text-white/90 max-w-3xl mx-auto mb-10 fade-up delay-2 drop-shadow">
+            Gestiona las consultas médicas con servicios veterinarios integrados y tecnología de vanguardia.
         </p>
         
         {% if api_available %}
-            <div class="inline-flex items-center bg-green-100 text-green-800 px-4 py-2 rounded-full">
-                <i class="fas fa-check-circle mr-2"></i>
-                APIs Veterinarias Activas
-            </div>
+        <div class="inline-flex items-center bg-emerald-500/20 text-emerald-300 px-5 py-3 rounded-full border border-emerald-500/30 fade-up delay-3">
+            <i class="fas fa-check-circle mr-2"></i>
+            <span class="font-semibold text-sm">APIs Veterinarias Activas</span>
+        </div>
         {% endif %}
     </div>
+    <div class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent"></div>
 </section>
 
-{# Sección de APIs veterinarias #}
+{# APIs VETERINARIAS #}
 {% if api_available and api_data %}
-<section class="py-12 bg-white border-b">
+<section class="py-20 bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 class="font-montserrat font-black text-2xl text-gray-900 mb-8 text-center">
-            <i class="fas fa-paw mr-3 text-cyan-500"></i>
-            Servicios Veterinarios Integrados
-        </h2>
+        <div class="text-center mb-14 fade-up">
+            <span class="text-cyan-600 font-semibold text-sm uppercase tracking-widest">Servicios Integrados</span>
+            <h2 class="font-montserrat font-black text-4xl md:text-5xl text-slate-800 mt-2 mb-4">Recursos Veterinarios</h2>
+            <div class="w-20 h-1 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full mx-auto"></div>
+        </div>
         
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {# Tarjeta de clínicas cercanas #}
-            <div class="bg-blue-50 rounded-2xl p-6">
-                <h3 class="font-bold text-lg text-blue-900 mb-4">
-                    <i class="fas fa-hospital mr-2"></i>Clínicas Cercanas
-                </h3>
-                {% for clinic in api_data.nearby_clinics %}
-                <div class="bg-white rounded-xl p-4 mb-3 shadow-sm">
-                    <div class="flex justify-between items-start mb-2">
-                        <h4 class="font-semibold text-gray-900">{{ clinic.name }}</h4>
-                        <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
-                            {{ clinic.distance }} km
-                        </span>
-                    </div>
-                    <p class="text-sm text-gray-600 mb-2">{{ clinic.address }}</p>
-                    <button onclick="callClinic('{{ clinic.phone }}')" class="text-blue-600 text-sm font-semibold hover:text-blue-800">
-                        <i class="fas fa-phone mr-1"></i>{{ clinic.phone }}
-                    </button>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {# Clínicas cercanas #}
+            <div class="fade-up delay-1 bg-gradient-to-br from-slate-50 to-blue-50/30 rounded-3xl p-8 border border-slate-100 shadow-md shadow-slate-200/50 hover:shadow-xl hover:shadow-blue-100/20 card-hover">
+                <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-blue-500/20 icon-pulse">
+                    <i class="fas fa-hospital text-2xl text-white"></i>
                 </div>
-                {% empty %}
-                <p class="text-gray-500 text-sm">No hay clínicas cercanas</p>
-                {% endfor %}
+                <h3 class="font-montserrat font-extrabold text-xl text-slate-800 mb-4">Clínicas Cercanas</h3>
+                <div class="space-y-3">
+                    {% for clinic in api_data.nearby_clinics %}
+                    <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-100 hover:border-cyan-200 transition-colors">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-slate-800 text-sm">{{ clinic.name }}</h4>
+                            <span class="text-xs bg-cyan-100 text-cyan-700 px-2.5 py-1 rounded-full font-bold whitespace-nowrap">
+                                {{ clinic.distance }} km
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-500 mb-3">{{ clinic.address }}</p>
+                        <button onclick="callClinic('{{ clinic.phone }}')" class="text-cyan-600 text-sm font-semibold hover:text-cyan-800 transition-colors">
+                            <i class="fas fa-phone mr-1"></i>{{ clinic.phone }}
+                        </button>
+                    </div>
+                    {% empty %}
+                    <p class="text-slate-400 text-sm text-center py-6">No hay clínicas cercanas</p>
+                    {% endfor %}
+                </div>
             </div>
             
-            {# Tarjeta de urgencias 24h #}
-            <div class="bg-red-50 rounded-2xl p-6">
-                <h3 class="font-bold text-lg text-red-900 mb-4">
-                    <i class="fas fa-ambulance mr-2"></i>Urgencias 24h
-                </h3>
-                {% for clinic in api_data.emergency_clinics %}
-                <div class="bg-white rounded-xl p-4 mb-3 shadow-sm border-2 border-red-200">
-                    <div class="flex justify-between items-start mb-2">
-                        <h4 class="font-semibold text-gray-900">{{ clinic.name }}</h4>
-                        <span class="text-xs bg-red-100 text-red-800 px-2 py-1 rounded-full animate-pulse">
-                            24h
-                        </span>
-                    </div>
-                    <p class="text-sm text-gray-600 mb-2">{{ clinic.address }}</p>
-                    <button onclick="callEmergency('{{ clinic.emergency_phone }}')" class="w-full bg-red-500 text-white text-sm font-bold py-2 rounded-lg hover:bg-red-600">
-                        <i class="fas fa-phone-alt mr-1"></i>Llamar Urgencia
-                    </button>
+            {# Urgencias 24h #}
+            <div class="fade-up delay-2 bg-gradient-to-br from-red-50 to-rose-50 rounded-3xl p-8 border border-red-100 shadow-md shadow-red-200/30 hover:shadow-xl hover:shadow-red-200/40 card-hover">
+                <div class="w-14 h-14 bg-gradient-to-br from-red-500 to-rose-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-red-500/20 emergency-pulse">
+                    <i class="fas fa-ambulance text-2xl text-white"></i>
                 </div>
-                {% empty %}
-                <p class="text-gray-500 text-sm">No hay servicios de urgencia</p>
-                {% endfor %}
+                <h3 class="font-montserrat font-extrabold text-xl text-slate-800 mb-4">Urgencias 24h</h3>
+                <div class="space-y-3">
+                    {% for clinic in api_data.emergency_clinics %}
+                    <div class="bg-white rounded-xl p-4 shadow-sm border-2 border-red-200 hover:border-red-300 transition-colors">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-slate-800 text-sm">{{ clinic.name }}</h4>
+                            <span class="text-xs bg-red-500 text-white px-2.5 py-1 rounded-full font-bold animate-pulse whitespace-nowrap">
+                                24h
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-500 mb-3">{{ clinic.address }}</p>
+                        <button onclick="callEmergency('{{ clinic.emergency_phone }}')" class="w-full bg-gradient-to-r from-red-500 to-rose-600 text-white font-bold text-sm py-2.5 rounded-xl hover:from-red-600 hover:to-rose-700 transition-all shadow-md hover:shadow-lg">
+                            <i class="fas fa-phone-alt mr-1"></i>Llamar Urgencia
+                        </button>
+                    </div>
+                    {% empty %}
+                    <p class="text-slate-400 text-sm text-center py-6">No hay servicios de urgencia</p>
+                    {% endfor %}
+                </div>
             </div>
             
-            {# Tarjeta de consejos de salud #}
-            <div class="bg-green-50 rounded-2xl p-6">
-                <h3 class="font-bold text-lg text-green-900 mb-4">
-                    <i class="fas fa-heartbeat mr-2"></i>Consejos de Salud
-                </h3>
-                {% for tip in api_data.health_tips %}
-                <div class="bg-white rounded-xl p-4 mb-3 shadow-sm">
-                    <h4 class="font-semibold text-gray-900 mb-2">{{ tip.title }}</h4>
-                    <p class="text-sm text-gray-600">{{ tip.description }}</p>
+            {# Consejos de Salud #}
+            <div class="fade-up delay-3 bg-gradient-to-br from-emerald-50 to-teal-50 rounded-3xl p-8 border border-emerald-100 shadow-md shadow-emerald-200/30 hover:shadow-xl hover:shadow-emerald-200/40 card-hover">
+                <div class="w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-emerald-500/20" style="animation: soft-pulse 3s infinite 1s;">
+                    <i class="fas fa-heartbeat text-2xl text-white"></i>
                 </div>
-                {% empty %}
-                <p class="text-gray-500 text-sm">No hay consejos disponibles</p>
-                {% endfor %}
+                <h3 class="font-montserrat font-extrabold text-xl text-slate-800 mb-4">Consejos de Salud</h3>
+                <div class="space-y-3">
+                    {% for tip in api_data.health_tips %}
+                    <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-100 hover:border-emerald-200 transition-colors">
+                        <h4 class="font-bold text-slate-800 text-sm mb-2">{{ tip.title }}</h4>
+                        <p class="text-xs text-slate-500 leading-relaxed">{{ tip.description }}</p>
+                    </div>
+                    {% empty %}
+                    <p class="text-slate-400 text-sm text-center py-6">No hay consejos disponibles</p>
+                    {% endfor %}
+                </div>
             </div>
         </div>
     </div>
 </section>
 {% endif %}
 
-{# Listado de consultas médicas #}
-<section class="py-16 bg-gray-50">
+{# HISTORIAL DE CONSULTAS #}
+<section class="py-20 bg-slate-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center mb-8">
-            <h2 class="font-montserrat font-black text-3xl text-gray-900">
-                Historial de Consultas
-            </h2>
-            <a href="{% url 'crear_consulta' %}" class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold text-sm uppercase tracking-wide px-6 py-3 rounded-full transition-all duration-300 hover:transform hover:-translate-y-1 hover:shadow-lg">
-                <i class="fas fa-plus mr-2"></i>Nueva Consulta
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-14 fade-up">
+            <div>
+                <span class="text-cyan-600 font-semibold text-sm uppercase tracking-widest">Historial</span>
+                <h2 class="font-montserrat font-black text-4xl md:text-5xl text-slate-800 mt-2">Consultas Médicas</h2>
+            </div>
+            <a href="{% url 'crear_consulta' %}" class="group bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold text-sm uppercase tracking-wider px-8 py-4 rounded-full transition-all duration-500 hover:shadow-2xl hover:shadow-cyan-500/30 hover:-translate-y-1 hover:scale-105 inline-flex items-center gap-2">
+                <i class="fas fa-plus-circle group-hover:rotate-90 transition-transform duration-500"></i>
+                Nueva Consulta
             </a>
         </div>
         
         {% if consultas %}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {% for consulta in consultas %}
-            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-all duration-300">
-                <div class="flex justify-between items-start mb-4">
+            <div class="fade-up delay-{{ forloop.counter0|add:1|slice:":1" }} bg-white rounded-3xl shadow-md shadow-slate-200/50 border border-slate-100 p-8 hover:shadow-2xl hover:shadow-cyan-200/30 hover:-translate-y-2 transition-all duration-500 group relative overflow-hidden">
+                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-400 to-blue-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+                
+                <div class="flex justify-between items-start mb-5">
                     <div>
-                        <h3 class="font-bold text-xl text-gray-900 mb-1">{{ consulta.mascota }}</h3>
-                        <p class="text-sm text-gray-600">{{ consulta.propietario }}</p>
+                        <h3 class="font-montserrat font-extrabold text-xl text-slate-800 mb-1 group-hover:text-cyan-700 transition-colors">{{ consulta.mascota }}</h3>
+                        <p class="text-sm text-slate-500"><i class="fas fa-user mr-1 text-cyan-500"></i>{{ consulta.propietario }}</p>
                     </div>
-                    <span class="px-3 py-1 text-xs font-semibold rounded-full
-                        {% if consulta.estado == 'pendiente' %}bg-yellow-100 text-yellow-800
-                        {% elif consulta.estado == 'en_proceso' %}bg-blue-100 text-blue-800
-                        {% elif consulta.estado == 'completada' %}bg-green-100 text-green-800
-                        {% else %}bg-gray-100 text-gray-800{% endif %}">
+                    <span class="px-3 py-1 text-xs font-bold rounded-full
+                        {% if consulta.estado == 'pendiente' %}bg-amber-100 text-amber-700
+                        {% elif consulta.estado == 'en_proceso' %}bg-blue-100 text-blue-700
+                        {% elif consulta.estado == 'completada' %}bg-emerald-100 text-emerald-700
+                        {% else %}bg-slate-100 text-slate-600{% endif %}">
                         {{ consulta.get_estado_display }}
                     </span>
                 </div>
                 
-                <div class="space-y-2 mb-4">
-                    <div class="flex items-center text-sm text-gray-600">
-                        <i class="fas fa-calendar mr-2 text-cyan-500"></i>
+                <div class="space-y-3 mb-6">
+                    <div class="flex items-center text-sm text-slate-600">
+                        <div class="w-8 h-8 bg-cyan-100 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+                            <i class="fas fa-calendar text-cyan-600 text-xs"></i>
+                        </div>
                         {{ consulta.fecha|date:"d/m/Y H:i" }}
                     </div>
-                    <div class="flex items-center text-sm text-gray-600">
-                        <i class="fas fa-user-md mr-2 text-cyan-500"></i>
+                    <div class="flex items-center text-sm text-slate-600">
+                        <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+                            <i class="fas fa-user-md text-blue-600 text-xs"></i>
+                        </div>
                         Dr. {{ consulta.veterinario }}
                     </div>
-                    <div class="flex items-center text-sm text-gray-600">
-                        <i class="fas fa-notes-medical mr-2 text-cyan-500"></i>
-                        {{ consulta.motivo|truncatechars:50 }}
+                    <div class="flex items-start text-sm text-slate-600">
+                        <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mr-3 flex-shrink-0 mt-0.5">
+                            <i class="fas fa-notes-medical text-purple-600 text-xs"></i>
+                        </div>
+                        <span class="leading-relaxed">{{ consulta.motivo|truncatechars:60 }}</span>
                     </div>
                 </div>
                 
-                {# Botones de acción según permisos #}
                 {% if perms.consultas.change_consulta or perms.consultas.delete_consulta %}
-                <div class="mt-4 space-y-2">
-                    {# Cambiar estado - Veterinario y Recepcionista #}
+                <div class="border-t border-slate-100 pt-4 space-y-3">
                     {% if perms.consultas.change_consulta %}
                     <form method="post" action="{% url 'actualizar_estado_consulta' consulta.id %}">
                         {% csrf_token %}
                         <div class="flex gap-2">
-                            <select name="estado" class="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                            <select name="estado" class="flex-1 border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-slate-50 focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
                                 <option value="pendiente" {% if consulta.estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
                                 <option value="en_proceso" {% if consulta.estado == 'en_proceso' %}selected{% endif %}>En Proceso</option>
                                 <option value="completada" {% if consulta.estado == 'completada' %}selected{% endif %}>Completada</option>
                                 <option value="cancelada" {% if consulta.estado == 'cancelada' %}selected{% endif %}>Cancelada</option>
                             </select>
-                            <button type="submit" class="bg-cyan-500 text-white text-sm font-bold px-4 py-2 rounded-lg hover:bg-cyan-600">
-                                <i class="fas fa-sync-alt mr-1"></i>Estado
+                            <button type="submit" class="bg-cyan-500 text-white text-sm font-bold px-4 py-2.5 rounded-xl hover:bg-cyan-600 transition-colors">
+                                <i class="fas fa-sync-alt"></i>
                             </button>
                         </div>
                     </form>
                     {% endif %}
                     
-                    {# Editar y Eliminar - Solo Recepcionista y Admin #}
                     {% if perms.consultas.change_consulta or perms.consultas.delete_consulta %}
                     <div class="flex gap-2">
                         {% if perms.consultas.change_consulta %}
-                        <a href="{% url 'editar_consulta' consulta.id %}" class="flex-1 bg-blue-500 text-white text-sm font-bold px-4 py-2 rounded-lg hover:bg-blue-600 text-center">
+                        <a href="{% url 'editar_consulta' consulta.id %}" class="flex-1 bg-blue-500 text-white text-sm font-bold px-4 py-2.5 rounded-xl hover:bg-blue-600 transition-colors text-center">
                             <i class="fas fa-edit mr-1"></i>Editar
                         </a>
                         {% endif %}
                         {% if perms.consultas.delete_consulta %}
                         <form method="post" action="{% url 'eliminar_consulta' consulta.id %}" class="flex-1" onsubmit="return confirm('¿Eliminar esta consulta?');">
                             {% csrf_token %}
-                            <button type="submit" class="w-full bg-red-500 text-white text-sm font-bold px-4 py-2 rounded-lg hover:bg-red-600">
+                            <button type="submit" class="w-full bg-red-500 text-white text-sm font-bold px-4 py-2.5 rounded-xl hover:bg-red-600 transition-colors">
                                 <i class="fas fa-trash mr-1"></i>Eliminar
                             </button>
                         </form>
@@ -188,13 +256,17 @@
             {% endfor %}
         </div>
         {% else %}
-        <div class="text-center py-12">
-            <i class="fas fa-stethoscope text-6xl text-gray-300 mb-4"></i>
-            <h3 class="text-xl font-semibold text-gray-900 mb-2">No hay consultas registradas</h3>
-            <p class="text-gray-600 mb-6">Comienza creando una nueva consulta médica</p>
-            <a href="{% url 'crear_consulta' %}" class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold text-sm uppercase tracking-wide px-6 py-3 rounded-full transition-all duration-300 hover:transform hover:-translate-y-1 hover:shadow-lg">
-                <i class="fas fa-plus mr-2"></i>Crear Primera Consulta
-            </a>
+        <div class="fade-up text-center py-20">
+            <div class="max-w-md mx-auto">
+                <div class="w-24 h-24 bg-slate-100 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-stethoscope text-4xl text-slate-300"></i>
+                </div>
+                <h3 class="font-montserrat font-extrabold text-2xl text-slate-800 mb-2">No hay consultas</h3>
+                <p class="text-slate-500 mb-8">Comienza creando una nueva consulta médica para tu mascota.</p>
+                <a href="{% url 'crear_consulta' %}" class="bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold text-sm uppercase tracking-wider px-8 py-4 rounded-full transition-all duration-500 hover:shadow-2xl hover:shadow-cyan-500/30 hover:-translate-y-1 inline-flex items-center gap-2">
+                    <i class="fas fa-plus-circle"></i>Crear Primera Consulta
+                </a>
+            </div>
         </div>
         {% endif %}
     </div>
@@ -202,18 +274,17 @@
 
 <script>
 function callClinic(phone) {
-    window.location.href = `tel:${phone}`;
+    window.location.href = 'tel:' + phone;
 }
 
 function callEmergency(phone) {
     if (confirm('¿Estás seguro de que quieres llamar a urgencias veterinarias?')) {
-        window.location.href = `tel:${phone}`;
+        window.location.href = 'tel:' + phone;
     }
 }
 
-// Auto-refresh de datos de APIs cada 60 segundos
 {% if api_available %}
-setInterval(() => {
+setInterval(function() {
     console.log('Verificando estado de APIs veterinarias...');
 }, 60000);
 {% endif %}
