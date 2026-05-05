@@ -1,8 +1,6 @@
 # Docker Compose para VetCT - Clínica Veterinaria
 # Arquitectura sencilla: 3 contenedores básicos
 
-version: '3.8'
-
 services:
   # Base de datos PostgreSQL
   db:

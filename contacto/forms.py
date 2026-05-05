@@ -1,14 +1,13 @@
-# Formularios: usamos ModelForm para que Django genere los campos automaticamente
-# Este archivo sirve para crear el formulario que el usuario verá en la web
+# Formularios de contacto
 from django import forms
 from .models import Consulta
 
 class ConsultaForm(forms.ModelForm):
     class Meta:
         model = Consulta
-        # Elegimos los campos que queremos mostrar
+        # Campos que se mostrarán
         fields = ['nombre', 'email', 'asunto', 'mensaje']
-        # Podemos añadir clases de Bootstrap directamente aquí
+        # Estilo Bootstrap para los campos
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Tu nombre'}),
             'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'tu@email.com'}),

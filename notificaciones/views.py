@@ -1,4 +1,5 @@
-# Vistas para el sistema de notificaciones
+# Sistema de notificaciones de la clínica veterinaria
+# Aquí gestionamos todos los mensajes internos entre el personal
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
@@ -9,39 +10,85 @@ from laboratorio.models import Analisis
 from cirugias.models import Cirugia
 from urgencias.models import Urgencia
 
-# Panel de recepción - Vista principal
+# PANEL DE RECEPCIÓN: Aquí llegan todas las solicitudes nuevas
 @login_required
 def panel_recepcion(request):
-    # Obtener solicitudes pendientes y aceptadas
-    consultas = Consulta.objects.filter(estado__in=['Pendiente', 'En Proceso']).order_by('-fecha')
-    analisis = Analisis.objects.filter(estado__in=['Pendiente', 'En Proceso']).order_by('-fecha')
-    cirugias = Cirugia.objects.filter(estado__in=['Pendiente', 'En Proceso']).order_by('-fecha')
-    urgencias = Urgencia.objects.filter(estado__in=['Pendiente', 'En Proceso']).order_by('-fecha')
+    # Separamos las consultas por estado
+    consultas_pendientes = Consulta.objects.filter(estado='Pendiente').order_by('-fecha')
+    consultas_aceptadas = Consulta.objects.filter(estado='Aceptada').order_by('-fecha')
+    consultas_rechazadas = Consulta.objects.filter(estado='Rechazada').order_by('-fecha')
     
+    # Lo mismo para otros servicios
+    analisis_pendientes = Analisis.objects.filter(estado='Pendiente').order_by('-fecha')
+    analisis_aceptados = Analisis.objects.filter(estado='Aceptada').order_by('-fecha')
+    analisis_rechazados = Analisis.objects.filter(estado='Rechazada').order_by('-fecha')
+    
+    cirugias_pendientes = Cirugia.objects.filter(estado='Pendiente').order_by('-fecha')
+    cirugias_aceptadas = Cirugia.objects.filter(estado='Aceptada').order_by('-fecha')
+    cirugias_rechazadas = Cirugia.objects.filter(estado='Rechazada').order_by('-fecha')
+    
+    urgencias_pendientes = Urgencia.objects.filter(estado='Pendiente').order_by('-fecha')
+    urgencias_aceptadas = Urgencia.objects.filter(estado='Aceptada').order_by('-fecha')
+    urgencias_rechazadas = Urgencia.objects.filter(estado='Rechazada').order_by('-fecha')
+    
+    # Notificaciones recientes PENDIENTES para el recepcionista
+    # Solo mostramos notificaciones de citas que están en estado 'Pendiente'
+    notificaciones_recientes = Notificacion.objects.filter(
+        receptor=request.user,
+        estado='pendiente'
+    ).order_by('-fecha_creacion')[:10]
+    
+    # Contador de notificaciones pendientes
+    notificaciones_pendientes_count = Notificacion.objects.filter(
+        receptor=request.user,
+        estado='pendiente'
+    ).count()
+    
+    # Mostramos todo organizado por estado en el panel de recepción
     return render(request, 'notificaciones/panel_recepcion.html', {
-        'consultas': consultas,
-        'analisis': analisis,
-        'cirugias': cirugias,
-        'urgencias': urgencias,
+        # Consultas separadas por estado
+        'consultas_pendientes': consultas_pendientes,
+        'consultas_aceptadas': consultas_aceptadas,
+        'consultas_rechazadas': consultas_rechazadas,
+        
+        # Análisis separados por estado
+        'analisis_pendientes': analisis_pendientes,
+        'analisis_aceptados': analisis_aceptados,
+        'analisis_rechazados': analisis_rechazados,
+        
+        # Cirugías separadas por estado
+        'cirugias_pendientes': cirugias_pendientes,
+        'cirugias_aceptadas': cirugias_aceptadas,
+        'cirugias_rechazadas': cirugias_rechazadas,
+        
+        # Urgencias separadas por estado
+        'urgencias_pendientes': urgencias_pendientes,
+        'urgencias_aceptadas': urgencias_aceptadas,
+        'urgencias_rechazadas': urgencias_rechazadas,
+        
+        # Notificaciones del recepcionista
+        'notificaciones_recientes': notificaciones_recientes,
+        'notificaciones_pendientes_count': notificaciones_pendientes_count,
     })
 
-# Aceptar solicitud - Cambia estado a 'En Proceso'
+# ACEPTAR SOLICITUD: Cuando el recepcionista aprueba una cita
 @login_required
 def aceptar_solicitud(request, notificacion_id):
+    # Buscamos la notificación que queremos aceptar
     notificacion = get_object_or_404(Notificacion, id=notificacion_id)
     
-    # Cambiar estado del objeto relacionado
+    # Cambiamos el estado de la cita/consulta a "Aceptada"
     objeto = notificacion.get_objeto()
     if objeto:
-        objeto.estado = 'En Proceso'
+        objeto.estado = 'Aceptada'  # La cita ha sido aprobada por recepción
         objeto.save()
     
-    # Actualizar notificación
+    # Marcamos la notificación original como aceptada
     notificacion.estado = 'aceptada'
     notificacion.save()
     
-    # Notificar a veterinarios de forma simple
-    veterinarios = User.objects.filter(groups__name='veterinarios')
+    # Creamos notificación para todos los veterinarios
+    veterinarios = User.objects.filter(groups__name='Veterinarios')
     for vet in veterinarios:
         Notificacion.objects.create(
             tipo=notificacion.tipo,
@@ -51,44 +98,92 @@ def aceptar_solicitud(request, notificacion_id):
             estado='pendiente'
         )
     
-    messages.success(request, 'Solicitud aceptada correctamente')
+    # Notificación en tiempo real a veterinarios
+    try:
+        from channels.layers import get_channel_layer
+        from asgiref.sync import async_to_sync
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            'clinica_notificaciones',
+            {
+                'type': 'enviar.notificacion',
+                'message': f'Consulta de {objeto.paciente} aceptada - asignada a veterinarios'
+            }
+        )
+    except:
+        pass
+    
+    messages.success(request, 'Consulta aceptada y notificada a veterinarios')
     return redirect('panel_recepcion')
 
-# Rechazar solicitud - Cambia estado a 'Cancelada'
+# RECHAZAR SOLICITUD: Cuando no podemos atender una cita
 @login_required
 def rechazar_solicitud(request, notificacion_id):
+    # Buscamos la notificación que vamos a rechazar
     notificacion = get_object_or_404(Notificacion, id=notificacion_id)
     
-    # Cambiar estado del objeto relacionado
+    # Cambiamos el estado de la cita a "Rechazada"
     objeto = notificacion.get_objeto()
     if objeto:
-        objeto.estado = 'Cancelada'
+        objeto.estado = 'Rechazada'  # La cita ha sido rechazada por recepción
         objeto.save()
     
-    # Actualizar notificación
+    # Marcamos la notificación como rechazada
     notificacion.estado = 'rechazada'
     notificacion.save()
     
-    messages.success(request, 'Solicitud rechazada correctamente')
+    # Notificación en tiempo real
+    try:
+        from channels.layers import get_channel_layer
+        from asgiref.sync import async_to_sync
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            'clinica_notificaciones',
+            {
+                'type': 'enviar.notificacion',
+                'message': f'Consulta de {objeto.paciente} ha sido rechazada'
+            }
+        )
+    except:
+        pass
+    
+    messages.success(request, 'Consulta rechazada correctamente')
     return redirect('panel_recepcion')
 
-# Panel de veterinarios - Vista simple para veterinarios
+# PANEL VETERINARIO: Aquí los veterinarios ven sus tareas
 @login_required
 def panel_veterinario(request):
-    # Obtener notificaciones pendientes para este veterinario
-    notificaciones = Notificacion.objects.filter(
+    # Separamos las notificaciones por estado
+    notificaciones_pendientes = Notificacion.objects.filter(
         receptor=request.user,
         estado='pendiente'
     ).order_by('-fecha_creacion')
     
+    notificaciones_aceptadas = Notificacion.objects.filter(
+        receptor=request.user,
+        estado='aceptada'
+    ).order_by('-fecha_creacion')
+    
+    notificaciones_rechazadas = Notificacion.objects.filter(
+        receptor=request.user,
+        estado='rechazada'
+    ).order_by('-fecha_creacion')
+    
+    # Contador de notificaciones pendientes
+    notificaciones_pendientes_count = notificaciones_pendientes.count()
+    
+    # Mostramos las notificaciones organizadas por estado
     return render(request, 'notificaciones/panel_veterinario.html', {
-        'notificaciones': notificaciones,
+        'notificaciones_pendientes': notificaciones_pendientes,
+        'notificaciones_aceptadas': notificaciones_aceptadas,
+        'notificaciones_rechazadas': notificaciones_rechazadas,
+        'notificaciones_pendientes_count': notificaciones_pendientes_count,
     })
 
-# Mis Notificaciones - Vista para ver todas las notificaciones del veterinario
+# MIS NOTIFICACIONES: Lista de mensajes para el veterinario
 @login_required
 def mis_notificaciones(request):
-    # Obtener todas las notificaciones para este veterinario
+    # Sacamos todas las notificaciones que son para este veterinario
     notificaciones = Notificacion.objects.filter(
         receptor=request.user
     ).order_by('-fecha_creacion')
@@ -99,7 +194,7 @@ def mis_notificaciones(request):
 
 
 
-# Aceptar cita - Cambia estado a 'En Proceso'
+# Aceptar cita - El veterinario la pone en proceso
 @login_required
 def aceptar_cita(request, tipo, cita_id):
     # Obtener el objeto según el tipo
@@ -115,25 +210,28 @@ def aceptar_cita(request, tipo, cita_id):
         messages.error(request, 'Tipo de cita no válido')
         return redirect('panel_recepcion')
     
-    # Cambiar estado
-    objeto.estado = 'En Proceso'
+    # Cambiar estado a Aceptada
+    objeto.estado = 'Aceptada'
     objeto.save()
     
-    # Notificar a veterinarios
-    veterinarios = User.objects.filter(groups__name='veterinarios')
-    for vet in veterinarios:
-        Notificacion.objects.create(
-            tipo=tipo,
-            objeto_id=cita_id,
-            emisor=request.user,
-            receptor=vet,
-            estado='pendiente'
-        )
+    # Buscar y actualizar la notificación del recepcionista
+    notificacion = Notificacion.objects.filter(
+        tipo=tipo,
+        objeto_id=cita_id,
+        receptor=request.user
+    ).first()
     
-    messages.success(request, f'{tipo.title()} aceptada correctamente')
+    if notificacion:
+        notificacion.estado = 'aceptada'
+        notificacion.save()
+    
+    # El veterinario ha aceptado la cita - fin del flujo de notificaciones
+    # No se crean nuevas notificaciones, la cita está asignada al veterinario
+    
+    messages.success(request, f'{tipo.title()} aceptada correctamente. La cita ha sido asignada a ti.')
     return redirect('panel_recepcion')
 
-# Rechazar cita - Cambia estado a 'Cancelada'
+# Rechazar cita - Se cancela la cita
 @login_required
 def rechazar_cita(request, tipo, cita_id):
     # Obtener el objeto según el tipo
@@ -149,14 +247,60 @@ def rechazar_cita(request, tipo, cita_id):
         messages.error(request, 'Tipo de cita no válido')
         return redirect('panel_recepcion')
     
-    # Cambiar estado
-    objeto.estado = 'Cancelada'
+    # Cambiar estado a Rechazada
+    objeto.estado = 'Rechazada'
     objeto.save()
+    
+    # Buscar y actualizar la notificación del recepcionista
+    notificacion = Notificacion.objects.filter(
+        tipo=tipo,
+        objeto_id=cita_id,
+        receptor=request.user
+    ).first()
+    
+    if notificacion:
+        notificacion.estado = 'rechazada'
+        notificacion.save()
     
     messages.success(request, f'{tipo.title()} rechazada correctamente')
     return redirect('panel_recepcion')
 
-# Eliminar cita - Elimina el objeto completamente
+# Cancelar cita aceptada - Vuelve a estado Pendiente
+@login_required
+def cancelar_cita(request, tipo, cita_id):
+    # Obtener el objeto según el tipo
+    if tipo == 'consulta':
+        objeto = get_object_or_404(Consulta, id=cita_id)
+    elif tipo == 'analisis':
+        objeto = get_object_or_404(Analisis, id=cita_id)
+    elif tipo == 'cirugia':
+        objeto = get_object_or_404(Cirugia, id=cita_id)
+    elif tipo == 'urgencia':
+        objeto = get_object_or_404(Urgencia, id=cita_id)
+    else:
+        messages.error(request, 'Tipo de cita no válido')
+        return redirect('panel_recepcion')
+    
+    # Cambiar estado a Pendiente (cancela la aceptación)
+    objeto.estado = 'Pendiente'
+    objeto.save()
+    
+    # Buscar y actualizar la notificación del veterinario a pendiente
+    notificacion = Notificacion.objects.filter(
+        tipo=tipo,
+        objeto_id=cita_id,
+        receptor=request.user,
+        estado='aceptada'
+    ).first()
+    
+    if notificacion:
+        notificacion.estado = 'pendiente'
+        notificacion.save()
+    
+    messages.success(request, f'{tipo.title()} cancelada. Vuelve a estar pendiente de asignación.')
+    return redirect('panel_veterinario')
+
+# Eliminar cita - Se borra completamente
 @login_required
 def eliminar_cita(request, tipo, cita_id):
     # Obtener el objeto según el tipo
@@ -178,7 +322,31 @@ def eliminar_cita(request, tipo, cita_id):
     messages.success(request, f'{tipo.title()} eliminada correctamente')
     return redirect('panel_recepcion')
 
-# Crear nueva cita
+# Ver detalles de una cita - Muestra toda la información del formulario
+@login_required
+def ver_cita(request, tipo, cita_id):
+    # Obtener el objeto según el tipo
+    if tipo == 'consulta':
+        objeto = get_object_or_404(Consulta, id=cita_id)
+    elif tipo == 'analisis':
+        from laboratorio.models import Analisis
+        objeto = get_object_or_404(Analisis, id=cita_id)
+    elif tipo == 'cirugia':
+        from cirugias.models import Cirugia
+        objeto = get_object_or_404(Cirugia, id=cita_id)
+    elif tipo == 'urgencia':
+        from urgencias.models import Urgencia
+        objeto = get_object_or_404(Urgencia, id=cita_id)
+    else:
+        messages.error(request, 'Tipo de cita no válido')
+        return redirect('panel_recepcion')
+    
+    return render(request, 'notificaciones/ver_cita.html', {
+        'tipo': tipo,
+        'cita': objeto,
+    })
+
+# Crear nueva cita - Formulario para añadir solicitudes
 @login_required
 def crear_cita(request):
     if request.method == 'POST':
@@ -221,7 +389,7 @@ def crear_cita(request):
             return redirect('panel_recepcion')
         
         # Crear notificación para recepcionistas
-        recepcionistas = User.objects.filter(groups__name='recepcionistas')
+        recepcionistas = User.objects.filter(groups__name='Recepcionistas')
         for recep in recepcionistas:
             Notificacion.objects.create(
                 tipo=tipo,
@@ -236,7 +404,7 @@ def crear_cita(request):
     
     return redirect('panel_recepcion')
 
-# Configurar permisos de usuarios - Vista para administradores
+# Configurar permisos - Solo para administradores
 @login_required
 def configurar_permisos(request):
     # Solo administradores pueden acceder
@@ -293,9 +461,8 @@ def configurar_permisos(request):
         'recepcionistas_ids': recepcionistas_ids,
     })
 
-# Crear notificación automática
 def crear_notificacion_automatica(tipo, objeto_id, emisor, receptor):
-    """Crea notificaciones automáticamente cuando un cliente solicita un servicio"""
+    """Crea una notificación cuando un cliente pide algo"""
     Notificacion.objects.create(
         tipo=tipo,
         objeto_id=objeto_id,
@@ -303,3 +470,93 @@ def crear_notificacion_automatica(tipo, objeto_id, emisor, receptor):
         receptor=receptor,
         estado='pendiente'
     )
+
+# VISTAS SIMPLIFICADAS PARA EL PANEL DE RECEPCIÓN
+# Estas vistas permiten aceptar/rechazar sin depender de notificaciones
+
+@login_required
+def aceptar_cita_recepcion(request, tipo, cita_id):
+    """Aceptar una cita directamente desde el panel de recepción"""
+    # Buscar el objeto según el tipo
+    if tipo == 'consulta':
+        objeto = get_object_or_404(Consulta, id=cita_id)
+    elif tipo == 'analisis':
+        from laboratorio.models import Analisis
+        objeto = get_object_or_404(Analisis, id=cita_id)
+    elif tipo == 'cirugia':
+        from cirugias.models import Cirugia
+        objeto = get_object_or_404(Cirugia, id=cita_id)
+    elif tipo == 'urgencia':
+        from urgencias.models import Urgencia
+        objeto = get_object_or_404(Urgencia, id=cita_id)
+    else:
+        messages.error(request, 'Tipo de cita no válido')
+        return redirect('panel_recepcion')
+    
+    # Cambiar estado a Aceptada
+    objeto.estado = 'Aceptada'
+    objeto.save()
+    
+    # Actualizar la notificación del recepcionista a 'aceptada'
+    notificacion = Notificacion.objects.filter(
+        tipo=tipo,
+        objeto_id=cita_id,
+        receptor=request.user,
+        estado='pendiente'
+    ).first()
+    
+    if notificacion:
+        notificacion.estado = 'aceptada'
+        notificacion.save()
+    
+    # Notificar a veterinarios
+    veterinarios = User.objects.filter(groups__name='Veterinarios')
+    for vet in veterinarios:
+        Notificacion.objects.create(
+            tipo=tipo,
+            objeto_id=cita_id,
+            emisor=request.user,
+            receptor=vet,
+            estado='pendiente'
+        )
+    
+    messages.success(request, f'{tipo.capitalize()} aceptada correctamente')
+    return redirect('panel_recepcion')
+
+@login_required
+def rechazar_cita_recepcion(request, tipo, cita_id):
+    """Rechazar una cita directamente desde el panel de recepción"""
+    # Buscar el objeto según el tipo
+    if tipo == 'consulta':
+        objeto = get_object_or_404(Consulta, id=cita_id)
+    elif tipo == 'analisis':
+        from laboratorio.models import Analisis
+        objeto = get_object_or_404(Analisis, id=cita_id)
+    elif tipo == 'cirugia':
+        from cirugias.models import Cirugia
+        objeto = get_object_or_404(Cirugia, id=cita_id)
+    elif tipo == 'urgencia':
+        from urgencias.models import Urgencia
+        objeto = get_object_or_404(Urgencia, id=cita_id)
+    else:
+        messages.error(request, 'Tipo de cita no válido')
+        return redirect('panel_recepcion')
+    
+    # Cambiar estado a Rechazada
+    objeto.estado = 'Rechazada'
+    objeto.save()
+    
+    # Actualizar la notificación a 'rechazada'
+    notificacion = Notificacion.objects.filter(
+        tipo=tipo,
+        objeto_id=cita_id,
+        receptor=request.user,
+        estado='pendiente'
+    ).first()
+    
+    if notificacion:
+        notificacion.estado = 'rechazada'
+        notificacion.save()
+    
+    messages.success(request, f'{tipo.capitalize()} rechazada correctamente')
+    return redirect('panel_recepcion')

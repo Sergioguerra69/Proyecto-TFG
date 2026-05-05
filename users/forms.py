@@ -1,11 +1,10 @@
-# Formularios: usamos ModelForm para que Django genere los campos automaticamente
-# users/forms.py
+# Formularios de usuarios - registro y perfiles
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from .models import Perfil
 
-# Clase CSS para todos los campos
+# Estilo CSS para los campos del formulario
 CLASE_INPUT = 'w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 transition-all duration-300'
 
 class RegistroForm(UserCreationForm):
@@ -51,11 +50,11 @@ class RegistroForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
-        # Aplicar clase CSS a TODOS los campos (incluyendo password1 y password2)
+        # Aplicar estilo CSS a todos los campos
         for field in self.fields.values():
             field.widget.attrs.update({'class': CLASE_INPUT})
         
-        # Personalizar etiquetas
+        # Cambiar nombres de los campos
         self.fields['username'].label = "Nombre de usuario"
         self.fields['email'].label = "Correo electrónico"
         self.fields['telefono'].label = "Teléfono"
@@ -65,13 +64,13 @@ class RegistroForm(UserCreationForm):
     
     def save(self, commit=True):
         user = super().save(commit)
-        # Guardar nombre y apellido del usuario
+        # Guardar datos del usuario
         user.first_name = self.cleaned_data['first_name']
         user.last_name = self.cleaned_data['last_name']
         if commit:
             user.save()
         
-        # Verificamos si el perfil ya existe (o lo creamos)
+        # Crear o actualizar perfil del usuario
         Perfil.objects.update_or_create(
             usuario=user,
             defaults={

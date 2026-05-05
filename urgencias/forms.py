@@ -1,4 +1,4 @@
-# Formularios: usamos ModelForm para que Django genere los campos automaticamente
+# Formularios para urgencias
 from django import forms
 from .models import Urgencia
 

@@ -88,7 +88,7 @@
                         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
                             <div>
                                 <h3 class="font-bold text-gray-900">{{ consulta.motivo|default:"Consulta general" }}</h3>
-                                <p class="text-gray-600 text-sm">{{ consulta.fecha|date:"d/m/Y H:i" }}</p>
+                                <p class="text-gray-600 text-sm">{{ consulta.fecha|date:"d/m/Y" }}</p>
                             </div>
                             <span class="px-3 py-1 rounded-full text-xs font-bold {% if consulta.estado == 'Pendiente' %}bg-yellow-100 text-yellow-800{% elif consulta.estado == 'En Proceso' %}bg-blue-100 text-blue-800{% elif consulta.estado == 'Completada' %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
                                 {{ consulta.estado }}
@@ -127,7 +127,7 @@
                         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
                             <div>
                                 <h3 class="font-bold text-gray-900">{{ analisis_item.tipo|default:"Análisis general" }}</h3>
-                                <p class="text-gray-600 text-sm">{{ analisis_item.fecha|date:"d/m/Y H:i" }}</p>
+                                <p class="text-gray-600 text-sm">{{ analisis_item.fecha|date:"d/m/Y" }}</p>
                             </div>
                             <span class="px-3 py-1 rounded-full text-xs font-bold {% if analisis_item.estado == 'Pendiente' %}bg-yellow-100 text-yellow-800{% elif analisis_item.estado == 'En Proceso' %}bg-blue-100 text-blue-800{% elif analisis_item.estado == 'Completada' %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
                                 {{ analisis_item.estado }}
@@ -166,7 +166,7 @@
                         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
                             <div>
                                 <h3 class="font-bold text-gray-900">{{ cirugia.tipo|default:"Cirugía programada" }}</h3>
-                                <p class="text-gray-600 text-sm">{{ cirugia.fecha|date:"d/m/Y H:i" }}</p>
+                                <p class="text-gray-600 text-sm">{{ cirugia.fecha|date:"d/m/Y" }}</p>
                                 <p class="text-gray-700 text-sm mt-1"><strong>Paciente:</strong> {{ cirugia.paciente|default:"No especificado" }}</p>
                             </div>
                             <span class="px-3 py-1 rounded-full text-xs font-bold {% if cirugia.estado == 'Pendiente' %}bg-yellow-100 text-yellow-800{% elif cirugia.estado == 'En Proceso' %}bg-blue-100 text-blue-800{% elif cirugia.estado == 'Completada' %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
@@ -206,7 +206,7 @@
                         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
                             <div>
                                 <h3 class="font-bold text-gray-900">{{ urgencia.motivo|default:"Urgencia" }}</h3>
-                                <p class="text-gray-600 text-sm">{{ urgencia.fecha|date:"d/m/Y H:i" }}</p>
+                                <p class="text-gray-600 text-sm">{{ urgencia.fecha|date:"d/m/Y" }}</p>
                             </div>
                             <span class="px-3 py-1 rounded-full text-xs font-bold {% if urgencia.estado == 'Pendiente' %}bg-yellow-100 text-yellow-800{% elif urgencia.estado == 'En Proceso' %}bg-blue-100 text-blue-800{% elif urgencia.estado == 'Atendida' %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
                                 {{ urgencia.estado }}

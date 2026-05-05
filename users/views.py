@@ -1,4 +1,4 @@
-# Vistas: funciones que muestran las paginas
+# Vistas de usuarios - registro, login y perfiles
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
@@ -12,7 +12,7 @@ from laboratorio.models import Analisis
 from cirugias.models import Cirugia
 from urgencias.models import Urgencia
 
-# Pagina para registrarse
+# Página de registro
 def registro(peticion):
     if peticion.method == 'POST':
         formulario = RegistroForm(peticion.POST)
@@ -28,7 +28,7 @@ def registro(peticion):
 
 from django.contrib.auth.forms import AuthenticationForm
 
-# Pagina para iniciar sesion
+# Página de login
 def login_view(peticion):
     if peticion.method == 'POST':
         formulario = AuthenticationForm(peticion, data=peticion.POST)
@@ -47,13 +47,13 @@ def login_view(peticion):
     
     return render(peticion, 'users/login.html', {'formulario': formulario})
 
-# Cerrar sesion
+# Cerrar sesión
 def logout_view(peticion):
     logout(peticion)
     messages.info(peticion, 'Has cerrado sesión correctamente')
     return redirect('home')
 
-# Pagina del perfil
+# Página del perfil
 @login_required
 def perfil(peticion):
     if peticion.method == 'POST':
@@ -70,33 +70,32 @@ def perfil(peticion):
 # Lista de agentes (solo admin)
 @login_required
 def lista_agentes(peticion):
-    # Solo los administradores pueden ver esta pagina
+    # Solo admins pueden ver esta página
     if not peticion.user.is_staff:
         messages.error(peticion, 'No tienes permisos para ver esta pagina')
         return redirect('home')
     
-    # Obtener todos los usuarios que son staff (agentes)
+    # Obtener todos los agentes (staff)
     agentes = User.objects.filter(is_staff=True).order_by('username')
     
     return render(peticion, 'users/lista_agentes.html', {'agentes': agentes})
 
-# Pedir cita de consulta
+# Solicitar consulta
 @login_required
 def solicitar_consulta(peticion):
     if peticion.method == 'POST':
         formulario = SolicitudConsultaForm(peticion.POST)
         if formulario.is_valid():
-            # Guardar la consulta con el usuario actual
             consulta = formulario.save(commit=False)
             consulta.usuario = peticion.user
             consulta.estado = 'Pendiente'
             consulta.save()
             
-            # Crear notificación automática para recepción
+            # Notificar al recepcionista
             from notificaciones.views import crear_notificacion_automatica
             from django.contrib.auth.models import User
             
-            # Buscar recepcionistas
+            # Buscar recepcionista
             recepcionistas = User.objects.filter(perfil__rol='recepcionista').first()
             if recepcionistas:
                 crear_notificacion_automatica(
@@ -113,23 +112,22 @@ def solicitar_consulta(peticion):
     
     return render(peticion, 'users/solicitar_consulta.html', {'formulario': formulario})
 
-# Pedir analisis
+# Solicitar análisis
 @login_required
 def solicitar_analisis(peticion):
     if peticion.method == 'POST':
         formulario = SolicitudAnalisisForm(peticion.POST)
         if formulario.is_valid():
-            # Guardar el analisis con el usuario actual
             analisis = formulario.save(commit=False)
             analisis.usuario = peticion.user
             analisis.estado = 'Pendiente'
             analisis.save()
             
-            # Crear notificación automática para recepción
+            # Notificar al recepcionista
             from notificaciones.views import crear_notificacion_automatica
             from django.contrib.auth.models import User
             
-            # Buscar recepcionistas
+            # Buscar recepcionista
             recepcionistas = User.objects.filter(perfil__rol='recepcionista').first()
             if recepcionistas:
                 crear_notificacion_automatica(
@@ -146,23 +144,22 @@ def solicitar_analisis(peticion):
     
     return render(peticion, 'users/solicitar_analisis.html', {'formulario': formulario})
 
-# Pedir cirugia
+# Solicitar cirugía
 @login_required
 def solicitar_cirugia(peticion):
     if peticion.method == 'POST':
         formulario = SolicitudCirugiaForm(peticion.POST)
         if formulario.is_valid():
-            # Guardar la cirugia con el usuario actual
             cirugia = formulario.save(commit=False)
             cirugia.usuario = peticion.user
             cirugia.estado = 'Pendiente'
             cirugia.save()
             
-            # Crear notificación automática para recepción
+            # Notificar al recepcionista
             from notificaciones.views import crear_notificacion_automatica
             from django.contrib.auth.models import User
             
-            # Buscar recepcionistas
+            # Buscar recepcionista
             recepcionistas = User.objects.filter(perfil__rol='recepcionista').first()
             if recepcionistas:
                 crear_notificacion_automatica(
@@ -179,23 +176,22 @@ def solicitar_cirugia(peticion):
     
     return render(peticion, 'users/solicitar_cirugia.html', {'formulario': formulario})
 
-# Pedir urgencia
+# Solicitar urgencia
 @login_required
 def solicitar_urgencia(request):
     if request.method == 'POST':
         form = SolicitudUrgenciaForm(request.POST)
         if form.is_valid():
-            # Guardar la urgencia con el usuario actual
             urgencia = form.save(commit=False)
             urgencia.usuario = request.user
             urgencia.estado = 'Pendiente'
             urgencia.save()
             
-            # Crear notificación automática para recepción
+            # Notificar al recepcionista
             from notificaciones.views import crear_notificacion_automatica
             from django.contrib.auth.models import User
             
-            # Buscar recepcionistas
+            # Buscar recepcionista
             recepcionistas = User.objects.filter(perfil__rol='recepcionista').first()
             if recepcionistas:
                 crear_notificacion_automatica(
@@ -215,7 +211,7 @@ def solicitar_urgencia(request):
 # Ver mis citas
 @login_required
 def mis_citas(request):
-    # Obtener todas las solicitudes del usuario actual
+    # Obtener todas las solicitudes del usuario
     consultas = Consulta.objects.filter(usuario=request.user).order_by('-fecha')
     analisis = Analisis.objects.filter(usuario=request.user).order_by('-fecha')
     cirugias = Cirugia.objects.filter(usuario=request.user).order_by('-fecha')
@@ -230,12 +226,12 @@ def mis_citas(request):
     
     return render(request, 'users/mis_citas.html', context)
 
-# Admin: panel de control
+# Panel de administración
 
 @login_required
 @permission_required('users.view_panel_admin', raise_exception=True)
 def panel_admin(request):
-    # Estadísticas
+    # Estadísticas del sistema
     from django.db.models import Count
     from django.utils import timezone
     
@@ -244,7 +240,7 @@ def panel_admin(request):
     total_citas_hoy = Consulta.objects.filter(fecha__date=timezone.now().date()).count()
     total_urgencias = Urgencia.objects.filter(estado='Pendiente').count()
     
-    # Equipo de trabajo (todos excepto clientes)
+    # Equipo de trabajo (no clientes)
     equipo = User.objects.filter(perfil__rol__in=['veterinario', 'auxiliar', 'recepcionista', 'admin'])
     
     context = {
@@ -260,7 +256,7 @@ def panel_admin(request):
 @login_required
 @permission_required('auth.view_user', raise_exception=True)
 def gestionar_usuarios(request):
-    # Obtener todos los usuarios con su perfil
+    # Obtener todos los usuarios con sus perfiles
     usuarios = User.objects.all().select_related('perfil')
     
     return render(request, 'users/gestionar_usuarios.html', {
@@ -273,7 +269,7 @@ def crear_usuario(request):
     from django.contrib.auth.models import Group
     
     if request.method == 'POST':
-        # Crear usuario
+        # Crear usuario Django
         username = request.POST.get('username')
         email = request.POST.get('email')
         password = request.POST.get('password')
@@ -291,12 +287,12 @@ def crear_usuario(request):
             last_name=last_name
         )
         
-        # Actualizar perfil
+        # Actualizar perfil del usuario
         user.perfil.rol = rol
         user.perfil.telefono = telefono
         user.perfil.save()
         
-        # Asignar a grupo según el rol (los signals asignarán permisos automáticamente)
+        # Asignar grupo según rol
         grupo_mapping = {
             'veterinario': 'Veterinarios',
             'auxiliar': 'Auxiliares',
@@ -311,7 +307,7 @@ def crear_usuario(request):
                 user.is_staff = True
                 user.save()
             except Group.DoesNotExist:
-                # Si el grupo no existe, los signals se encargarán de los permisos básicos
+                # Si no existe el grupo, dar permisos básicos
                 if rol in ['veterinario', 'auxiliar', 'recepcionista', 'admin']:
                     user.is_staff = True
                     user.save()
@@ -347,7 +343,7 @@ def editar_usuario(request, user_id):
 def eliminar_usuario(request, user_id):
     usuario = get_object_or_404(User, id=user_id)
     
-    # No permitir eliminar al superusuario
+    # No se puede eliminar al superusuario
     if usuario.is_superuser:
         messages.error(request, 'No puedes eliminar al superusuario')
         return redirect('gestionar_usuarios')

@@ -3,219 +3,120 @@
 {% block title %}Consultas Médicas - VetCT{% endblock %}
 
 {% block content %}
-{# Cabecera de la página #}
-<section class="py-16 text-center bg-gradient-to-r from-blue-50 to-cyan-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 class="mb-6 font-bold text-4xl md:text-5xl text-gray-900">
-            <i class="fas fa-stethoscope mr-3 text-blue-500"></i>
-            Consultas Médicas
-        </h1>
-        <p class="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-            Gestiona las consultas médicas con servicios veterinarios integrados
-        </p>
-        
-        {% if api_available %}
-            <div class="inline-flex items-center bg-green-100 text-green-800 px-4 py-2 rounded-full">
-                <i class="fas fa-check-circle mr-2"></i>
-                APIs Veterinarias Activas
-            </div>
-        {% endif %}
-    </div>
-</section>
-
-{# Sección de APIs veterinarias #}
-{% if api_available and api_data %}
-<section class="py-12 bg-white border-b">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 class="font-montserrat font-black text-2xl text-gray-900 mb-8 text-center">
-            <i class="fas fa-paw mr-3 text-cyan-500"></i>
-            Servicios Veterinarios Integrados
-        </h2>
-        
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {# Tarjeta de clínicas cercanas #}
-            <div class="bg-blue-50 rounded-2xl p-6">
-                <h3 class="font-bold text-lg text-blue-900 mb-4">
-                    <i class="fas fa-hospital mr-2"></i>Clínicas Cercanas
-                </h3>
-                {% for clinic in api_data.nearby_clinics %}
-                <div class="bg-white rounded-xl p-4 mb-3 shadow-sm">
-                    <div class="flex justify-between items-start mb-2">
-                        <h4 class="font-semibold text-gray-900">{{ clinic.name }}</h4>
-                        <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
-                            {{ clinic.distance }} km
-                        </span>
-                    </div>
-                    <p class="text-sm text-gray-600 mb-2">{{ clinic.address }}</p>
-                    <button onclick="callClinic('{{ clinic.phone }}')" class="text-blue-600 text-sm font-semibold hover:text-blue-800">
-                        <i class="fas fa-phone mr-1"></i>{{ clinic.phone }}
-                    </button>
-                </div>
-                {% empty %}
-                <p class="text-gray-500 text-sm">No hay clínicas cercanas</p>
-                {% endfor %}
-            </div>
-            
-            {# Tarjeta de urgencias 24h #}
-            <div class="bg-red-50 rounded-2xl p-6">
-                <h3 class="font-bold text-lg text-red-900 mb-4">
-                    <i class="fas fa-ambulance mr-2"></i>Urgencias 24h
-                </h3>
-                {% for clinic in api_data.emergency_clinics %}
-                <div class="bg-white rounded-xl p-4 mb-3 shadow-sm border-2 border-red-200">
-                    <div class="flex justify-between items-start mb-2">
-                        <h4 class="font-semibold text-gray-900">{{ clinic.name }}</h4>
-                        <span class="text-xs bg-red-100 text-red-800 px-2 py-1 rounded-full animate-pulse">
-                            24h
-                        </span>
-                    </div>
-                    <p class="text-sm text-gray-600 mb-2">{{ clinic.address }}</p>
-                    <button onclick="callEmergency('{{ clinic.emergency_phone }}')" class="w-full bg-red-500 text-white text-sm font-bold py-2 rounded-lg hover:bg-red-600">
-                        <i class="fas fa-phone-alt mr-1"></i>Llamar Urgencia
-                    </button>
-                </div>
-                {% empty %}
-                <p class="text-gray-500 text-sm">No hay servicios de urgencia</p>
-                {% endfor %}
-            </div>
-            
-            {# Tarjeta de consejos de salud #}
-            <div class="bg-green-50 rounded-2xl p-6">
-                <h3 class="font-bold text-lg text-green-900 mb-4">
-                    <i class="fas fa-heartbeat mr-2"></i>Consejos de Salud
-                </h3>
-                {% for tip in api_data.health_tips %}
-                <div class="bg-white rounded-xl p-4 mb-3 shadow-sm">
-                    <h4 class="font-semibold text-gray-900 mb-2">{{ tip.title }}</h4>
-                    <p class="text-sm text-gray-600">{{ tip.description }}</p>
-                </div>
-                {% empty %}
-                <p class="text-gray-500 text-sm">No hay consejos disponibles</p>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
-</section>
-{% endif %}
-
-{# Listado de consultas médicas #}
-<section class="py-16 bg-gray-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center mb-8">
-            <h2 class="font-montserrat font-black text-3xl text-gray-900">
-                Historial de Consultas
-            </h2>
-            <a href="{% url 'crear_consulta' %}" class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold text-sm uppercase tracking-wide px-6 py-3 rounded-full transition-all duration-300 hover:transform hover:-translate-y-1 hover:shadow-lg">
-                <i class="fas fa-plus mr-2"></i>Nueva Consulta
+<div style="padding: 20px; background-color: #f5f5f5; min-height: 100vh;">
+    <div style="max-width: 1200px; margin: 0 auto;">
+        <!-- Cabecera -->
+        <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
+            <h1 style="color: #333; margin-bottom: 10px;">
+                <i class="fas fa-stethoscope" style="color: #3b82f6; margin-right: 10px;"></i>
+                Consultas Médicas
+            </h1>
+            <p style="color: #666; margin-bottom: 20px;">Gestiona las consultas médicas</p>
+            <a href="{% url 'crear_consulta' %}" style="background-color: #3b82f6; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                <i class="fas fa-plus" style="margin-right: 5px;"></i>Nueva Consulta
             </a>
         </div>
-        
+
+        <!-- Listado de consultas -->
         {% if consultas %}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {% for consulta in consultas %}
-            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-all duration-300">
-                <div class="flex justify-between items-start mb-4">
-                    <div>
-                        <h3 class="font-bold text-xl text-gray-900 mb-1">{{ consulta.mascota }}</h3>
-                        <p class="text-sm text-gray-600">{{ consulta.propietario }}</p>
-                    </div>
-                    <span class="px-3 py-1 text-xs font-semibold rounded-full
-                        {% if consulta.estado == 'pendiente' %}bg-yellow-100 text-yellow-800
-                        {% elif consulta.estado == 'en_proceso' %}bg-blue-100 text-blue-800
-                        {% elif consulta.estado == 'completada' %}bg-green-100 text-green-800
-                        {% else %}bg-gray-100 text-gray-800{% endif %}">
-                        {{ consulta.get_estado_display }}
-                    </span>
-                </div>
+            <div style="background: white; padding: 20px; border-radius: 8px;">
+                <h2 style="color: #333; margin-bottom: 20px;">Historial de Consultas</h2>
                 
-                <div class="space-y-2 mb-4">
-                    <div class="flex items-center text-sm text-gray-600">
-                        <i class="fas fa-calendar mr-2 text-cyan-500"></i>
-                        {{ consulta.fecha|date:"d/m/Y H:i" }}
-                    </div>
-                    <div class="flex items-center text-sm text-gray-600">
-                        <i class="fas fa-user-md mr-2 text-cyan-500"></i>
-                        Dr. {{ consulta.veterinario }}
-                    </div>
-                    <div class="flex items-center text-sm text-gray-600">
-                        <i class="fas fa-notes-medical mr-2 text-cyan-500"></i>
-                        {{ consulta.motivo|truncatechars:50 }}
-                    </div>
-                </div>
-                
-                {# Botones de acción según permisos #}
-                {% if perms.consultas.change_consulta or perms.consultas.delete_consulta %}
-                <div class="mt-4 space-y-2">
-                    {# Cambiar estado - Veterinario y Recepcionista #}
-                    {% if perms.consultas.change_consulta %}
-                    <form method="post" action="{% url 'actualizar_estado_consulta' consulta.id %}">
-                        {% csrf_token %}
-                        <div class="flex gap-2">
-                            <select name="estado" class="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm">
-                                <option value="pendiente" {% if consulta.estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
-                                <option value="en_proceso" {% if consulta.estado == 'en_proceso' %}selected{% endif %}>En Proceso</option>
-                                <option value="completada" {% if consulta.estado == 'completada' %}selected{% endif %}>Completada</option>
-                                <option value="cancelada" {% if consulta.estado == 'cancelada' %}selected{% endif %}>Cancelada</option>
-                            </select>
-                            <button type="submit" class="bg-cyan-500 text-white text-sm font-bold px-4 py-2 rounded-lg hover:bg-cyan-600">
-                                <i class="fas fa-sync-alt mr-1"></i>Estado
-                            </button>
+                {% for consulta in consultas %}
+                <div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 5px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <div>
+                            <h3 style="color: #333; margin: 0;">{{ consulta.paciente|default:consulta.mascota|default:"Paciente" }}</h3>
+                            <p style="color: #666; margin: 5px 0; font-size: 14px;">{{ consulta.usuario.username|default:consulta.propietario|default:"Propietario" }}</p>
                         </div>
-                    </form>
-                    {% endif %}
-                    
-                    {# Editar y Eliminar - Solo Recepcionista y Admin #}
-                    {% if perms.consultas.change_consulta or perms.consultas.delete_consulta %}
-                    <div class="flex gap-2">
-                        {% if perms.consultas.change_consulta %}
-                        <a href="{% url 'editar_consulta' consulta.id %}" class="flex-1 bg-blue-500 text-white text-sm font-bold px-4 py-2 rounded-lg hover:bg-blue-600 text-center">
-                            <i class="fas fa-edit mr-1"></i>Editar
-                        </a>
+                        {% if consulta.estado == 'Pendiente' %}
+                            <span style="padding: 5px 10px; border-radius: 3px; font-size: 12px; font-weight: bold; background-color: #fef3c7; color: #92400e;">
+                                {{ consulta.estado|default:"Pendiente" }}
+                            </span>
+                        {% elif consulta.estado == 'En Proceso' %}
+                            <span style="padding: 5px 10px; border-radius: 3px; font-size: 12px; font-weight: bold; background-color: #dbeafe; color: #1e40af;">
+                                {{ consulta.estado|default:"Pendiente" }}
+                            </span>
+                        {% elif consulta.estado == 'Completada' %}
+                            <span style="padding: 5px 10px; border-radius: 3px; font-size: 12px; font-weight: bold; background-color: #d1fae5; color: #065f46;">
+                                {{ consulta.estado|default:"Pendiente" }}
+                            </span>
+                        {% else %}
+                            <span style="padding: 5px 10px; border-radius: 3px; font-size: 12px; font-weight: bold; background-color: #f3f4f6; color: #374151;">
+                                {{ consulta.estado|default:"Pendiente" }}
+                            </span>
                         {% endif %}
-                        {% if perms.consultas.delete_consulta %}
-                        <form method="post" action="{% url 'eliminar_consulta' consulta.id %}" class="flex-1" onsubmit="return confirm('¿Eliminar esta consulta?');">
+                    </div>
+                    
+                    <div style="margin-bottom: 10px;">
+                        <p style="color: #666; margin: 5px 0; font-size: 14px;">
+                            <i class="fas fa-calendar" style="color: #3b82f6; margin-right: 5px;"></i>
+                            {{ consulta.fecha|date:"d/m/Y H:i"|default:"Sin fecha" }}
+                        </p>
+                        <p style="color: #666; margin: 5px 0; font-size: 14px;">
+                            <i class="fas fa-user-md" style="color: #3b82f6; margin-right: 5px;"></i>
+                            Dr. {{ consulta.usuario.username|default:"Veterinario" }}
+                        </p>
+                        <p style="color: #666; margin: 5px 0; font-size: 14px;">
+                            <i class="fas fa-notes-medical" style="color: #3b82f6; margin-right: 5px;"></i>
+                            {{ consulta.motivo|default:consulta.tipo|default:"Sin motivo" }}
+                        </p>
+                    </div>
+                    
+                    <!-- Debug: Mostrar información del usuario -->
+                    <div style="background-color: #f0f0f0; padding: 5px; margin: 5px 0; font-size: 12px;">
+                        Debug: Usuario: {{ user.username }} | Staff: {{ user.is_staff }} | 
+                        Permisos: {{ user.get_all_permissions|join:", " }}
+                    </div>
+                    
+                    <!-- Botones de acción - Simplificado: mostrar para cualquier usuario logueado -->
+                    {% if user.is_authenticated %}
+                    <div style="display: flex; gap: 10px;">
+                        <!-- Botón para cambiar estado - Cualquier usuario logueado -->
+                        {% if user.is_authenticated %}
+                        <form method="post" action="{% url 'actualizar_estado_consulta' consulta.id %}" style="flex: 1;">
                             {% csrf_token %}
-                            <button type="submit" class="w-full bg-red-500 text-white text-sm font-bold px-4 py-2 rounded-lg hover:bg-red-600">
-                                <i class="fas fa-trash mr-1"></i>Eliminar
-                            </button>
+                            <div style="display: flex; gap: 5px;">
+                                <select name="estado" style="flex: 1; padding: 5px; border: 1px solid #ddd; border-radius: 3px;">
+                                    <option value="Pendiente" {% if consulta.estado == 'Pendiente' %}selected{% endif %}>Pendiente</option>
+                                    <option value="En Proceso" {% if consulta.estado == 'En Proceso' %}selected{% endif %}>En Proceso</option>
+                                    <option value="Completada" {% if consulta.estado == 'Completada' %}selected{% endif %}>Completada</option>
+                                    <option value="Cancelada" {% if consulta.estado == 'Cancelada' %}selected{% endif %}>Cancelada</option>
+                                </select>
+                                <button type="submit" style="background-color: #06b6d4; color: white; padding: 5px 10px; border: none; border-radius: 3px; cursor: pointer;">
+                                    Actualizar
+                                </button>
+                            </div>
                         </form>
                         {% endif %}
+                        
+                        <!-- Botón editar - Cualquier usuario logueado -->
+                        <a href="{% url 'editar_consulta' consulta.id %}" style="background-color: #3b82f6; color: white; padding: 5px 10px; text-decoration: none; border-radius: 3px;">
+                            <i class="fas fa-edit"></i> Editar
+                        </a>
+                        
+                        <!-- Botón eliminar - Cualquier usuario logueado -->
+                        <form method="post" action="{% url 'eliminar_consulta' consulta.id %}" style="display: inline;" onsubmit="return confirm('¿Eliminar esta consulta?');">
+                            {% csrf_token %}
+                            <button type="submit" style="background-color: #ef4444; color: white; padding: 5px 10px; border: none; border-radius: 3px; cursor: pointer;">
+                                <i class="fas fa-trash"></i> Eliminar
+                            </button>
+                        </form>
                     </div>
                     {% endif %}
                 </div>
-                {% endif %}
+                {% endfor %}
             </div>
-            {% endfor %}
-        </div>
         {% else %}
-        <div class="text-center py-12">
-            <i class="fas fa-stethoscope text-6xl text-gray-300 mb-4"></i>
-            <h3 class="text-xl font-semibold text-gray-900 mb-2">No hay consultas registradas</h3>
-            <p class="text-gray-600 mb-6">Comienza creando una nueva consulta médica</p>
-            <a href="{% url 'crear_consulta' %}" class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold text-sm uppercase tracking-wide px-6 py-3 rounded-full transition-all duration-300 hover:transform hover:-translate-y-1 hover:shadow-lg">
-                <i class="fas fa-plus mr-2"></i>Crear Primera Consulta
-            </a>
-        </div>
+            <div style="background: white; padding: 40px; border-radius: 8px; text-align: center;">
+                <i class="fas fa-stethoscope" style="font-size: 48px; color: #d1d5db; margin-bottom: 20px;"></i>
+                <h3 style="color: #333; margin-bottom: 10px;">No hay consultas registradas</h3>
+                <p style="color: #666; margin-bottom: 20px;">Comienza creando una nueva consulta médica</p>
+                <a href="{% url 'crear_consulta' %}" style="background-color: #3b82f6; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                    <i class="fas fa-plus" style="margin-right: 5px;"></i>Crear Primera Consulta
+                </a>
+            </div>
         {% endif %}
     </div>
-</section>
-
-<script>
-function callClinic(phone) {
-    window.location.href = `tel:${phone}`;
-}
-
-function callEmergency(phone) {
-    if (confirm('¿Estás seguro de que quieres llamar a urgencias veterinarias?')) {
-        window.location.href = `tel:${phone}`;
-    }
-}
-
-// Auto-refresh de datos de APIs cada 60 segundos
-{% if api_available %}
-setInterval(() => {
-    console.log('Verificando estado de APIs veterinarias...');
-}, 60000);
-{% endif %}
-</script>
+</div>
 {% endblock %}

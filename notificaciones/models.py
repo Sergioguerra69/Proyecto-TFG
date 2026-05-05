@@ -1,8 +1,9 @@
-# Modelos para el sistema de notificaciones
+# Sistema de notificaciones de la clínica
 from django.db import models
 from django.contrib.auth.models import User
 
 class Notificacion(models.Model):
+    # Tipos de notificaciones
     TIPO_CHOICES = [
         ('consulta', 'Consulta'),
         ('analisis', 'Análisis'),
@@ -10,25 +11,26 @@ class Notificacion(models.Model):
         ('urgencia', 'Urgencia'),
     ]
     
+    # Estados de una notificación
     ESTADO_NOTIFICACION = [
         ('pendiente', 'Pendiente'),
         ('aceptada', 'Aceptada'),
         ('rechazada', 'Rechazada'),
     ]
     
-    # Usuario que recibe la notificación (recepcionista/admin)
+    # Quien recibe el mensaje (recepcionista/admin)
     receptor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notificaciones_recibidas')
-    # Usuario que creó la solicitud (cliente)
+    # Quien envía el mensaje (cliente)
     emisor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notificaciones_enviadas')
-    # Tipo de solicitud
+    # Tipo de solicitud (consulta, análisis, etc.)
     tipo = models.CharField(max_length=20, choices=TIPO_CHOICES)
     # ID del objeto relacionado
     objeto_id = models.PositiveIntegerField()
     # Estado de la notificación
     estado = models.CharField(max_length=20, choices=ESTADO_NOTIFICACION, default='pendiente')
-    # Mensaje opcional
+    # Mensaje adicional (opcional)
     mensaje = models.TextField(blank=True)
-    # Fecha de creación
+    # Fecha de creación (automática)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     
     class Meta:
@@ -40,7 +42,7 @@ class Notificacion(models.Model):
         return f"Notificación {self.get_tipo_display()} - {self.emisor.username}"
     
     def get_objeto(self):
-        """Obtener el objeto relacionado"""
+        """Obtener el objeto relacionado con la notificación"""
         if self.tipo == 'consulta':
             try:
                 from consultas.models import Consulta

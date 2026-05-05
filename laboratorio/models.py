@@ -29,6 +29,8 @@ class Analisis(models.Model):
     tipo_animal_otro = models.CharField(max_length=50, blank=True, verbose_name='Especificar otro animal')
     # Cuándo se hizo
     fecha = models.DateField()
+    # Hora de la cita
+    hora = models.TimeField(default='09:00')
     # Archivo con los resultados (si lo tenemos en PDF)
     resultado = models.FileField(upload_to='laboratorio/', null=True, blank=True)
     # Comentarios sobre el análisis
