@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Solicitar Urgencia - VetCT{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/registro.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- Formulario de solicitud de urgencia -->
+<div class="row">
+    <div class="col-12 col-md-8 col-lg-6 mx-auto">
+        <div class="card border shadow-sm mt-4">
+            <div class="card-header bg-white py-3">
+                <h1 class="h4 card-title mb-0">Solicitar Urgencia Veterinaria</h1>
+            </div>
+            <div class="card-body">
+                <p class="text-muted small">Complete el formulario para solicitar atención de urgencia para su mascota.</p>
+
+                <!-- Alerta de errores -->
+                <div id="js-alerta" class="alert alert-danger d-none" role="alert"></div>
+
+                <form method="post" id="form-solicitud" novalidate>
+                    {% csrf_token %}
+
+                    <!-- Campos del formulario -->
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <label for="{{ form.paciente.id_for_label }}" class="form-label fw-bold small">
+                                {{ form.paciente.label }} *
+                            </label>
+                            {{ form.paciente }}
+                            {% if form.paciente.help_text %}
+                            <div class="form-text small">{{ form.paciente.help_text|safe }}</div>
+                            {% endif %}
+                            {% if form.paciente.errors %}
+                            <div class="text-danger small">{{ form.paciente.errors|striptags }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-12 mb-3">
+                            <label for="{{ form.prioridad.id_for_label }}" class="form-label fw-bold small">
+                                {{ form.prioridad.label }} *
+                            </label>
+                            {{ form.prioridad }}
+                            {% if form.prioridad.help_text %}
+                            <div class="form-text small">{{ form.prioridad.help_text|safe }}</div>
+                            {% endif %}
+                            {% if form.prioridad.errors %}
+                            <div class="text-danger small">{{ form.prioridad.errors|striptags }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-12 mb-3">
+                            <label for="{{ form.descripcion.id_for_label }}" class="form-label fw-bold small">
+                                {{ form.descripcion.label }} *
+                            </label>
+                            {{ form.descripcion }}
+                            {% if form.descripcion.help_text %}
+                            <div class="form-text small">{{ form.descripcion.help_text|safe }}</div>
+                            {% endif %}
+                            {% if form.descripcion.errors %}
+                            <div class="text-danger small">{{ form.descripcion.errors|striptags }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Botones -->
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-danger">Enviar Solicitud de Urgencia</button>
+                        <a href="{% url 'home' %}" class="btn btn-link btn-sm text-decoration-none text-muted">
+                            Cancelar y volver al inicio
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

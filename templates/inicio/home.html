@@ -1,0 +1,529 @@
+{% extends 'base.html' %}
+
+{% block title %}VetCT | Expertos en Vida Animal{% endblock %}
+
+{% block content %}
+
+<style>
+    .fade-up {
+        opacity: 0;
+        transform: translateY(40px);
+        transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+    }
+    .fade-up.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    .fade-in {
+        opacity: 0;
+        transition: opacity 1s ease-out;
+    }
+    .fade-in.visible {
+        opacity: 1;
+    }
+    
+    .scale-in {
+        opacity: 0;
+        transform: scale(0.9);
+        transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    }
+    .scale-in.visible {
+        opacity: 1;
+        transform: scale(1);
+    }
+    
+    .delay-1 { transition-delay: 0.1s; }
+    .delay-2 { transition-delay: 0.2s; }
+    .delay-3 { transition-delay: 0.3s; }
+    .delay-4 { transition-delay: 0.4s; }
+    
+    @keyframes shimmer {
+        100% { left: 100%; }
+    }
+    .animated-line {
+        position: relative;
+        width: 80px;
+        height: 4px;
+        background: linear-gradient(90deg, #0891b2, #1e40af);
+        border-radius: 2px;
+        margin: 0 auto 20px;
+        overflow: hidden;
+    }
+    .animated-line::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+        animation: shimmer 2s infinite;
+    }
+    
+    @keyframes soft-pulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(8, 145, 178, 0.3); }
+        50% { box-shadow: 0 0 0 15px rgba(8, 145, 178, 0); }
+    }
+    .icon-pulse {
+        animation: soft-pulse 3s infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-8px); }
+    }
+    .float-animation {
+        animation: float 4s ease-in-out infinite;
+    }
+
+    /* NEW HERO SECTION - PetCare Plus Style */
+    .hero-petcare {
+        background: linear-gradient(135deg, #2a6e8f 0%, #1d4e6f 50%, #1a3a5c 100%);
+        padding: 100px 0;
+        min-height: 90vh;
+        display: flex;
+        align-items: center;
+        position: relative;
+        width: 100%;
+    }
+
+    .hero-petcare h1 {
+        font-size: 3.2rem;
+        font-weight: 800;
+        margin-bottom: 1.5rem;
+        line-height: 1.2;
+        color: white;
+    }
+
+    .hero-petcare p {
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+        color: rgba(255, 255, 255, 0.9);
+        line-height: 1.6;
+    }
+
+    .hero-petcare .btn-appointment {
+        background: #ff914d;
+        color: white;
+        padding: 14px 35px;
+        border-radius: 50px;
+        font-weight: 600;
+        border: none;
+        margin-right: 15px;
+        transition: all 0.3s ease;
+        display: inline-block;
+        text-decoration: none;
+    }
+
+    .hero-petcare .btn-appointment:hover {
+        background: #ff7a2d;
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .hero-petcare .btn-services {
+        background: transparent;
+        border: 2px solid white;
+        color: white;
+        padding: 14px 35px;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-block;
+        text-decoration: none;
+    }
+
+    .hero-petcare .btn-services:hover {
+        background: white;
+        color: #2a6e8f;
+        transform: translateY(-3px);
+    }
+
+    .hero-petcare .hero-img {
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+        width: 100%;
+        max-width: 100%;
+        transition: transform 0.3s ease;
+    }
+
+    .hero-petcare .hero-img:hover {
+        transform: scale(1.02);
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-fade-in {
+        animation: fadeInUp 0.8s ease-out forwards;
+    }
+
+    /* Fix for row and column alignment */
+    .hero-petcare .row {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .hero-petcare .col-left {
+        flex: 0 0 50%;
+        max-width: 50%;
+        padding-right: 10px;
+    }
+
+    .hero-petcare .col-right {
+        flex: 0 0 50%;
+        max-width: 50%;
+        text-align: center;
+    }
+
+        /* Force center alignment */
+    .hero-petcare .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        width: 100%;
+    }
+
+    .hero-petcare .row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .hero-petcare .col-left {
+        flex: 0 0 50%;
+        max-width: 50%;
+        padding: 0 15px;
+    }
+
+    .hero-petcare .col-right {
+        flex: 0 0 50%;
+        max-width: 50%;
+        padding: 0 15px;
+        text-align: center;
+    }
+
+    /* Override any sidebar issues */
+    body .hero-petcare {
+        width: 100%;
+        position: relative;
+        left: 0;
+        right: 0;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+    }
+
+    @media (max-width: 500px) {
+        .hero-petcare {
+            padding: 60px 0;
+            text-align: center;
+        }
+        .hero-petcare h1 {
+            font-size: 2rem;
+        }
+        .hero-petcare .col-left,
+        .hero-petcare .col-right {
+            flex: 0 0 100%;
+            max-width: 100%;
+            padding-right: 0;
+        }
+        .hero-petcare .col-right {
+            margin-top: 40px;
+        }
+        .hero-petcare .btn-appointment,
+        .hero-petcare .btn-services {
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+    }
+
+
+</style>
+
+{# NEW HERO - PETCARE PLUS STYLE #}
+<section class="hero-petcare">
+    <div class="container">
+        <div class="row">
+            <div class="col-left">
+                <h1 class="animate-fade-in">Cuidado Compasivo para tus Mascotas</h1>
+                <p class="animate-fade-in">En VetCT ofrecemos servicios veterinarios integrales con tecnología de última generación y un enfoque compasivo para garantizar que tus mascotas vivan vidas saludables y felices.</p>
+                <div class="hero-btns animate-fade-in">
+                    <a href="{% url 'contacto' %}" class="btn-appointment">Agendar Cita</a>
+                    <a href="{% url 'servicios' %}" class="btn-services">Nuestros Servicios</a>
+                </div>
+
+                {% if user.is_authenticated %}
+                <div class="mt-5 p-4" style="background: rgba(255,255,255,0.1); border-radius: 20px; backdrop-filter: blur(10px);">
+                    <p class="mb-3 text-white">Bienvenido, <strong style="color: #ff914d;">{{ user.username }}</strong></p>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        {% if user.perfil and user.perfil.rol == 'recepcionista' %}
+                        <a href="{% url 'panel_recepcion' %}" style="background: #10b981; padding: 8px 16px; border-radius: 12px; color: white; font-size: 12px; font-weight: bold; text-decoration: none;">
+                            <i class="fas fa-bell"></i> PANEL RECEPCIÓN
+                        </a>
+                        {% endif %}
+                        {% if user.perfil and user.perfil.rol == 'veterinario' %}
+                        <a href="{% url 'panel_veterinario' %}" style="background: #22c55e; padding: 8px 16px; border-radius: 12px; color: white; font-size: 12px; font-weight: bold; text-decoration: none;">
+                            <i class="fas fa-user-md"></i> PANEL VETERINARIO
+                        </a>
+                        {% endif %}
+                        <a href="{% url 'solicitar_urgencia' %}" style="background: #ef4444; padding: 8px 16px; border-radius: 12px; color: white; font-size: 12px; font-weight: bold; text-decoration: none; animation: pulse 2s infinite;">
+                            <i class="fas fa-exclamation-triangle"></i> URGENCIAS 24H
+                        </a>
+                        <a href="{% url 'mis_citas' %}" style="background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 12px; color: white; font-size: 12px; font-weight: bold; text-decoration: none;">
+                            <i class="fas fa-calendar-alt"></i> Mis Citas
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            <div class="col-right">
+                <img src="https://images.unsplash.com/photo-1583337130417-3346a1be7dee?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Veterinario con mascota" class="hero-img animate-fade-in">
+            </div>
+        </div>
+    </div>
+</section>
+
+{# CARACTERÍSTICAS - OLD STYLE #}
+<section class="py-24 bg-white relative overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+        <div class="text-center mb-16 fade-up">
+            <span class="text-cyan-600 font-semibold text-sm uppercase tracking-widest">Nuestros Servicios</span>
+            <h2 class="font-montserrat font-black text-4xl md:text-5xl text-slate-800 mt-2 mb-4">Cuidado integral</h2>
+            <div class="animated-line"></div>
+            <p class="text-slate-500 max-w-xl mx-auto text-lg">Servicios especializados para cada etapa de la vida de tu mascota.</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="fade-up delay-1 group bg-white rounded-3xl shadow-lg shadow-slate-200/50 text-center p-10 hover:shadow-2xl hover:shadow-cyan-200/40 hover:-translate-y-3 transition-all duration-500 border border-slate-50 relative overflow-hidden">
+                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-400 to-blue-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+                <div class="w-20 h-20 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-lg shadow-cyan-500/20 icon-pulse">
+                    <i class="fas fa-heartbeat text-3xl text-white"></i>
+                </div>
+                <h3 class="font-montserrat font-extrabold text-2xl text-slate-800 mb-4 group-hover:text-cyan-700 transition-colors">Atención Vital</h3>
+                <p class="text-slate-500 leading-relaxed">Monitoreo constante y cuidados intensivos especializados con equipos de última generación.</p>
+            </div>
+            
+            <div class="fade-up delay-2 group bg-white rounded-3xl shadow-lg shadow-slate-200/50 text-center p-10 hover:shadow-2xl hover:shadow-cyan-200/40 hover:-translate-y-3 transition-all duration-500 border border-slate-50 relative overflow-hidden">
+                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-400 to-blue-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+                <div class="w-20 h-20 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-lg shadow-cyan-500/20" style="animation: soft-pulse 3s infinite 0.5s;">
+                    <i class="fas fa-x-ray text-3xl text-white"></i>
+                </div>
+                <h3 class="font-montserrat font-extrabold text-2xl text-slate-800 mb-4 group-hover:text-cyan-700 transition-colors">Rayos X & Lab</h3>
+                <p class="text-slate-500 leading-relaxed">Resultados inmediatos con equipos digitales de alta resolución y precisión diagnóstica.</p>
+            </div>
+            
+            <div class="fade-up delay-3 group bg-white rounded-3xl shadow-lg shadow-slate-200/50 text-center p-10 hover:shadow-2xl hover:shadow-cyan-200/40 hover:-translate-y-3 transition-all duration-500 border border-slate-50 relative overflow-hidden">
+                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-400 to-blue-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+                <div class="w-20 h-20 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-lg shadow-cyan-500/20" style="animation: soft-pulse 3s infinite 1s;">
+                    <i class="fas fa-syringe text-3xl text-white"></i>
+                </div>
+                <h3 class="font-montserrat font-extrabold text-2xl text-slate-800 mb-4 group-hover:text-cyan-700 transition-colors">Vacunas</h3>
+                <p class="text-slate-500 leading-relaxed">Esquema completo de inmunización adaptado a cada especie y etapa de vida.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+{# ESTADÍSTICAS CON CONTADOR - OLD STYLE #}
+<section class="py-24 bg-gradient-to-br from-slate-900 to-blue-950 relative overflow-hidden">
+    <div class="absolute inset-0 opacity-5">
+        <div class="absolute top-0 left-0 w-full h-full" style="background-image: radial-gradient(circle at 20% 50%, #22d3ee 1px, transparent 1px); background-size: 50px 50px;"></div>
+    </div>
+    
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16 fade-up">
+            <span class="text-cyan-400 font-semibold text-sm uppercase tracking-widest">Confianza</span>
+            <h2 class="font-montserrat font-black text-4xl md:text-5xl text-white mt-2 mb-4">Nuestra experiencia</h2>
+            <p class="text-slate-400 max-w-xl mx-auto text-lg">Cifras que respaldan nuestro compromiso con la salud animal.</p>
+        </div>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-8">
+            <div class="fade-up delay-1 text-center group">
+                <div class="text-7xl font-black text-cyan-400 mb-3 group-hover:scale-110 transition-transform duration-300 counter" data-target="12">0</div>
+                <div class="flex items-center justify-center gap-2 text-slate-300 font-medium text-lg">
+                    <i class="fas fa-calendar-check text-cyan-400 group-hover:rotate-12 transition-transform duration-300"></i>
+                    <span>Años de Experiencia</span>
+                </div>
+            </div>
+            <div class="fade-up delay-2 text-center group">
+                <div class="text-7xl font-black text-cyan-400 mb-3 group-hover:scale-110 transition-transform duration-300 counter" data-target="5000">0</div>
+                <div class="flex items-center justify-center gap-2 text-slate-300 font-medium text-lg">
+                    <i class="fas fa-paw text-cyan-400 group-hover:-rotate-12 transition-transform duration-300"></i>
+                    <span>Mascotas Atendidas</span>
+                </div>
+            </div>
+            <div class="fade-up delay-3 text-center group">
+                <div class="text-7xl font-black text-cyan-400 mb-3 group-hover:scale-110 transition-transform duration-300"><span class="counter" data-target="24">0</span>/<span class="counter" data-target="7">0</span></div>
+                <div class="flex items-center justify-center gap-2 text-slate-300 font-medium text-lg">
+                    <i class="fas fa-clock text-cyan-400 group-hover:rotate-12 transition-transform duration-300"></i>
+                    <span>Urgencias Disponibles</span>
+                </div>
+            </div>
+            <div class="fade-up delay-4 text-center group">
+                <div class="text-7xl font-black text-cyan-400 mb-3 group-hover:scale-110 transition-transform duration-300"><span class="counter" data-target="100">0</span>%</div>
+                <div class="flex items-center justify-center gap-2 text-slate-300 font-medium text-lg">
+                    <i class="fas fa-star text-cyan-400 group-hover:-rotate-12 transition-transform duration-300"></i>
+                    <span>Satisfacción</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{# TESTIMONIOS - OLD STYLE #}
+<section class="py-24 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16 fade-up">
+            <span class="text-cyan-600 font-semibold text-sm uppercase tracking-widest">Testimonios</span>
+            <h2 class="font-montserrat font-black text-4xl md:text-5xl text-slate-800 mt-2 mb-4">Lo que dicen nuestros clientes</h2>
+            <p class="text-slate-500 max-w-xl mx-auto text-lg">La confianza de miles de familias nos avala.</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="fade-up delay-1 bg-slate-50 rounded-3xl p-8 border border-slate-100 hover:shadow-xl hover:shadow-cyan-100/20 hover:-translate-y-2 transition-all duration-500">
+                <div class="flex text-yellow-400 mb-4">
+                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                </div>
+                <p class="text-slate-600 mb-6 italic leading-relaxed">"Salvaron a mi perro de una urgencia a las 3am. Profesionales increíbles, instalaciones impecables. Los recomiendo sin dudar."</p>
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full flex items-center justify-center text-white font-bold">M</div>
+                    <div>
+                        <p class="font-bold text-slate-800">María García</p>
+                        <p class="text-slate-400 text-sm">Cliente desde 2020</p>
+                    </div>
+                </div>
+            </div>
+            <div class="fade-up delay-2 bg-slate-50 rounded-3xl p-8 border border-slate-100 hover:shadow-xl hover:shadow-cyan-100/20 hover:-translate-y-2 transition-all duration-500">
+                <div class="flex text-yellow-400 mb-4">
+                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                </div>
+                <p class="text-slate-600 mb-6 italic leading-relaxed">"El seguimiento post-operatorio de mi gato fue excepcional. Me llamaban cada día para informarme. Un trato cercano y profesional."</p>
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center text-white font-bold">C</div>
+                    <div>
+                        <p class="font-bold text-slate-800">Carlos López</p>
+                        <p class="text-slate-400 text-sm">Cliente desde 2021</p>
+                    </div>
+                </div>
+            </div>
+            <div class="fade-up delay-3 bg-slate-50 rounded-3xl p-8 border border-slate-100 hover:shadow-xl hover:shadow-cyan-100/20 hover:-translate-y-2 transition-all duration-500">
+                <div class="flex text-yellow-400 mb-4">
+                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                </div>
+                <p class="text-slate-600 mb-6 italic leading-relaxed">"La mejor clínica veterinaria de la zona. Equipamiento de primer nivel y los veterinarios explican todo con detalle y paciencia."</p>
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full flex items-center justify-center text-white font-bold">A</div>
+                    <div>
+                        <p class="font-bold text-slate-800">Ana Martínez</p>
+                        <p class="text-slate-400 text-sm">Cliente desde 2023</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{# CTA FINAL - OLD STYLE #}
+<section class="py-24 bg-white relative overflow-hidden">
+    <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent"></div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-gradient-to-br from-cyan-600 via-blue-700 to-indigo-800 rounded-3xl shadow-2xl shadow-cyan-500/30 p-12 md:p-16 max-w-3xl mx-auto text-center relative overflow-hidden fade-up">
+            <div class="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2"></div>
+            <div class="absolute bottom-0 left-0 w-40 h-40 bg-white/5 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2"></div>
+            <div class="relative">
+                <span class="inline-block bg-white/20 text-white text-sm font-semibold uppercase tracking-widest px-4 py-2 rounded-full mb-6">
+                    <i class="fas fa-paw mr-2"></i>Primera consulta gratuita
+                </span>
+                <h2 class="font-montserrat font-black text-3xl md:text-4xl text-white mb-4">¿Listo para visitarnos?</h2>
+                <p class="text-cyan-100 mb-3 font-medium">Lunes a Sábados: 9:00 - 20:00 | Domingos: Solo Urgencias</p>
+                <p class="text-5xl md:text-6xl font-black text-white mb-2 tracking-tight">
+                    <i class="fas fa-phone-alt text-3xl mr-3"></i>+34 722 19 49 81
+                </p>
+                <p class="text-cyan-200 text-sm mb-8">Disponibles 24/7 para emergencias</p>
+                <div class="flex gap-4 justify-center flex-wrap">
+                    <a href="{% url 'contacto' %}" class="group bg-white text-cyan-700 font-bold text-sm uppercase tracking-wider px-8 py-4 rounded-full transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 hover:scale-105" style="text-decoration: none;">
+                        <i class="fas fa-calendar-plus mr-2 group-hover:rotate-12 transition-transform duration-300 inline-block"></i>Agendar Cita
+                    </a>
+                    <a href="{% url 'servicios' %}" class="border-2 border-white/60 text-white font-bold text-sm uppercase tracking-wider px-8 py-4 rounded-full transition-all duration-500 hover:bg-white/10 hover:border-white hover:-translate-y-1" style="text-decoration: none;">
+                        <i class="fas fa-arrow-right mr-2"></i>Ver Servicios
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+const observerOptions = {
+    threshold: 0.15,
+    rootMargin: '0px 0px -50px 0px'
+};
+
+const observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            
+            var counters = entry.target.querySelectorAll('.counter');
+            counters.forEach(function(counter) {
+                if (!counter.dataset.started) {
+                    counter.dataset.started = 'true';
+                    animateCounter(counter);
+                }
+            });
+        }
+    });
+}, observerOptions);
+
+document.querySelectorAll('.fade-up, .fade-in, .scale-in').forEach(function(el) {
+    observer.observe(el);
+});
+
+function animateCounter(element) {
+    var target = parseInt(element.getAttribute('data-target'));
+    var duration = 2000;
+    var startTime = performance.now();
+    
+    function update(currentTime) {
+        var elapsed = currentTime - startTime;
+        var progress = Math.min(elapsed / duration, 1);
+        
+        var easeOut = 1 - Math.pow(1 - progress, 3);
+        var current = Math.floor(easeOut * target);
+        
+        element.textContent = current.toLocaleString();
+        
+        if (progress < 1) {
+            requestAnimationFrame(update);
+        } else {
+            element.textContent = target.toLocaleString();
+        }
+    }
+    
+    requestAnimationFrame(update);
+}
+
+if (window.innerWidth > 768) {
+    window.addEventListener('scroll', function() {
+        var scrolled = window.pageYOffset;
+        var parallaxElements = document.querySelectorAll('.parallax-bg');
+        parallaxElements.forEach(function(el) {
+            var speed = 0.3;
+            el.style.transform = 'translateY(' + (scrolled * speed) + 'px)';
+        });
+    });
+}
+</script>
+
+{% endblock %}
