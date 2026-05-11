@@ -22,11 +22,13 @@
                 <h3 class="font-bold">Notificaciones recientes</h3>
             </div>
             <div class="p-4 overflow-x-auto">
-                <table class="w-full min-w-[600px]">
+                <table class="w-full min-w-[800px]">
                     <thead>
                         <tr class="bg-gray-100">
                             <th class="px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold">Tipo</th>
                             <th class="px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold">De</th>
+                            <th class="px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold">Paciente</th>
+                            <th class="px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold">Motivo/Detalles</th>
                             <th class="px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold">Fecha</th>
                             <th class="px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold">Estado</th>
                             <th class="px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold">Acciones</th>
@@ -37,6 +39,32 @@
                         <tr class="border-b hover:bg-gray-50">
                             <td class="px-2 md:px-3 py-2 text-sm">{{ notif.get_tipo_display }}</td>
                             <td class="px-2 md:px-3 py-2 text-sm">{{ notif.emisor.username }}</td>
+                            <td class="px-2 md:px-3 py-2 text-sm">
+                                {% if notif.objeto %}
+                                    {% if notif.objeto.paciente %}
+                                        {{ notif.objeto.paciente.nombre }}
+                                    {% else %}
+                                        No especificado
+                                    {% endif %}
+                                {% else %}
+                                    No disponible
+                                {% endif %}
+                            </td>
+                            <td class="px-2 md:px-3 py-2 text-sm max-w-xs truncate">
+                                {% if notif.objeto %}
+                                    {% if notif.tipo == 'consulta' %}
+                                        {{ notif.objeto.motivo|default:"Sin motivo" }}
+                                    {% elif notif.tipo == 'analisis' %}
+                                        {{ notif.objeto.nombre|default:"Sin nombre" }}
+                                    {% elif notif.tipo == 'cirugia' %}
+                                        {{ notif.objeto.tipo_cirugia|default:"Sin tipo" }}
+                                    {% elif notif.tipo == 'urgencia' %}
+                                        {{ notif.objeto.descripcion|default:"Sin descripción" }}
+                                    {% endif %}
+                                {% else %}
+                                    Sin detalles
+                                {% endif %}
+                            </td>
                             <td class="px-2 md:px-3 py-2 text-xs md:text-sm text-gray-600">{{ notif.fecha_creacion|date:"d/m/Y" }}</td>
                             <td class="px-2 md:px-3 py-2 text-sm">
                                 {% if notif.estado == 'aceptada' %}

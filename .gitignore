@@ -50,3 +50,55 @@ redis_data/
 .idea/
 *.swp
 *.swo
+
+# APIs y archivos de configuración sensible
+api_keys.py
+secrets.json
+config/secrets.py
+local_settings.py
+production_settings.py
+staging_settings.py
+
+# Archivos de APIs de terceros
+api_responses/
+cache/
+temp/
+downloads/
+api_cache/
+logs/
+*.log
+
+# Archivos de configuración de APIs
+.env.local
+.env.production
+.env.development
+credentials.json
+service_account.json
+
+# Datos de APIs externas
+external_apis/
+third_party_data/
+api_test_responses/
+mock_data/
+
+# Archivos temporales de APIs
+*.tmp
+*.temp
+api_temp/
+cache_*.json
+
+# Documentación de APIs (local)
+api_docs/
+postman_collections/
+insomnia_exports/
+
+# Backups de datos de APIs
+api_backups/
+data_exports/
+*.backup
+*.bak
+
+# Tokens y sesiones de APIs
+tokens/
+sessions/
+auth_cache/
