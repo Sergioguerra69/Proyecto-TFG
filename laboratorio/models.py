@@ -35,6 +35,10 @@ class Analisis(models.Model):
     resultado = models.FileField(upload_to='laboratorio/', null=True, blank=True)
     # Comentarios sobre el análisis
     notas = models.TextField(blank=True)
+    # Datos de contacto del solicitante
+    dni = models.CharField(max_length=20, blank=True, verbose_name='DNI')
+    telefono = models.CharField(max_length=15, blank=True, verbose_name='Teléfono')
+    correo = models.EmailField(blank=True, verbose_name='Correo electrónico')
     # Estado del progreso
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='Pendiente')
     # Fecha de creación

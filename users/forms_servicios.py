@@ -10,7 +10,7 @@ from urgencias.models import Urgencia
 class SolicitudConsultaForm(forms.ModelForm):
     class Meta:
         model = Consulta
-        fields = ['paciente', 'tipo_animal', 'tipo_animal_otro', 'fecha', 'motivo']
+        fields = ['paciente', 'tipo_animal', 'tipo_animal_otro', 'fecha', 'motivo', 'dni', 'telefono', 'correo']
         widgets = {
             'paciente': forms.TextInput(attrs={
                 'class': 'w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-cyan-500',
@@ -33,13 +33,25 @@ class SolicitudConsultaForm(forms.ModelForm):
                 'class': 'w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-cyan-500',
                 'rows': 4,
                 'placeholder': 'Describa los síntomas o motivo de la consulta'
+            }),
+            'dni': forms.TextInput(attrs={
+                'class': 'w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-cyan-500',
+                'placeholder': 'DNI del solicitante'
+            }),
+            'telefono': forms.TextInput(attrs={
+                'class': 'w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-cyan-500',
+                'placeholder': 'Teléfono de contacto'
+            }),
+            'correo': forms.EmailInput(attrs={
+                'class': 'w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-cyan-500',
+                'placeholder': 'Correo electrónico'
             })
         }
 
 class SolicitudAnalisisForm(forms.ModelForm):
     class Meta:
         model = Analisis
-        fields = ['nombre', 'paciente', 'tipo_animal', 'tipo_animal_otro', 'fecha', 'notas']
+        fields = ['nombre', 'paciente', 'tipo_animal', 'tipo_animal_otro', 'fecha', 'notas', 'dni', 'telefono', 'correo']
         widgets = {
             'nombre': forms.TextInput(attrs={
                 'class': 'w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-cyan-500',
@@ -66,13 +78,25 @@ class SolicitudAnalisisForm(forms.ModelForm):
                 'class': 'w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-cyan-500',
                 'rows': 3,
                 'placeholder': 'Comentarios adicionales'
+            }),
+            'dni': forms.TextInput(attrs={
+                'class': 'w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-cyan-500',
+                'placeholder': 'DNI del solicitante'
+            }),
+            'telefono': forms.TextInput(attrs={
+                'class': 'w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-cyan-500',
+                'placeholder': 'Teléfono de contacto'
+            }),
+            'correo': forms.EmailInput(attrs={
+                'class': 'w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-cyan-500',
+                'placeholder': 'Correo electrónico'
             })
         }
 
 class SolicitudCirugiaForm(forms.ModelForm):
     class Meta:
         model = Cirugia
-        fields = ['paciente', 'tipo_animal', 'tipo_animal_otro', 'tipo_cirugia', 'fecha', 'quirofano']
+        fields = ['paciente', 'tipo_animal', 'tipo_animal_otro', 'tipo_cirugia', 'fecha', 'quirofano', 'dni', 'telefono', 'correo']
         widgets = {
             'paciente': forms.TextInput(attrs={
                 'class': 'w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-cyan-500',
@@ -97,13 +121,25 @@ class SolicitudCirugiaForm(forms.ModelForm):
             }),
             'quirofano': forms.Select(attrs={
                 'class': 'w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-cyan-500'
+            }),
+            'dni': forms.TextInput(attrs={
+                'class': 'w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-cyan-500',
+                'placeholder': 'DNI del solicitante'
+            }),
+            'telefono': forms.TextInput(attrs={
+                'class': 'w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-cyan-500',
+                'placeholder': 'Teléfono de contacto'
+            }),
+            'correo': forms.EmailInput(attrs={
+                'class': 'w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-cyan-500',
+                'placeholder': 'Correo electrónico'
             })
         }
 
 class SolicitudUrgenciaForm(forms.ModelForm):
     class Meta:
         model = Urgencia
-        fields = ['paciente', 'tipo_animal', 'tipo_animal_otro', 'prioridad', 'descripcion']
+        fields = ['paciente', 'tipo_animal', 'tipo_animal_otro', 'prioridad', 'descripcion', 'dni', 'telefono', 'correo']
         widgets = {
             'paciente': forms.TextInput(attrs={
                 'class': 'w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-cyan-500',
@@ -125,5 +161,17 @@ class SolicitudUrgenciaForm(forms.ModelForm):
                 'class': 'w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-cyan-500',
                 'rows': 4,
                 'placeholder': 'Describa la emergencia en detalle'
+            }),
+            'dni': forms.TextInput(attrs={
+                'class': 'w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-cyan-500',
+                'placeholder': 'DNI del solicitante'
+            }),
+            'telefono': forms.TextInput(attrs={
+                'class': 'w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-cyan-500',
+                'placeholder': 'Teléfono de contacto'
+            }),
+            'correo': forms.EmailInput(attrs={
+                'class': 'w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-cyan-500',
+                'placeholder': 'Correo electrónico'
             })
         }

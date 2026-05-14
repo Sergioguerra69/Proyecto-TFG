@@ -67,8 +67,9 @@ def crear_consulta(request):
             
             # Notificación solo al recepcionista
             try:
-                from django.contrib.auth.models import User, Group
-                recepcionistas = User.objects.filter(groups__name='Recepcionistas')
+                from django.contrib.auth.models import User
+                # Notificar a recepcionistas (por rol de perfil)
+                recepcionistas = User.objects.filter(perfil__rol='recepcionista')
                 
                 for recepcionista in recepcionistas:
                     from notificaciones.models import Notificacion

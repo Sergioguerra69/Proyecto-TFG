@@ -1,0 +1,280 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-slate-800 py-8">
+ <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+ <!-- Header -->
+ <div class="mb-8">
+ <div class="bg-white rounded-lg shadow-lg p-6 border border-slate-200">
+ <div class="flex items-center justify-between">
+ <div class="flex items-center gap-4">
+ <div class="w-12 h-12 bg-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+ <i class="fas fa-user-md text-white text-xl"></i>
+ </div>
+ <div>
+ <h1 class="text-2xl font-bold text-slate-800">Panel Veterinario</h1>
+ <p class="text-slate-600">Gestiona tus solicitudes asignadas</p>
+ </div>
+ </div>
+ <div class="flex items-center gap-3">
+ <a href="{% url 'ver_notificaciones_veterinario' %}" class="px-4 py-2 bg-purple-100 text-purple-800 rounded-lg hover:bg-purple-200 transition-colors flex items-center gap-2 relative">
+ <i class="fas fa-bell"></i>
+ Notificaciones
+ {% if notificaciones_no_leidas.count %}
+ <span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
+ {% endif %}
+ </a>
+ <div class="px-4 py-2 bg-green-100 text-green-800 rounded-lg font-semibold">
+ <i class="fas fa-clipboard-check mr-2"></i>
+ {{ asignaciones_pendientes.count }} Pendientes
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+
+ <!-- Pestañas -->
+ <div class="mb-6">
+ <div class="bg-white rounded-xl shadow-md p-2 border border-slate-200">
+ <div class="flex space-x-2">
+ <button onclick="showTab('pendientes')" id="tab-pendientes" class="flex-1 px-4 py-2 bg-purple-500 text-white rounded-lg font-medium transition-colors">
+ <i class="fas fa-clock mr-2"></i>
+ Solicitudes Pendientes ({{ asignaciones_pendientes.count }})
+ </button>
+ <button onclick="showTab('aceptadas')" id="tab-aceptadas" class="flex-1 px-4 py-2 bg-slate-100 text-slate-700 rounded-lg font-medium hover:bg-slate-200 transition-colors">
+ <i class="fas fa-check-circle mr-2"></i>
+ Solicitudes Aceptadas ({{ asignaciones_aceptadas.count }})
+ </button>
+ <button onclick="showTab('completadas')" id="tab-completadas" class="flex-1 px-4 py-2 bg-slate-100 text-slate-700 rounded-lg font-medium hover:bg-slate-200 transition-colors">
+ <i class="fas fa-flag-checkered mr-2"></i>
+ Solicitudes Completadas ({{ asignaciones_completadas.count }})
+ </button>
+ </div>
+ </div>
+ </div>
+
+ <!-- Contenido de las pestañas -->
+ <div id="content-pendientes" class="tab-content">
+ {% if asignaciones_pendientes %}
+ <div class="grid gap-4">
+ {% for asignacion in asignaciones_pendientes %}
+ <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow border border-slate-200 overflow-hidden">
+ <div class="p-6">
+ <div class="flex items-start justify-between mb-4">
+ <div class="flex-1">
+ <div class="flex items-center gap-3 mb-2">
+ <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+ <i class="fas fa-user text-purple-600"></i>
+ </div>
+ <div>
+ <h3 class="font-semibold text-slate-800">{{ asignacion.formulario.nombre }}</h3>
+ <p class="text-sm text-slate-600">{{ asignacion.formulario.email }}</p>
+ </div>
+ </div>
+ <h4 class="font-medium text-slate-800 mb-2">{{ asignacion.formulario.asunto }}</h4>
+ <p class="text-slate-600 line-clamp-2">{{ asignacion.formulario.mensaje|truncatewords:30 }}</p>
+ {% if asignacion.notas_asignacion %}
+ <div class="mt-2 p-2 bg-purple-50 rounded border border-purple-200">
+ <p class="text-xs text-purple-700">
+ <i class="fas fa-sticky-note mr-1"></i>
+ Notas: {{ asignacion.notas_asignacion|truncatewords:15 }}
+ </p>
+ </div>
+ {% endif %}
+ </div>
+ <div class="flex flex-col items-end gap-2">
+ <span class="px-3 py-1 bg-purple-100 text-purple-800 text-xs font-medium rounded-full">
+ Asignada
+ </span>
+ <span class="text-xs text-slate-500">
+ {{ asignacion.fecha_asignacion|date:"d/m/Y H:i" }}
+ </span>
+ <span class="text-xs text-slate-500">
+ Por: {{ asignacion.asignado_por.username }}
+ </span>
+ </div>
+ </div>
+ <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+ <div class="flex items-center gap-4 text-sm text-slate-600">
+ {% if asignacion.formulario.telefono %}
+ <span><i class="fas fa-phone mr-1"></i>{{ asignacion.formulario.telefono }}</span>
+ {% endif %}
+ <span><i class="fas fa-id-card mr-1"></i>{{ asignacion.formulario.dni }}</span>
+ </div>
+ <div class="flex items-center gap-2">
+ <a href="{% url 'ver_solicitud_asignada' asignacion.id %}" class="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors flex items-center gap-2">
+ <i class="fas fa-eye"></i>
+ Ver Detalles
+ </a>
+ </div>
+ </div>
+ </div>
+ </div>
+ {% endfor %}
+ </div>
+ {% else %}
+ <div class="bg-white rounded-xl shadow-md p-12 text-center border border-slate-200">
+ <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+ <i class="fas fa-inbox text-slate-400 text-3xl"></i>
+ </div>
+ <h3 class="text-xl font-semibold text-slate-800 mb-2">No hay solicitudes pendientes</h3>
+ <p class="text-slate-600">No tienes solicitudes asignadas pendientes de revisión</p>
+ </div>
+ {% endif %}
+ </div>
+
+ <div id="content-aceptadas" class="tab-content hidden">
+ {% if asignaciones_aceptadas %}
+ <div class="grid gap-4">
+ {% for asignacion in asignaciones_aceptadas %}
+ <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow border border-slate-200 overflow-hidden">
+ <div class="p-6">
+ <div class="flex items-start justify-between mb-4">
+ <div class="flex-1">
+ <div class="flex items-center gap-3 mb-2">
+ <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+ <i class="fas fa-user text-green-600"></i>
+ </div>
+ <div>
+ <h3 class="font-semibold text-slate-800">{{ asignacion.formulario.nombre }}</h3>
+ <p class="text-sm text-slate-600">{{ asignacion.formulario.email }}</p>
+ </div>
+ </div>
+ <h4 class="font-medium text-slate-800 mb-2">{{ asignacion.formulario.asunto }}</h4>
+ <p class="text-slate-600 line-clamp-2">{{ asignacion.formulario.mensaje|truncatewords:30 }}</p>
+ </div>
+ <div class="flex flex-col items-end gap-2">
+ <span class="px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+ Aceptada
+ </span>
+ <span class="text-xs text-slate-500">
+ {{ asignacion.fecha_aceptacion|date:"d/m/Y H:i" }}
+ </span>
+ </div>
+ </div>
+ <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+ <div class="flex items-center gap-4 text-sm text-slate-600">
+ {% if asignacion.formulario.telefono %}
+ <span><i class="fas fa-phone mr-1"></i>{{ asignacion.formulario.telefono }}</span>
+ {% endif %}
+ </div>
+ <div class="flex items-center gap-2">
+ <a href="{% url 'ver_solicitud_asignada' asignacion.id %}" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors flex items-center gap-2">
+ <i class="fas fa-eye"></i>
+ Ver Detalles
+ </a>
+ </div>
+ </div>
+ </div>
+ </div>
+ {% endfor %}
+ </div>
+ {% else %}
+ <div class="bg-white rounded-xl shadow-md p-12 text-center border border-slate-200">
+ <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+ <i class="fas fa-clipboard-check text-slate-400 text-3xl"></i>
+ </div>
+ <h3 class="text-xl font-semibold text-slate-800 mb-2">No hay solicitudes aceptadas</h3>
+ <p class="text-slate-600">Aún no has aceptado ninguna solicitud</p>
+ </div>
+ {% endif %}
+ </div>
+
+ <div id="content-completadas" class="tab-content hidden">
+ {% if asignaciones_completadas %}
+ <div class="grid gap-4">
+ {% for asignacion in asignaciones_completadas %}
+ <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow border border-slate-200 overflow-hidden">
+ <div class="p-6">
+ <div class="flex items-start justify-between mb-4">
+ <div class="flex-1">
+ <div class="flex items-center gap-3 mb-2">
+ <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+ <i class="fas fa-user text-blue-600"></i>
+ </div>
+ <div>
+ <h3 class="font-semibold text-slate-800">{{ asignacion.formulario.nombre }}</h3>
+ <p class="text-sm text-slate-600">{{ asignacion.formulario.email }}</p>
+ </div>
+ </div>
+ <h4 class="font-medium text-slate-800 mb-2">{{ asignacion.formulario.asunto }}</h4>
+ <p class="text-slate-600 line-clamp-2">{{ asignacion.formulario.mensaje|truncatewords:30 }}</p>
+ </div>
+ <div class="flex flex-col items-end gap-2">
+ <span class="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
+ Completada
+ </span>
+ <span class="text-xs text-slate-500">
+ {{ asignacion.fecha_completacion|date:"d/m/Y H:i" }}
+ </span>
+ </div>
+ </div>
+ <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+ <div class="flex items-center gap-4 text-sm text-slate-600">
+ {% if asignacion.formulario.telefono %}
+ <span><i class="fas fa-phone mr-1"></i>{{ asignacion.formulario.telefono }}</span>
+ {% endif %}
+ </div>
+ <div class="flex items-center gap-2">
+ <a href="{% url 'ver_solicitud_asignada' asignacion.id %}" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors flex items-center gap-2">
+ <i class="fas fa-eye"></i>
+ Ver Detalles
+ </a>
+ </div>
+ </div>
+ </div>
+ </div>
+ {% endfor %}
+ </div>
+ {% else %}
+ <div class="bg-white rounded-xl shadow-md p-12 text-center border border-slate-200">
+ <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+ <i class="fas fa-flag-checkered text-slate-400 text-3xl"></i>
+ </div>
+ <h3 class="text-xl font-semibold text-slate-800 mb-2">No hay solicitudes completadas</h3>
+ <p class="text-slate-600">Aún no has completado ninguna solicitud</p>
+ </div>
+ {% endif %}
+ </div>
+ </div>
+</div>
+
+<script>
+function showTab(tabName) {
+ // Ocultar todo el contenido
+ document.querySelectorAll('.tab-content').forEach(content => {
+ content.classList.add('hidden');
+ });
+ 
+ // Resetear todas las pestañas
+ document.querySelectorAll('[id^="tab-"]').forEach(tab => {
+ tab.classList.remove('bg-purple-500', 'text-white');
+ tab.classList.add('bg-slate-100', 'text-slate-700');
+ });
+ 
+ // Mostrar el contenido seleccionado
+ document.getElementById('content-' + tabName).classList.remove('hidden');
+ 
+ // Activar la pestaña seleccionada
+ const activeTab = document.getElementById('tab-' + tabName);
+ activeTab.classList.remove('bg-slate-100', 'text-slate-700');
+ activeTab.classList.add('bg-purple-500', 'text-white');
+}
+
+// Mostrar la primera pestaña por defecto
+document.addEventListener('DOMContentLoaded', function() {
+ showTab('pendientes');
+});
+</script>
+
+<style>
+.line-clamp-2 {
+ display: -webkit-box;
+ -webkit-line-clamp: 2;
+ -webkit-box-orient: vertical;
+ overflow: hidden;
+}
+</style>
+{% endblock %}

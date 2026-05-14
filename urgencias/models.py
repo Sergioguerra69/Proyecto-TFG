@@ -39,6 +39,10 @@ class Urgencia(models.Model):
     prioridad = models.CharField(max_length=20, choices=PRIORIDAD_CHOICES)
     # Qué le pasa exactamente
     descripcion = models.TextField()
+    # Datos de contacto del solicitante
+    dni = models.CharField(max_length=20, blank=True, verbose_name='DNI')
+    telefono = models.CharField(max_length=15, blank=True, verbose_name='Teléfono')
+    correo = models.EmailField(blank=True, verbose_name='Correo electrónico')
     # Para saber en qué estado de atención está
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='Pendiente')
 

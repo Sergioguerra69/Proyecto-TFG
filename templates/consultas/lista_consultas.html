@@ -4,119 +4,119 @@
 
 {% block content %}
 <div style="padding: 20px; background-color: #f5f5f5; min-height: 100vh;">
-    <div style="max-width: 1200px; margin: 0 auto;">
-        <!-- Cabecera -->
-        <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
-            <h1 style="color: #333; margin-bottom: 10px;">
-                <i class="fas fa-stethoscope" style="color: #3b82f6; margin-right: 10px;"></i>
-                Consultas Médicas
-            </h1>
-            <p style="color: #666; margin-bottom: 20px;">Gestiona las consultas médicas</p>
-            <a href="{% url 'crear_consulta' %}" style="background-color: #3b82f6; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
-                <i class="fas fa-plus" style="margin-right: 5px;"></i>Nueva Consulta
-            </a>
-        </div>
+ <div style="max-width: 1200px; margin: 0 auto;">
+ <!-- Cabecera -->
+ <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
+ <h1 style="color: #333; margin-bottom: 10px;">
+ <i class="fas fa-stethoscope" style="color: #3b82f6; margin-right: 10px;"></i>
+ Consultas Médicas
+ </h1>
+ <p style="color: #666; margin-bottom: 20px;">Gestiona las consultas médicas</p>
+ <a href="{% url 'crear_consulta' %}" style="background-color: #3b82f6; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+ <i class="fas fa-plus" style="margin-right: 5px;"></i>Nueva Consulta
+ </a>
+ </div>
 
-        <!-- Listado de consultas -->
-        {% if consultas %}
-            <div style="background: white; padding: 20px; border-radius: 8px;">
-                <h2 style="color: #333; margin-bottom: 20px;">Historial de Consultas</h2>
-                
-                {% for consulta in consultas %}
-                <div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 5px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                        <div>
-                            <h3 style="color: #333; margin: 0;">{{ consulta.paciente|default:consulta.mascota|default:"Paciente" }}</h3>
-                            <p style="color: #666; margin: 5px 0; font-size: 14px;">{{ consulta.usuario.username|default:consulta.propietario|default:"Propietario" }}</p>
-                        </div>
-                        {% if consulta.estado == 'Pendiente' %}
-                            <span style="padding: 5px 10px; border-radius: 3px; font-size: 12px; font-weight: bold; background-color: #fef3c7; color: #92400e;">
-                                {{ consulta.estado|default:"Pendiente" }}
-                            </span>
-                        {% elif consulta.estado == 'En Proceso' %}
-                            <span style="padding: 5px 10px; border-radius: 3px; font-size: 12px; font-weight: bold; background-color: #dbeafe; color: #1e40af;">
-                                {{ consulta.estado|default:"Pendiente" }}
-                            </span>
-                        {% elif consulta.estado == 'Completada' %}
-                            <span style="padding: 5px 10px; border-radius: 3px; font-size: 12px; font-weight: bold; background-color: #d1fae5; color: #065f46;">
-                                {{ consulta.estado|default:"Pendiente" }}
-                            </span>
-                        {% else %}
-                            <span style="padding: 5px 10px; border-radius: 3px; font-size: 12px; font-weight: bold; background-color: #f3f4f6; color: #374151;">
-                                {{ consulta.estado|default:"Pendiente" }}
-                            </span>
-                        {% endif %}
-                    </div>
-                    
-                    <div style="margin-bottom: 10px;">
-                        <p style="color: #666; margin: 5px 0; font-size: 14px;">
-                            <i class="fas fa-calendar" style="color: #3b82f6; margin-right: 5px;"></i>
-                            {{ consulta.fecha|date:"d/m/Y H:i"|default:"Sin fecha" }}
-                        </p>
-                        <p style="color: #666; margin: 5px 0; font-size: 14px;">
-                            <i class="fas fa-user-md" style="color: #3b82f6; margin-right: 5px;"></i>
-                            Dr. {{ consulta.usuario.username|default:"Veterinario" }}
-                        </p>
-                        <p style="color: #666; margin: 5px 0; font-size: 14px;">
-                            <i class="fas fa-notes-medical" style="color: #3b82f6; margin-right: 5px;"></i>
-                            {{ consulta.motivo|default:consulta.tipo|default:"Sin motivo" }}
-                        </p>
-                    </div>
-                    
-                    <!-- Debug: Mostrar información del usuario -->
-                    <div style="background-color: #f0f0f0; padding: 5px; margin: 5px 0; font-size: 12px;">
-                        Debug: Usuario: {{ user.username }} | Staff: {{ user.is_staff }} | 
-                        Permisos: {{ user.get_all_permissions|join:", " }}
-                    </div>
-                    
-                    <!-- Botones de acción - Simplificado: mostrar para cualquier usuario logueado -->
-                    {% if user.is_authenticated %}
-                    <div style="display: flex; gap: 10px;">
-                        <!-- Botón para cambiar estado - Cualquier usuario logueado -->
-                        {% if user.is_authenticated %}
-                        <form method="post" action="{% url 'actualizar_estado_consulta' consulta.id %}" style="flex: 1;">
-                            {% csrf_token %}
-                            <div style="display: flex; gap: 5px;">
-                                <select name="estado" style="flex: 1; padding: 5px; border: 1px solid #ddd; border-radius: 3px;">
-                                    <option value="Pendiente" {% if consulta.estado == 'Pendiente' %}selected{% endif %}>Pendiente</option>
-                                    <option value="En Proceso" {% if consulta.estado == 'En Proceso' %}selected{% endif %}>En Proceso</option>
-                                    <option value="Completada" {% if consulta.estado == 'Completada' %}selected{% endif %}>Completada</option>
-                                    <option value="Cancelada" {% if consulta.estado == 'Cancelada' %}selected{% endif %}>Cancelada</option>
-                                </select>
-                                <button type="submit" style="background-color: #06b6d4; color: white; padding: 5px 10px; border: none; border-radius: 3px; cursor: pointer;">
-                                    Actualizar
-                                </button>
-                            </div>
-                        </form>
-                        {% endif %}
-                        
-                        <!-- Botón editar - Cualquier usuario logueado -->
-                        <a href="{% url 'editar_consulta' consulta.id %}" style="background-color: #3b82f6; color: white; padding: 5px 10px; text-decoration: none; border-radius: 3px;">
-                            <i class="fas fa-edit"></i> Editar
-                        </a>
-                        
-                        <!-- Botón eliminar - Cualquier usuario logueado -->
-                        <form method="post" action="{% url 'eliminar_consulta' consulta.id %}" style="display: inline;" onsubmit="return confirm('¿Eliminar esta consulta?');">
-                            {% csrf_token %}
-                            <button type="submit" style="background-color: #ef4444; color: white; padding: 5px 10px; border: none; border-radius: 3px; cursor: pointer;">
-                                <i class="fas fa-trash"></i> Eliminar
-                            </button>
-                        </form>
-                    </div>
-                    {% endif %}
-                </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <div style="background: white; padding: 40px; border-radius: 8px; text-align: center;">
-                <i class="fas fa-stethoscope" style="font-size: 48px; color: #d1d5db; margin-bottom: 20px;"></i>
-                <h3 style="color: #333; margin-bottom: 10px;">No hay consultas registradas</h3>
-                <p style="color: #666; margin-bottom: 20px;">Comienza creando una nueva consulta médica</p>
-                <a href="{% url 'crear_consulta' %}" style="background-color: #3b82f6; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
-                    <i class="fas fa-plus" style="margin-right: 5px;"></i>Crear Primera Consulta
-                </a>
-            </div>
-        {% endif %}
-    </div>
+ <!-- Listado de consultas -->
+ {% if consultas %}
+ <div style="background: white; padding: 20px; border-radius: 8px;">
+ <h2 style="color: #333; margin-bottom: 20px;">Historial de Consultas</h2>
+ 
+ {% for consulta in consultas %}
+ <div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 5px;">
+ <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+ <div>
+ <h3 style="color: #333; margin: 0;">{{ consulta.paciente|default:consulta.mascota|default:"Paciente" }}</h3>
+ <p style="color: #666; margin: 5px 0; font-size: 14px;">{{ consulta.usuario.username|default:consulta.propietario|default:"Propietario" }}</p>
+ </div>
+ {% if consulta.estado == 'Pendiente' %}
+ <span style="padding: 5px 10px; border-radius: 3px; font-size: 12px; font-weight: bold; background-color: #fef3c7; color: #92400e;">
+ {{ consulta.estado|default:"Pendiente" }}
+ </span>
+ {% elif consulta.estado == 'En Proceso' %}
+ <span style="padding: 5px 10px; border-radius: 3px; font-size: 12px; font-weight: bold; background-color: #dbeafe; color: #1e40af;">
+ {{ consulta.estado|default:"Pendiente" }}
+ </span>
+ {% elif consulta.estado == 'Completada' %}
+ <span style="padding: 5px 10px; border-radius: 3px; font-size: 12px; font-weight: bold; background-color: #d1fae5; color: #065f46;">
+ {{ consulta.estado|default:"Pendiente" }}
+ </span>
+ {% else %}
+ <span style="padding: 5px 10px; border-radius: 3px; font-size: 12px; font-weight: bold; background-color: #f3f4f6; color: #374151;">
+ {{ consulta.estado|default:"Pendiente" }}
+ </span>
+ {% endif %}
+ </div>
+ 
+ <div style="margin-bottom: 10px;">
+ <p style="color: #666; margin: 5px 0; font-size: 14px;">
+ <i class="fas fa-calendar" style="color: #3b82f6; margin-right: 5px;"></i>
+ {{ consulta.fecha|date:"d/m/Y H:i"|default:"Sin fecha" }}
+ </p>
+ <p style="color: #666; margin: 5px 0; font-size: 14px;">
+ <i class="fas fa-user-md" style="color: #3b82f6; margin-right: 5px;"></i>
+ Dr. {{ consulta.usuario.username|default:"Veterinario" }}
+ </p>
+ <p style="color: #666; margin: 5px 0; font-size: 14px;">
+ <i class="fas fa-notes-medical" style="color: #3b82f6; margin-right: 5px;"></i>
+ {{ consulta.motivo|default:consulta.tipo|default:"Sin motivo" }}
+ </p>
+ </div>
+ 
+ <!-- Debug: Mostrar información del usuario -->
+ <div style="background-color: #f0f0f0; padding: 5px; margin: 5px 0; font-size: 12px;">
+ Debug: Usuario: {{ user.username }} | Staff: {{ user.is_staff }} | 
+ Permisos: {{ user.get_all_permissions|join:", " }}
+ </div>
+ 
+ <!-- Botones de acción - Simplificado: mostrar para cualquier usuario logueado -->
+ {% if user.is_authenticated %}
+ <div style="display: flex; gap: 10px;">
+ <!-- Botón para cambiar estado - Cualquier usuario logueado -->
+ {% if user.is_authenticated %}
+ <form method="post" action="{% url 'actualizar_estado_consulta' consulta.id %}" style="flex: 1;">
+ {% csrf_token %}
+ <div style="display: flex; gap: 5px;">
+ <select name="estado" style="flex: 1; padding: 5px; border: 1px solid #ddd; border-radius: 3px;">
+ <option value="Pendiente" {% if consulta.estado == 'Pendiente' %}selected{% endif %}>Pendiente</option>
+ <option value="En Proceso" {% if consulta.estado == 'En Proceso' %}selected{% endif %}>En Proceso</option>
+ <option value="Completada" {% if consulta.estado == 'Completada' %}selected{% endif %}>Completada</option>
+ <option value="Cancelada" {% if consulta.estado == 'Cancelada' %}selected{% endif %}>Cancelada</option>
+ </select>
+ <button type="submit" style="background-color: #06b6d4; color: white; padding: 5px 10px; border: none; border-radius: 3px; cursor: pointer;">
+ Actualizar
+ </button>
+ </div>
+ </form>
+ {% endif %}
+ 
+ <!-- Botón editar - Cualquier usuario logueado -->
+ <a href="{% url 'editar_consulta' consulta.id %}" style="background-color: #3b82f6; color: white; padding: 5px 10px; text-decoration: none; border-radius: 3px;">
+ <i class="fas fa-edit"></i> Editar
+ </a>
+ 
+ <!-- Botón eliminar - Cualquier usuario logueado -->
+ <form method="post" action="{% url 'eliminar_consulta' consulta.id %}" style="display: inline;" onsubmit="return confirm('¿Eliminar esta consulta?');">
+ {% csrf_token %}
+ <button type="submit" style="background-color: #ef4444; color: white; padding: 5px 10px; border: none; border-radius: 3px; cursor: pointer;">
+ <i class="fas fa-trash"></i> Eliminar
+ </button>
+ </form>
+ </div>
+ {% endif %}
+ </div>
+ {% endfor %}
+ </div>
+ {% else %}
+ <div style="background: white; padding: 40px; border-radius: 8px; text-align: center;">
+ <i class="fas fa-stethoscope" style="font-size: 48px; color: #d1d5db; margin-bottom: 20px;"></i>
+ <h3 style="color: #333; margin-bottom: 10px;">No hay consultas registradas</h3>
+ <p style="color: #666; margin-bottom: 20px;">Comienza creando una nueva consulta médica</p>
+ <a href="{% url 'crear_consulta' %}" style="background-color: #3b82f6; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+ <i class="fas fa-plus" style="margin-right: 5px;"></i>Crear Primera Consulta
+ </a>
+ </div>
+ {% endif %}
+ </div>
 </div>
 {% endblock %}

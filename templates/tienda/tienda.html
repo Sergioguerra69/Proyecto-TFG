@@ -3,92 +3,37 @@
 {% block title %}Tienda - VetCT | Productos para tu Mascota{% endblock %}
 
 {% block content %}
-
-<style>
-    .fade-up {
-        opacity: 0;
-        transform: translateY(40px);
-        transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-    }
-    .fade-up.visible { opacity: 1; transform: translateY(0); }
-    .delay-1 { transition-delay: 0.1s; }
-    .delay-2 { transition-delay: 0.2s; }
-    .delay-3 { transition-delay: 0.3s; }
-    .delay-4 { transition-delay: 0.4s; }
-    .delay-5 { transition-delay: 0.5s; }
-    
-    @keyframes float {
-        0%, 100% { transform: translateY(0px); }
-        50% { transform: translateY(-10px); }
-    }
-    .float-animation { animation: float 4s ease-in-out infinite; }
-    
-    @keyframes cartBounce {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.15); }
-    }
-    .cart-added { animation: cartBounce 0.4s ease-in-out; }
-    
-    .product-card { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-    .product-card:hover .product-img { transform: scale(1.08); }
-    .product-img { transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
-    
-    @keyframes pulse-badge {
-        0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
-        50% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
-    }
-    .badge-hot { animation: pulse-badge 2s infinite; }
-    
-    @keyframes soft-pulse {
-        0%, 100% { box-shadow: 0 0 0 0 rgba(8, 145, 178, 0.3); }
-        50% { box-shadow: 0 0 0 15px rgba(8, 145, 178, 0); }
-    }
-    .icon-pulse { animation: soft-pulse 3s infinite; }
-    
-    .filter-dropdown {
-        appearance: none;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23475569' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: right 16px center;
-        padding-right: 40px;
-    }
-</style>
-
 {# HERO TIENDA #}
-<section class="relative py-24 md:py-32 overflow-hidden" style="background-color: #0ea5e9;">
-    <div class="absolute inset-0">
-        <div class="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4 pointer-events-none"></div>
-        <div class="absolute bottom-0 left-0 w-72 h-72 bg-white/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/4 pointer-events-none"></div>
-    </div>
-    
+<section class="relative py-24 md:py-32 bg-slate-900 border-b border-slate-800">
     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex flex-col lg:flex-row justify-between items-center gap-8">
             <div class="text-center lg:text-left">
-                <span style="background: rgba(0,0,0,0.3); color: #fff; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; padding: 10px 20px; border-radius: 50px; display: inline-block; margin-bottom: 24px; border: 1px solid rgba(255,255,255,0.3);">
+                <span
+                    class="inline-block bg-cyan-900 text-cyan-300 text-sm font-semibold uppercase tracking-widest px-4 py-2 rounded-full mb-6">
                     <i class="fas fa-store mr-2"></i>Tienda Oficial
                 </span>
-                <h1 style="font-family: Montserrat, sans-serif; font-weight: 900; font-size: 3.5rem; color: #ffffff; margin-bottom: 16px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
-                    Catálogo de <span style="color: #fde047;">Productos</span>
+                <h1 class="font-montserrat font-black text-4xl md:text-5xl lg:text-6xl text-white mb-4 tracking-tight">
+                    Catálogo de <span class="text-cyan-400">Productos</span>
                 </h1>
-                <p style="font-size: 1.25rem; color: #ffffff; font-weight: 600; max-width: 600px; margin-bottom: 32px; text-shadow: 1px 1px 3px rgba(0,0,0,0.3);">
+                <p class="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto lg:mx-0 mb-8">
                     Alimentos, medicamentos y accesorios de las mejores marcas para el bienestar de tu mascota.
                 </p>
-                <div style="display: flex; gap: 12px; justify-content: flex-start; flex-wrap: wrap;">
-                    <span style="background: rgba(0,0,0,0.3); color: #fff; padding: 10px 20px; border-radius: 50px; font-weight: 600; border: 1px solid rgba(255,255,255,0.2);">
-                        <i class="fas fa-truck-fast mr-2" style="color: #fde047;"></i>Envío 24-48h
+                <div class="flex gap-4 justify-center lg:justify-start flex-wrap">
+                    <span class="flex items-center bg-slate-800 px-5 py-3 rounded-full text-white text-sm font-medium">
+                        <i class="fas fa-truck-fast text-cyan-400 mr-2"></i>Envío 24-48h
                     </span>
-                    <span style="background: rgba(0,0,0,0.3); color: #fff; padding: 10px 20px; border-radius: 50px; font-weight: 600; border: 1px solid rgba(255,255,255,0.2);">
-                        <i class="fas fa-shield-halved mr-2" style="color: #fde047;"></i>Compra Segura
+                    <span class="flex items-center bg-slate-800 px-5 py-3 rounded-full text-white text-sm font-medium">
+                        <i class="fas fa-shield-halved text-cyan-400 mr-2"></i>Compra Segura
                     </span>
-                    <span style="background: rgba(0,0,0,0.3); color: #fff; padding: 10px 20px; border-radius: 50px; font-weight: 600; border: 1px solid rgba(255,255,255,0.2);">
-                        <i class="fas fa-rotate-left mr-2" style="color: #fde047;"></i>Devolución Gratis
+                    <span class="flex items-center bg-slate-800 px-5 py-3 rounded-full text-white text-sm font-medium">
+                        <i class="fas fa-rotate-left text-cyan-400 mr-2"></i>Devolución Gratis
                     </span>
                 </div>
             </div>
             <div>
-                <a href="/tienda/nuevo_producto/" style="background: #fff; color: #0284c7; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; padding: 16px 32px; border-radius: 50px; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
-                    <i class="fas fa-plus-circle"></i>
-                    Nuevo Producto
+                <a href="/tienda/nuevo_producto/"
+                    class="bg-cyan-600 text-white font-bold text-sm uppercase tracking-wider px-8 py-4 rounded-lg transition-colors hover:bg-cyan-700 flex items-center justify-center gap-2">
+                    <i class="fas fa-plus-circle"></i>Nuevo Producto
                 </a>
             </div>
         </div>
@@ -96,19 +41,22 @@
 </section>
 
 {# FILTROS STICKY #}
-<section class="py-6 bg-white border-b border-slate-100 sticky top-[72px] z-40 shadow-sm">
+<section class="py-6 bg-white border-b border-slate-200 sticky top-[72px] z-40 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex flex-col md:flex-row gap-4 items-end">
             <div class="flex-1">
                 <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Buscar</label>
                 <div class="relative">
                     <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                    <input type="text" id="buscador" placeholder="¿Qué necesita tu mascota?" class="w-full pl-12 pr-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-300 bg-slate-50">
+                    <input type="text" id="buscador" placeholder="¿Qué necesita tu mascota?"
+                        class="w-full pl-12 pr-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-colors bg-slate-50">
                 </div>
             </div>
             <div class="w-full md:w-48">
-                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Categoría</label>
-                <select id="filtro-categoria" class="filter-dropdown w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-300 bg-slate-50 text-slate-700 cursor-pointer">
+                <label
+                    class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Categoría</label>
+                <select id="filtro-categoria"
+                    class="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-colors bg-slate-50 text-slate-700 cursor-pointer">
                     <option value="todas">Todas</option>
                     <option value="medicamentos">💊 Medicamentos</option>
                     <option value="alimentos">🦴 Alimentos</option>
@@ -119,7 +67,8 @@
             </div>
             <div class="w-full md:w-48">
                 <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Precio</label>
-                <select id="filtro-precio" class="filter-dropdown w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-300 bg-slate-50 text-slate-700 cursor-pointer">
+                <select id="filtro-precio"
+                    class="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-colors bg-slate-50 text-slate-700 cursor-pointer">
                     <option value="todos">Cualquier precio</option>
                     <option value="0-10">0€ - 10€</option>
                     <option value="10-25">10€ - 25€</option>
@@ -129,15 +78,17 @@
             </div>
             <div class="w-full md:w-48">
                 <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Stock</label>
-                <select id="filtro-stock" class="filter-dropdown w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-300 bg-slate-50 text-slate-700 cursor-pointer">
+                <select id="filtro-stock"
+                    class="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-colors bg-slate-50 text-slate-700 cursor-pointer">
                     <option value="todos">Mostrar todos</option>
                     <option value="disponible">Solo disponibles</option>
                 </select>
             </div>
         </div>
         <div class="flex justify-between items-center mt-4">
-            <p class="text-sm text-slate-500" id="resultados-contador"></p>
-            <button onclick="resetFiltros()" class="text-sm text-cyan-600 hover:text-cyan-700 font-medium transition-colors">
+            <p class="text-sm font-medium text-slate-500" id="resultados-contador"></p>
+            <button onclick="resetFiltros()"
+                class="text-sm text-cyan-600 hover:text-cyan-700 font-bold transition-colors">
                 <i class="fas fa-rotate mr-1"></i>Limpiar filtros
             </button>
         </div>
@@ -150,33 +101,36 @@
         <div id="lista-productos" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             <div class="col-span-full flex items-center justify-center py-20">
                 <div class="text-center">
-                    <div class="w-16 h-16 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                    <div class="text-cyan-600 text-3xl mb-4"><i class="fas fa-spinner fa-spin"></i></div>
                     <p class="text-slate-500 font-medium">Cargando productos...</p>
                 </div>
             </div>
         </div>
-        
+
         <div id="estado-vacio" class="hidden text-center py-20">
             <div class="max-w-md mx-auto">
-                <div class="w-24 h-24 bg-slate-100 rounded-3xl flex items-center justify-center mx-auto mb-6">
-                    <i class="fas fa-box-open text-4xl text-slate-300"></i>
+                <div
+                    class="w-20 h-20 bg-slate-200 rounded-xl flex items-center justify-center mx-auto mb-6 text-slate-400">
+                    <i class="fas fa-box-open text-3xl"></i>
                 </div>
-                <h3 class="font-montserrat font-extrabold text-2xl text-slate-800 mb-2">Sin productos</h3>
+                <h3 class="font-montserrat font-bold text-2xl text-slate-800 mb-2">Sin productos</h3>
                 <p class="text-slate-500 mb-6">No se encontraron productos con los filtros seleccionados.</p>
-                <button onclick="resetFiltros()" class="bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold px-6 py-3 rounded-xl hover:shadow-lg transition-all">
+                <button onclick="resetFiltros()"
+                    class="bg-cyan-600 text-white font-bold px-6 py-3 rounded-lg hover:bg-cyan-700 transition-colors">
                     <i class="fas fa-rotate mr-2"></i>Mostrar todos
                 </button>
             </div>
         </div>
-        
+
         <div id="estado-error" class="hidden text-center py-20">
             <div class="max-w-md mx-auto">
-                <div class="w-24 h-24 bg-red-50 rounded-3xl flex items-center justify-center mx-auto mb-6">
-                    <i class="fas fa-exclamation-triangle text-4xl text-red-400"></i>
+                <div class="w-20 h-20 bg-red-100 rounded-xl flex items-center justify-center mx-auto mb-6 text-red-500">
+                    <i class="fas fa-exclamation-triangle text-3xl"></i>
                 </div>
-                <h3 class="font-montserrat font-extrabold text-2xl text-slate-800 mb-2">Error al cargar</h3>
+                <h3 class="font-montserrat font-bold text-2xl text-slate-800 mb-2">Error al cargar</h3>
                 <p class="text-slate-500 mb-6">No se pudieron cargar los productos. Inténtalo de nuevo.</p>
-                <button onclick="cargarProductos()" class="bg-gradient-to-r from-red-500 to-rose-600 text-white font-bold px-6 py-3 rounded-xl hover:shadow-lg transition-all">
+                <button onclick="cargarProductos()"
+                    class="bg-cyan-600 text-white font-bold px-6 py-3 rounded-lg hover:bg-cyan-700 transition-colors">
                     <i class="fas fa-redo mr-2"></i>Reintentar
                 </button>
             </div>
@@ -186,158 +140,149 @@
 
 {# CARRITO FLOTANTE #}
 <div id="carrito-flotante" class="fixed bottom-6 right-6 z-50 hidden">
-    <button onclick="toggleCarrito()" class="relative bg-gradient-to-r from-cyan-500 to-blue-600 text-white p-4 rounded-full shadow-2xl hover:shadow-cyan-500/40 hover:-translate-y-1 transition-all duration-300 icon-pulse">
-        <i class="fas fa-shopping-cart text-2xl"></i>
-        <span id="carrito-contador" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center">0</span>
+    <button onclick="toggleCarrito()"
+        class="relative bg-cyan-600 text-white p-4 rounded-full shadow-lg hover:bg-cyan-700 transition-colors">
+        <i class="fas fa-shopping-cart text-xl"></i>
+        <span id="carrito-contador"
+            class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center">0</span>
     </button>
 </div>
 
 <script>
-let todosProductos = [];
-let carrito = JSON.parse(localStorage.getItem('carritoVetCT') || '[]');
+    let todosProductos = [];
+    let carrito = JSON.parse(localStorage.getItem('carritoVetCT') || '[]');
 
-function cargarProductos() {
-    document.getElementById('lista-productos').classList.remove('hidden');
-    document.getElementById('estado-vacio').classList.add('hidden');
-    document.getElementById('estado-error').classList.add('hidden');
-    
-    fetch('/api/productos/')
-        .then(function(res) { return res.json(); })
-        .then(function(productos) {
-            todosProductos = productos;
-            aplicarFiltros();
-            actualizarCarritoFlotante();
-        })
-        .catch(function(error) {
-            console.error('Error:', error);
-            document.getElementById('lista-productos').innerHTML = '';
-            document.getElementById('lista-productos').classList.add('hidden');
-            document.getElementById('estado-error').classList.remove('hidden');
+    function cargarProductos() {
+        document.getElementById('lista-productos').classList.remove('hidden');
+        document.getElementById('estado-vacio').classList.add('hidden');
+        document.getElementById('estado-error').classList.add('hidden');
+
+        fetch('/api/productos/')
+            .then(function (res) { return res.json(); })
+            .then(function (productos) {
+                todosProductos = productos;
+                aplicarFiltros();
+                actualizarCarritoFlotante();
+            })
+            .catch(function (error) {
+                console.error('Error:', error);
+                document.getElementById('lista-productos').innerHTML = '';
+                document.getElementById('lista-productos').classList.add('hidden');
+                document.getElementById('estado-error').classList.remove('hidden');
+            });
+    }
+
+    function aplicarFiltros() {
+        var busqueda = document.getElementById('buscador').value.toLowerCase();
+        var categoria = document.getElementById('filtro-categoria').value;
+        var precio = document.getElementById('filtro-precio').value;
+        var stock = document.getElementById('filtro-stock').value;
+
+        var filtrados = todosProductos.filter(function (p) {
+            var nombre = (p.nombre || '').toLowerCase();
+            var desc = (p.descripcion || '').toLowerCase();
+            var matchBusqueda = !busqueda || nombre.includes(busqueda) || desc.includes(busqueda);
+            var matchCategoria = categoria === 'todas' || (p.categoria || '').toLowerCase() === categoria;
+            var matchStock = stock === 'todos' || (stock === 'disponible' ? p.stock > 0 : p.stock === 0);
+
+            var matchPrecio = true;
+            var precioNum = parseFloat(p.precio);
+            if (precio === '0-10') matchPrecio = precioNum <= 10;
+            else if (precio === '10-25') matchPrecio = precioNum > 10 && precioNum <= 25;
+            else if (precio === '25-50') matchPrecio = precioNum > 25 && precioNum <= 50;
+            else if (precio === '50+') matchPrecio = precioNum > 50;
+
+            return matchBusqueda && matchCategoria && matchPrecio && matchStock;
         });
-}
 
-function aplicarFiltros() {
-    var busqueda = document.getElementById('buscador').value.toLowerCase();
-    var categoria = document.getElementById('filtro-categoria').value;
-    var precio = document.getElementById('filtro-precio').value;
-    var stock = document.getElementById('filtro-stock').value;
-    
-    var filtrados = todosProductos.filter(function(p) {
-        var nombre = (p.nombre || '').toLowerCase();
-        var desc = (p.descripcion || '').toLowerCase();
-        var matchBusqueda = !busqueda || nombre.includes(busqueda) || desc.includes(busqueda);
-        var matchCategoria = categoria === 'todas' || (p.categoria || '').toLowerCase() === categoria;
-        var matchStock = stock === 'todos' || (stock === 'disponible' ? p.stock > 0 : p.stock === 0);
-        
-        var matchPrecio = true;
-        var precioNum = parseFloat(p.precio);
-        if (precio === '0-10') matchPrecio = precioNum <= 10;
-        else if (precio === '10-25') matchPrecio = precioNum > 10 && precioNum <= 25;
-        else if (precio === '25-50') matchPrecio = precioNum > 25 && precioNum <= 50;
-        else if (precio === '50+') matchPrecio = precioNum > 50;
-        
-        return matchBusqueda && matchCategoria && matchPrecio && matchStock;
-    });
-    
-    document.getElementById('resultados-contador').textContent = 
-        filtrados.length === 1 ? '1 producto encontrado' : filtrados.length + ' productos encontrados';
-    
-    var contenedor = document.getElementById('lista-productos');
-    
-    if (filtrados.length === 0) {
-        contenedor.innerHTML = '';
-        contenedor.classList.add('hidden');
-        document.getElementById('estado-vacio').classList.remove('hidden');
-        return;
-    }
-    
-    contenedor.classList.remove('hidden');
-    document.getElementById('estado-vacio').classList.add('hidden');
-    
-    contenedor.innerHTML = filtrados.map(function(p, index) {
-        var stockClass = p.stock > 10 ? 'text-emerald-600' : p.stock > 0 ? 'text-amber-600' : 'text-red-500';
-        var stockText = p.stock > 10 ? 'En stock' : p.stock > 0 ? 'Quedan ' + p.stock : 'Agotado';
-        var stockBg = p.stock > 10 ? 'bg-emerald-50' : p.stock > 0 ? 'bg-amber-50' : 'bg-red-50';
-        var botonDeshabilitado = p.stock === 0 ? 'opacity-50 cursor-not-allowed pointer-events-none' : '';
-        var botonTexto = p.stock === 0 ? 'Sin stock' : 'Añadir al Carro';
-        
-        var imagenHtml = p.imagen 
-            ? '<div class="relative h-52 overflow-hidden bg-slate-100"><img src="' + p.imagen + '" alt="' + p.nombre + '" class="product-img w-full h-full object-cover"><div class="absolute top-3 left-3"><span class="' + stockBg + ' ' + stockClass + ' text-xs font-bold px-3 py-1 rounded-full shadow-sm">' + stockText + '</span></div>' + (p.stock > 0 && p.stock <= 5 ? '<div class="absolute top-3 right-3 badge-hot"><span class="bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full"><i class="fas fa-fire mr-1"></i>Últimas</span></div>' : '') + '</div>'
-            : '<div class="relative h-52 bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center"><div class="w-20 h-20 bg-white rounded-2xl flex items-center justify-center shadow-md"><i class="fas fa-box text-3xl text-slate-300"></i></div><div class="absolute top-3 left-3"><span class="' + stockBg + ' ' + stockClass + ' text-xs font-bold px-3 py-1 rounded-full shadow-sm">' + stockText + '</span></div>' + (p.stock > 0 && p.stock <= 5 ? '<div class="absolute top-3 right-3 badge-hot"><span class="bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full"><i class="fas fa-fire mr-1"></i>Últimas</span></div>' : '') + '</div>';
-        
-        return '<div class="fade-up delay-' + ((index % 4) + 1) + ' product-card bg-white rounded-2xl shadow-md shadow-slate-200/50 border border-slate-100 overflow-hidden hover:shadow-2xl hover:shadow-cyan-200/30 hover:-translate-y-2 group flex flex-col">' +
-            '<div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-400 to-blue-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left z-10"></div>' +
-            imagenHtml +
-            '<div class="p-6 flex flex-col flex-1">' +
-                '<h3 class="font-montserrat font-extrabold text-lg text-slate-800 mb-2 group-hover:text-cyan-700 transition-colors line-clamp-2">' + p.nombre + '</h3>' +
-                (p.descripcion ? '<p class="text-slate-500 text-sm mb-3 line-clamp-2">' + p.descripcion + '</p>' : '') +
+        document.getElementById('resultados-contador').textContent =
+            filtrados.length === 1 ? '1 producto encontrado' : filtrados.length + ' productos encontrados';
+
+        var contenedor = document.getElementById('lista-productos');
+
+        if (filtrados.length === 0) {
+            contenedor.innerHTML = '';
+            contenedor.classList.add('hidden');
+            document.getElementById('estado-vacio').classList.remove('hidden');
+            return;
+        }
+
+        contenedor.classList.remove('hidden');
+        document.getElementById('estado-vacio').classList.add('hidden');
+
+        contenedor.innerHTML = filtrados.map(function (p, index) {
+            var stockClass = p.stock > 10 ? 'text-emerald-700 bg-emerald-100' : p.stock > 0 ? 'text-amber-700 bg-amber-100' : 'text-red-700 bg-red-100';
+            var stockText = p.stock > 10 ? 'En stock' : p.stock > 0 ? 'Quedan ' + p.stock : 'Agotado';
+            var botonDeshabilitado = p.stock === 0 ? 'bg-slate-300 text-slate-500 cursor-not-allowed pointer-events-none' : 'bg-cyan-600 text-white hover:bg-cyan-700';
+            var botonTexto = p.stock === 0 ? 'Sin stock' : 'Añadir al Carro';
+
+            var imagenHtml = p.imagen
+                ? '<div class="relative h-48 bg-slate-200 border-b border-slate-100"><img src="' + p.imagen + '" alt="' + p.nombre + '" class="w-full h-full object-cover"><div class="absolute top-3 left-3"><span class="' + stockClass + ' text-xs font-bold px-2 py-1 rounded">' + stockText + '</span></div>' + (p.stock > 0 && p.stock <= 5 ? '<div class="absolute top-3 right-3"><span class="bg-red-600 text-white text-xs font-bold px-2 py-1 rounded"><i class="fas fa-fire mr-1"></i>Últimas</span></div>' : '') + '</div>'
+                : '<div class="relative h-48 bg-slate-200 border-b border-slate-100 flex items-center justify-center"><div class="text-4xl text-slate-400"><i class="fas fa-box"></i></div><div class="absolute top-3 left-3"><span class="' + stockClass + ' text-xs font-bold px-2 py-1 rounded">' + stockText + '</span></div>' + (p.stock > 0 && p.stock <= 5 ? '<div class="absolute top-3 right-3"><span class="bg-red-600 text-white text-xs font-bold px-2 py-1 rounded"><i class="fas fa-fire mr-1"></i>Últimas</span></div>' : '') + '</div>';
+
+            return '<div class="bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col hover:border-cyan-400 transition-colors overflow-hidden">' +
+                imagenHtml +
+                '<div class="p-5 flex flex-col flex-1">' +
+                '<h3 class="font-bold text-slate-800 mb-2 truncate" title="' + p.nombre + '">' + p.nombre + '</h3>' +
+                (p.descripcion ? '<p class="text-slate-500 text-sm mb-4 line-clamp-2">' + p.descripcion + '</p>' : '') +
                 '<div class="mt-auto">' +
-                    '<div class="flex items-end justify-between mb-4">' +
-                        '<div><p class="text-2xl font-black text-cyan-700">' + parseFloat(p.precio).toFixed(2) + ' €</p></div>' +
-                    '</div>' +
-                    '<button onclick="agregarAlCarro(' + p.id + ', \'' + p.nombre.replace(/'/g, "\\'") + '\', ' + p.precio + ', ' + p.stock + ')" class="' + botonDeshabilitado + ' w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold py-3 px-4 rounded-xl hover:from-cyan-600 hover:to-blue-700 transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2 text-sm">' +
-                        '<i class="fas fa-cart-plus"></i>' + botonTexto +
-                    '</button>' +
+                '<div class="flex items-center justify-between mb-4">' +
+                '<p class="text-xl font-black text-cyan-700">' + parseFloat(p.precio).toFixed(2) + ' €</p>' +
                 '</div>' +
-            '</div>' +
-        '</div>';
-    }).join('');
-    
-    document.querySelectorAll('.fade-up').forEach(function(el) { observer.observe(el); });
-}
-
-function agregarAlCarro(id, nombre, precio, stock) {
-    if (stock <= 0) return;
-    var existente = carrito.find(function(item) { return item.id === id; });
-    if (existente) {
-        if (existente.cantidad < stock) existente.cantidad++;
-        else { alert('No hay más stock disponible'); return; }
-    } else {
-        carrito.push({ id: id, nombre: nombre, precio: precio, cantidad: 1 });
+                '<button onclick="agregarAlCarro(' + p.id + ', \'' + p.nombre.replace(/'/g, "\\'") + '\', ' + p.precio + ', ' + p.stock + ')" class="' + botonDeshabilitado + ' w-full font-bold py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm">' +
+                '<i class="fas fa-cart-plus"></i>' + botonTexto +
+                '</button>' +
+                '</div>' +
+                '</div>' +
+                '</div>';
+        }).join('');
     }
-    localStorage.setItem('carritoVetCT', JSON.stringify(carrito));
-    actualizarCarritoFlotante();
-}
 
-function actualizarCarritoFlotante() {
-    var contador = document.getElementById('carrito-contador');
-    var flotante = document.getElementById('carrito-flotante');
-    var total = carrito.reduce(function(sum, item) { return sum + item.cantidad; }, 0);
-    contador.textContent = total;
-    if (total === 0) flotante.classList.add('hidden');
-    else flotante.classList.remove('hidden');
-}
-
-function toggleCarrito() {
-    if (carrito.length === 0) return;
-    var total = carrito.reduce(function(sum, item) { return sum + (item.precio * item.cantidad); }, 0);
-    var itemsTexto = carrito.map(function(item) { return '• ' + item.nombre + ' x' + item.cantidad + ' = ' + (item.precio * item.cantidad).toFixed(2) + '€'; }).join('\n');
-    if (confirm('Carrito:\n\n' + itemsTexto + '\n\nTotal: ' + total.toFixed(2) + '€\n\nIr al carrito?')) {
-        window.location.href = '/carrito/';
+    function agregarAlCarro(id, nombre, precio, stock) {
+        if (stock <= 0) return;
+        var existente = carrito.find(function (item) { return item.id === id; });
+        if (existente) {
+            if (existente.cantidad < stock) existente.cantidad++;
+            else { alert('No hay más stock disponible'); return; }
+        } else {
+            carrito.push({ id: id, nombre: nombre, precio: precio, cantidad: 1 });
+        }
+        localStorage.setItem('carritoVetCT', JSON.stringify(carrito));
+        actualizarCarritoFlotante();
     }
-}
 
-function resetFiltros() {
-    document.getElementById('buscador').value = '';
-    document.getElementById('filtro-categoria').value = 'todas';
-    document.getElementById('filtro-precio').value = 'todos';
-    document.getElementById('filtro-stock').value = 'todos';
-    aplicarFiltros();
-}
+    function actualizarCarritoFlotante() {
+        var contador = document.getElementById('carrito-contador');
+        var flotante = document.getElementById('carrito-flotante');
+        var total = carrito.reduce(function (sum, item) { return sum + item.cantidad; }, 0);
+        contador.textContent = total;
+        if (total === 0) flotante.classList.add('hidden');
+        else flotante.classList.remove('hidden');
+    }
 
-document.getElementById('buscador').addEventListener('input', aplicarFiltros);
-document.getElementById('filtro-categoria').addEventListener('change', aplicarFiltros);
-document.getElementById('filtro-precio').addEventListener('change', aplicarFiltros);
-document.getElementById('filtro-stock').addEventListener('change', aplicarFiltros);
+    function toggleCarrito() {
+        if (carrito.length === 0) return;
+        var total = carrito.reduce(function (sum, item) { return sum + (item.precio * item.cantidad); }, 0);
+        var itemsTexto = carrito.map(function (item) { return '• ' + item.nombre + ' x' + item.cantidad + ' = ' + (item.precio * item.cantidad).toFixed(2) + '€'; }).join('\n');
+        if (confirm('Carrito:\n\n' + itemsTexto + '\n\nTotal: ' + total.toFixed(2) + '€\n\nIr al carrito?')) {
+            window.location.href = '/carrito/';
+        }
+    }
 
-var observerOptions = { threshold: 0.1, rootMargin: '0px 0px -30px 0px' };
-var observer = new IntersectionObserver(function(entries) {
-    entries.forEach(function(entry) {
-        if (entry.isIntersecting) entry.target.classList.add('visible');
-    });
-}, observerOptions);
+    function resetFiltros() {
+        document.getElementById('buscador').value = '';
+        document.getElementById('filtro-categoria').value = 'todas';
+        document.getElementById('filtro-precio').value = 'todos';
+        document.getElementById('filtro-stock').value = 'todos';
+        aplicarFiltros();
+    }
 
-cargarProductos();
+    document.getElementById('buscador').addEventListener('input', aplicarFiltros);
+    document.getElementById('filtro-categoria').addEventListener('change', aplicarFiltros);
+    document.getElementById('filtro-precio').addEventListener('change', aplicarFiltros);
+    document.getElementById('filtro-stock').addEventListener('change', aplicarFiltros);
+
+    cargarProductos();
 </script>
 
 {% endblock %}

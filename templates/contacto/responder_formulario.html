@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}Responder Formulario - VetCT{% endblock %}
+
+{% block content %}
+<div class="bg-gray-100 py-8 min-h-screen">
+ <div class="container mx-auto px-4 max-w-4xl">
+ <!-- Título -->
+ <div class="bg-white rounded-lg shadow p-4 md:p-6 mb-6">
+ <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Responder Formulario de Contacto</h1>
+ <p class="text-gray-600 mt-2 text-sm md:text-base">Estás respondiendo a: <strong>{{ formulario.nombre }}</strong></p>
+ </div>
+
+ <!-- Información del formulario original -->
+ <div class="bg-white rounded-lg shadow p-4 md:p-6 mb-6">
+ <h2 class="text-lg font-semibold text-gray-800 mb-4">Información del Mensaje Original</h2>
+ 
+ <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+ <div>
+ <span class="text-sm font-medium text-gray-700">Nombre:</span>
+ <p class="text-gray-900 mt-1">{{ formulario.nombre }}</p>
+ </div>
+ <div>
+ <span class="text-sm font-medium text-gray-700">DNI:</span>
+ <p class="text-gray-900 mt-1">{{ formulario.dni }}</p>
+ </div>
+ <div>
+ <span class="text-sm font-medium text-gray-700">Email:</span>
+ <p class="text-gray-900 mt-1">{{ formulario.email }}</p>
+ </div>
+ <div>
+ <span class="text-sm font-medium text-gray-700">Teléfono:</span>
+ <p class="text-gray-900 mt-1">{{ formulario.telefono|default:"No especificado" }}</p>
+ </div>
+ </div>
+ 
+ <div class="mb-4">
+ <span class="text-sm font-medium text-gray-700">Asunto:</span>
+ <p class="text-gray-900 mt-1 font-medium">{{ formulario.asunto }}</p>
+ </div>
+ 
+ <div>
+ <span class="text-sm font-medium text-gray-700">Mensaje original:</span>
+ <div class="bg-gray-50 p-3 rounded-lg mt-1">
+ <p class="text-gray-700">{{ formulario.mensaje|linebreaks }}</p>
+ </div>
+ </div>
+ 
+ <div class="text-sm text-gray-600 mt-4">
+ <strong>Fecha de envío:</strong> {{ formulario.fecha_creacion|date:"d/m/Y H:i" }}
+ </div>
+ </div>
+
+ <!-- Formulario de respuesta -->
+ <div class="bg-white rounded-lg shadow p-4 md:p-6">
+ <h2 class="text-lg font-semibold text-gray-800 mb-4">Tu Respuesta</h2>
+ 
+ {% if messages %}
+ {% for message in messages %}
+ <div class="mb-4 p-4 rounded-lg {% if message.tags == 'success' %}bg-green-100 text-green-700 border border-green-400{% else %}bg-red-100 text-red-700 border border-red-400{% endif %}">
+ {{ message }}
+ </div>
+ {% endfor %}
+ {% endif %}
+
+ <form method="post" class="space-y-6">
+ {% csrf_token %}
+ 
+ <div>
+ <label for="id_contenido" class="block text-sm font-medium text-gray-700 mb-2">
+ Escribe tu respuesta <span class="text-red-500">*</span>
+ </label>
+ {{ respuesta_form.contenido }}
+ {% if respuesta_form.contenido.errors %}
+ <p class="mt-1 text-sm text-red-600">{{ respuesta_form.contenido.errors.0 }}</p>
+ {% endif %}
+ </div>
+
+ <div class="bg-blue-50 p-4 rounded-lg">
+ <p class="text-sm text-blue-800">
+ <strong>Nota:</strong> Esta respuesta será enviada al correo electrónico del cliente 
+ ({{ formulario.email }}) y quedará registrada en el sistema.
+ </p>
+ </div>
+
+ <div class="flex flex-col sm:flex-row gap-3">
+ <button type="submit" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-xl transition-colors duration-300 focus:ring-2 focus:ring-green-200">
+ Enviar respuesta
+ </button>
+ <a href="{% url 'panel_contactos_recepcionista' %}" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-xl transition-colors duration-300 focus:ring-2 focus:ring-gray-200 text-center">
+ Cancelar
+ </a>
+ </div>
+ </form>
+ </div>
+ </div>
+</div>
+{% endblock %}

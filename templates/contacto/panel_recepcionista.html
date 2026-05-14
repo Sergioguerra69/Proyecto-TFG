@@ -1,0 +1,250 @@
+{% extends 'base.html' %}
+
+{% block title %}Panel de Contactos - VetCT{% endblock %}
+
+{% block content %}
+<div class="bg-gray-100 py-8 min-h-screen">
+    <div class="container mx-auto px-4 max-w-6xl">
+        <!-- Título del panel -->
+        <div class="bg-white rounded-lg shadow p-4 md:p-6 mb-6 border-l-4 border-cyan-500">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Panel de Contactos</h1>
+            <p class="text-gray-600 mt-2 text-sm md:text-base">Gestiona los formularios de contacto recibidos</p>
+            {% if formularios_pendientes.count > 0 %}
+            <p class="mt-2 text-cyan-600 font-bold">Tienes {{ formularios_pendientes.count }} formularios pendientes</p>
+            {% endif %}
+
+            <!-- Enlace de regreso al panel principal -->
+            <div class="mt-4 p-3 bg-slate-50 border border-slate-200 rounded-lg">
+                <h3 class="text-sm font-semibold text-slate-800 mb-2">Panel Principal</h3>
+                <a href="{% url 'panel_recepcion' %}"
+                    class="inline-flex items-center px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-sm font-medium transition-colors duration-300">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Volver al Panel de Recepción
+                </a>
+                <p class="text-xs text-slate-500 mt-2">Regresa al panel principal de notificaciones</p>
+            </div>
+        </div>
+
+        <!-- Pestañas de formularios -->
+        <div class="bg-white rounded-lg shadow mb-6 border border-slate-200">
+            <div class="bg-cyan-600 text-white px-4 py-3 rounded-t-lg">
+                <h3 class="font-bold">Formularios de Contacto</h3>
+            </div>
+            <div class="flex border-b overflow-x-auto">
+                <button onclick="mostrarTab('pendientes')" id="tab-pendientes"
+                    class="tab-btn flex-1 py-3 px-4 font-medium bg-cyan-600 text-white min-w-[150px]">
+                    Formularios ({{ formularios_pendientes.count|default:0 }})
+                </button>
+                <button onclick="mostrarTab('respondidos')" id="tab-respondidos"
+                    class="tab-btn flex-1 py-3 px-4 font-medium text-gray-700 hover:bg-gray-100 min-w-[150px]">
+                    Form. Respondidos ({{ formularios_respondidos.count|default:0 }})
+                </button>
+                <button onclick="mostrarTab('dudas_pendientes')" id="tab-dudas_pendientes"
+                    class="tab-btn flex-1 py-3 px-4 font-medium text-gray-700 hover:bg-gray-100 min-w-[150px]">
+                    Dudas ({{ mensajes_pendientes.count|default:0 }})
+                </button>
+                <button onclick="mostrarTab('dudas_respondidas')" id="tab-dudas_respondidas"
+                    class="tab-btn flex-1 py-3 px-4 font-medium text-gray-700 hover:bg-gray-100 min-w-[150px]">
+                    Dudas Resp. ({{ mensajes_respondidos.count|default:0 }})
+                </button>
+            </div>
+
+            <!-- Formularios pendientes -->
+            <div id="pendientes" class="tab-content">
+                {% if formularios_pendientes %}
+                <div class="p-4 overflow-x-auto">
+                    <table class="w-full min-w-[800px]">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold">Nombre</th>
+                                <th class="px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold">DNI</th>
+                                <th class="px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold">Email</th>
+                                <th class="px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold">Teléfono</th>
+                                <th class="px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold">Fecha</th>
+                                <th class="px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for f in formularios_pendientes %}
+                            <tr class="border-b hover:bg-gray-50">
+                                <td class="px-2 md:px-3 py-2 text-sm">{{ f.nombre }}</td>
+                                <td class="px-2 md:px-3 py-2 text-sm">{{ f.dni }}</td>
+                                <td class="px-2 md:px-3 py-2 text-sm">{{ f.email }}</td>
+                                <td class="px-2 md:px-3 py-2 text-sm">{{ f.telefono|default:"No especificado" }}</td>
+                                <td class="px-2 md:px-3 py-2 text-xs md:text-sm text-gray-600">{{ f.fecha_creacion|date:"d/m/Y H:i" }}</td>
+                                <td class="px-2 md:px-3 py-2">
+                                    <div class="flex flex-col sm:flex-row gap-1">
+                                        <a href="{% url 'ver_formulario' f.id %}"
+                                            class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-xs md:text-sm">Ver</a>
+                                        <a href="{% url 'responder_formulario' f.id %}"
+                                            class="bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded text-xs md:text-sm">Responder</a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-10">
+                    <i class="fas fa-check-circle text-4xl text-gray-300 mb-3"></i>
+                    <h3 class="text-gray-900 font-medium">No hay formularios pendientes</h3>
+                    <p class="text-gray-500 text-sm">Todos los formularios de contacto han sido respondidos.</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Formularios respondidos -->
+            <div id="respondidos" class="tab-content hidden">
+                {% if formularios_respondidos %}
+                <div class="p-4 overflow-x-auto">
+                    <table class="w-full min-w-[800px]">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold">Nombre</th>
+                                <th class="px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold">DNI</th>
+                                <th class="px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold">Email</th>
+                                <th class="px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold">Respondido por
+                                </th>
+                                <th class="px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold">Fecha respuesta
+                                </th>
+                                <th class="px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for f in formularios_respondidos %}
+                            <tr class="border-b hover:bg-gray-50">
+                                <td class="px-2 md:px-3 py-2 text-sm">{{ f.nombre }}</td>
+                                <td class="px-2 md:px-3 py-2 text-sm">{{ f.dni }}</td>
+                                <td class="px-2 md:px-3 py-2 text-sm">{{ f.email }}</td>
+                                <td class="px-2 md:px-3 py-2 text-sm">{{ f.respondido_por.username|default:"No asignado" }}</td>
+                                <td class="px-2 md:px-3 py-2 text-xs md:text-sm text-gray-600">{{ f.fecha_respuesta|date:"d/m/Y H:i"|default:"No especificada" }}</td>
+                                <td class="px-2 md:px-3 py-2">
+                                    <a href="{% url 'ver_formulario' f.id %}"
+                                        class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-xs md:text-sm">Ver</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-10">
+                    <i class="fas fa-check-circle text-4xl text-gray-300 mb-3"></i>
+                    <h3 class="text-gray-900 font-medium">No hay formularios respondidos</h3>
+                    <p class="text-gray-500 text-sm">Aún no has respondido ningún formulario de contacto.</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Dudas pendientes -->
+            <div id="dudas_pendientes" class="tab-content hidden">
+                {% if mensajes_pendientes %}
+                <div class="p-4 overflow-x-auto">
+                    <table class="w-full min-w-[800px]">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold">Remitente</th>
+                                <th class="px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold">Email</th>
+                                <th class="px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold">Fecha</th>
+                                <th class="px-3 py-2 text-left text-xs md:text-sm font-semibold">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for m in mensajes_pendientes %}
+                            <tr class="border-b hover:bg-gray-50">
+                                <td class="px-2 md:px-3 py-2 text-sm">{{ m.nombre }}</td>
+                                <td class="px-2 md:px-3 py-2 text-sm">{{ m.email }}</td>
+                                <td class="px-2 md:px-3 py-2 text-xs md:text-sm text-gray-600">{{ m.fecha_creacion|date:"d/m/Y H:i" }}</td>
+                                <td class="px-2 md:px-3 py-2">
+                                    <div class="flex gap-1">
+                                        <a href="{% url 'ver_mensaje_cliente' m.id %}"
+                                            class="bg-cyan-600 hover:bg-cyan-700 text-white px-3 py-1.5 rounded text-xs font-bold shadow-sm transition-all">Ver
+                                            y Responder</a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-10">
+                    <i class="fas fa-comments text-4xl text-gray-300 mb-3"></i>
+                    <p class="text-gray-500">No hay dudas pendientes</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Dudas respondidas -->
+            <div id="dudas_respondidas" class="tab-content hidden">
+                {% if mensajes_respondidos %}
+                <div class="p-4 overflow-x-auto">
+                    <table class="w-full min-w-[800px]">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold">Remitente</th>
+                                <th class="px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold">Respondido por
+                                </th>
+                                <th class="px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold">Fecha respuesta
+                                </th>
+                                <th class="px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for m in mensajes_respondidos %}
+                            <tr class="border-b hover:bg-gray-50">
+                                <td class="px-2 md:px-3 py-2 text-sm">{{ m.nombre }}</td>
+                                <td class="px-2 md:px-3 py-2 text-sm">{{ m.respondido_por.username }}</td>
+                                <td class="px-2 md:px-3 py-2 text-xs md:text-sm text-gray-600">{{ m.fecha_respuesta|date:"d/m/Y H:i" }}</td>
+                                <td class="px-2 md:px-3 py-2">
+                                    <a href="{% url 'ver_mensaje_cliente' m.id %}"
+                                        class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-1.5 rounded text-xs font-bold transition-all border border-slate-200">Ver
+                                        historial</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-10">
+                    <i class="fas fa-history text-4xl text-gray-300 mb-3"></i>
+                    <p class="text-gray-500">No hay dudas respondidas</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function mostrarTab(tabNombre) {
+        // Ocultar todos los contenidos
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.add('hidden');
+        });
+
+        // Quitar estilo activo de todos los botones
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('bg-cyan-600', 'text-white');
+            btn.classList.add('text-gray-700', 'hover:bg-gray-100');
+        });
+
+        // Mostrar el contenido seleccionado
+        const selectedPanel = document.getElementById(tabNombre);
+        if (selectedPanel) {
+            selectedPanel.classList.remove('hidden');
+        }
+
+        // Activar el botón seleccionado
+        const botonActivo = document.getElementById('tab-' + tabNombre);
+        if (botonActivo) {
+            botonActivo.classList.remove('text-gray-700', 'hover:bg-gray-100');
+            botonActivo.classList.add('bg-cyan-600', 'text-white');
+        }
+    }
+</script>
+{% endblock %}

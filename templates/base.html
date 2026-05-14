@@ -1,18 +1,21 @@
 <!DOCTYPE html>
 {% load static %}
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}VetCT{% endblock %}</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <!-- Configuración de Tailwind CSS -->
     <script>
         tailwind.config = {
@@ -52,120 +55,156 @@
                 <a href="{% url 'home' %}" class="flex items-center gap-1 font-montserrat font-black text-3xl">
                     <span class="text-blue-600">Vet</span>
                     <span class="text-cyan-500">CT</span>
-                    <div class="w-2 h-2 bg-cyan-400 rounded-full animate-pulse ml-0.5"></div>
+                    <div class="w-2 h-2 bg-cyan-400 rounded-full ml-0.5"></div>
                 </a>
-                
-                <button class="lg:hidden p-2 rounded-lg hover:bg-slate-100 transition-colors" onclick="toggleMobileMenu()">
+
+                <button class="lg:hidden p-2 rounded-lg hover:bg-slate-100 transition-colors"
+                    onclick="toggleMobileMenu()">
                     <i class="fas fa-bars text-2xl text-slate-700"></i>
                 </button>
-                
+
                 <div class="hidden lg:flex items-center space-x-8">
-                    <a href="{% url 'home' %}" class="relative text-slate-700 hover:text-cyan-600 font-semibold transition-colors duration-300 group">
+                    <a href="{% url 'home' %}"
+                        class="relative text-slate-700 hover:text-cyan-600 font-semibold transition-colors duration-300 group">
                         Inicio
-                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-cyan-500 transition-all duration-300 group-hover:w-full"></span>
+                        <span
+                            class="absolute -bottom-1 left-0 w-0 h-0.5 bg-cyan-500 transition-all duration-300 group-hover:w-full"></span>
                     </a>
-                    <a href="{% url 'servicios' %}" class="relative text-slate-700 hover:text-cyan-600 font-semibold transition-colors duration-300 group">
+                    <a href="{% url 'servicios' %}"
+                        class="relative text-slate-700 hover:text-cyan-600 font-semibold transition-colors duration-300 group">
                         Servicios
-                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-cyan-500 transition-all duration-300 group-hover:w-full"></span>
+                        <span
+                            class="absolute -bottom-1 left-0 w-0 h-0.5 bg-cyan-500 transition-all duration-300 group-hover:w-full"></span>
                     </a>
-                    <a href="{% url 'tienda' %}" class="relative text-slate-700 hover:text-cyan-600 font-semibold transition-colors duration-300 group">
+                    <a href="{% url 'tienda' %}"
+                        class="relative text-slate-700 hover:text-cyan-600 font-semibold transition-colors duration-300 group">
                         Tienda
-                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-cyan-500 transition-all duration-300 group-hover:w-full"></span>
+                        <span
+                            class="absolute -bottom-1 left-0 w-0 h-0.5 bg-cyan-500 transition-all duration-300 group-hover:w-full"></span>
                     </a>
-                    <a href="{% url 'contacto' %}" class="relative text-slate-700 hover:text-cyan-600 font-semibold transition-colors duration-300 group">
+                    <a href="{% url 'contacto' %}"
+                        class="relative text-slate-700 hover:text-cyan-600 font-semibold transition-colors duration-300 group">
                         Contacto
-                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-cyan-500 transition-all duration-300 group-hover:w-full"></span>
+                        <span
+                            class="absolute -bottom-1 left-0 w-0 h-0.5 bg-cyan-500 transition-all duration-300 group-hover:w-full"></span>
                     </a>
                 </div>
-                
+
                 <div class="hidden lg:flex items-center space-x-3">
                     {% if user.is_authenticated %}
-                        {% if user.perfil and user.perfil.rol == 'recepcionista' %}
-                            <a href="{% url 'panel_recepcion' %}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full font-medium text-sm transition-all duration-300 hover:shadow-lg">
-                                <i class="fas fa-clipboard-list mr-1"></i>Panel Recepción
-                            </a>
-                        {% endif %}
-                        {% if user.perfil and user.perfil.rol == 'veterinario' %}
-                            <a href="{% url 'panel_veterinario' %}" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full font-medium text-sm transition-all duration-300 hover:shadow-lg">
-                                <i class="fas fa-user-md mr-1"></i>Panel Veterinario
-                            </a>
-                        {% endif %}
-                        <a href="{% url 'perfil' %}" class="flex items-center gap-2 text-slate-700 font-semibold hover:text-cyan-600 transition-colors">
-                            <i class="fas fa-user-circle text-xl text-cyan-500"></i>
-                            {{ user.username }}
-                        </a>
-                        <form method="post" action="{% url 'logout' %}" class="inline">
-                            {% csrf_token %}
-                            <button type="submit" class="px-4 py-2 text-sm font-medium text-red-500 border border-red-200 rounded-full hover:bg-red-50 transition-colors">
-                                <i class="fas fa-sign-out-alt mr-1"></i>Salir
-                            </button>
-                        </form>
+                    {% if user.perfil and user.perfil.rol == 'recepcionista' %}
+                    <a href="{% url 'panel_recepcion' %}"
+                        class="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-full font-medium text-sm transition-colors hover:shadow-sm">
+                        <i class="fas fa-clipboard-list mr-1"></i>Panel Recepción
+                    </a>
+                    {% endif %}
+                    {% if user.perfil and user.perfil.rol == 'veterinario' %}
+                    <a href="{% url 'panel_veterinario' %}"
+                        class="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-full font-medium text-sm transition-colors hover:shadow-sm">
+                        <i class="fas fa-user-md mr-1"></i>Panel Veterinario
+                    </a>
+                    {% endif %}
+                    <a href="{% url 'perfil' %}"
+                        class="flex items-center gap-2 text-slate-700 font-semibold hover:text-cyan-600 transition-colors">
+                        <i class="fas fa-user-circle text-xl text-cyan-500"></i>
+                        {{ user.username }}
+                    </a>
+                    <form method="post" action="{% url 'logout' %}" class="inline">
+                        {% csrf_token %}
+                        <button type="submit"
+                            class="px-4 py-2 text-sm font-medium text-red-500 border border-red-200 rounded-full hover:bg-red-50 transition-colors">
+                            <i class="fas fa-sign-out-alt mr-1"></i>Salir
+                        </button>
+                    </form>
                     {% else %}
-                        <a href="{% url 'registro' %}" class="text-slate-600 hover:text-cyan-600 font-semibold transition-colors duration-300">Registrarse</a>
-                        <a href="{% url 'login' %}" class="bg-gradient-to-r from-cyan-600 to-blue-700 text-white font-bold text-sm uppercase tracking-wider px-6 py-3 rounded-full transition-all duration-300 hover:shadow-xl hover:shadow-cyan-500/25 hover:-translate-y-0.5">
-                            <i class="fas fa-sign-in-alt mr-1"></i>Entrar
-                        </a>
+                    <a href="{% url 'registro' %}"
+                        class="text-slate-600 hover:text-cyan-600 font-semibold transition-colors duration-300">Registrarse</a>
+                    <a href="{% url 'login' %}"
+                        class="bg-cyan-600 text-white font-bold text-sm uppercase tracking-wider px-6 py-3 rounded-full transition-all duration-300 hover:shadow-sm border border-slate-200 hover: hover:-translate-y-0.5">
+                        <i class="fas fa-sign-in-alt mr-1"></i>Entrar
+                    </a>
                     {% endif %}
                 </div>
             </div>
-            
+
             <div id="mobileMenu" class="hidden lg:hidden py-4 border-t border-slate-100">
                 <div class="flex flex-col space-y-3">
-                    <a href="{% url 'home' %}" class="text-slate-700 hover:text-cyan-600 transition-colors font-semibold py-2">Inicio</a>
-                    <a href="{% url 'servicios' %}" class="text-slate-700 hover:text-cyan-600 transition-colors font-semibold py-2">Servicios</a>
-                    <a href="{% url 'tienda' %}" class="text-slate-700 hover:text-cyan-600 transition-colors font-semibold py-2">Tienda</a>
-                    <a href="{% url 'contacto' %}" class="text-slate-700 hover:text-cyan-600 transition-colors font-semibold py-2">Contacto</a>
+                    <a href="{% url 'home' %}"
+                        class="text-slate-700 hover:text-cyan-600 transition-colors font-semibold py-2">Inicio</a>
+                    <a href="{% url 'servicios' %}"
+                        class="text-slate-700 hover:text-cyan-600 transition-colors font-semibold py-2">Servicios</a>
+                    <a href="{% url 'tienda' %}"
+                        class="text-slate-700 hover:text-cyan-600 transition-colors font-semibold py-2">Tienda</a>
+                    <a href="{% url 'contacto' %}"
+                        class="text-slate-700 hover:text-cyan-600 transition-colors font-semibold py-2">Contacto</a>
                     {% if user.is_authenticated %}
-                        {% if user.perfil and user.perfil.rol == 'recepcionista' %}
-                            <a href="{% url 'panel_recepcion' %}" class="bg-blue-500 text-white px-4 py-2 rounded-full font-medium text-center">
-                                <i class="fas fa-clipboard-list mr-1"></i>Panel Recepción
-                            </a>
-                        {% endif %}
-                        {% if user.perfil and user.perfil.rol == 'veterinario' %}
-                            <a href="{% url 'panel_veterinario' %}" class="bg-green-500 text-white px-4 py-2 rounded-full font-medium text-center">
-                                <i class="fas fa-user-md mr-1"></i>Panel Veterinario
-                            </a>
-                        {% endif %}
-                        <a href="{% url 'perfil' %}" class="flex items-center gap-2 text-cyan-600 font-bold py-2">
-                            <i class="fas fa-user-circle text-xl"></i>
-                            {{ user.username }}
-                        </a>
-                        <form method="post" action="{% url 'logout' %}" class="inline">
-                            {% csrf_token %}
-                            <button type="submit" class="w-full text-left px-4 py-2 text-sm font-medium text-red-500 border border-red-200 rounded-lg hover:bg-red-50 transition-colors">
-                                <i class="fas fa-sign-out-alt mr-2"></i>Salir
-                            </button>
-                        </form>
+                    {% if user.perfil and user.perfil.rol == 'recepcionista' %}
+                    <a href="{% url 'panel_recepcion' %}"
+                        class="bg-cyan-600 text-white px-4 py-2 rounded-full font-medium text-center hover:bg-cyan-700">
+                        <i class="fas fa-clipboard-list mr-1"></i>Panel Recepción
+                    </a>
+                    {% endif %}
+                    {% if user.perfil and user.perfil.rol == 'veterinario' %}
+                    <a href="{% url 'panel_veterinario' %}"
+                        class="bg-cyan-600 text-white px-4 py-2 rounded-full font-medium text-center hover:bg-cyan-700">
+                        <i class="fas fa-user-md mr-1"></i>Panel Veterinario
+                    </a>
+                    {% endif %}
+                    <a href="{% url 'perfil' %}" class="flex items-center gap-2 text-cyan-600 font-bold py-2">
+                        <i class="fas fa-user-circle text-xl"></i>
+                        {{ user.username }}
+                    </a>
+                    <form method="post" action="{% url 'logout' %}" class="inline">
+                        {% csrf_token %}
+                        <button type="submit"
+                            class="w-full text-left px-4 py-2 text-sm font-medium text-red-500 border border-red-200 rounded-lg hover:bg-red-50 transition-colors">
+                            <i class="fas fa-sign-out-alt mr-2"></i>Salir
+                        </button>
+                    </form>
                     {% else %}
-                        <a href="{% url 'registro' %}" class="text-slate-700 hover:text-cyan-600 transition-colors font-semibold py-2">Registrarse</a>
-                        <a href="{% url 'login' %}" class="flex items-center justify-center gap-2 bg-gradient-to-r from-cyan-600 to-blue-700 text-white font-bold text-sm uppercase tracking-wider px-6 py-3 rounded-full transition-all duration-300 hover:shadow-xl hover:shadow-cyan-500/25">
-                            <i class="fas fa-sign-in-alt"></i>Entrar
-                        </a>
+                    <a href="{% url 'registro' %}"
+                        class="text-slate-700 hover:text-cyan-600 transition-colors font-semibold py-2">Registrarse</a>
+                    <a href="{% url 'login' %}"
+                        class="flex items-center justify-center gap-2 bg-cyan-600 text-white font-bold text-sm uppercase tracking-wider px-6 py-3 rounded-full transition-all duration-300 hover:shadow-sm border border-slate-200 hover:">
+                        <i class="fas fa-sign-in-alt"></i>Entrar
+                    </a>
                     {% endif %}
                 </div>
             </div>
         </div>
     </nav>
 
-    <!-- Sistema de mensajes -->
+    <!-- Sistema de mensajes (Toast notifications) -->
     {% if messages %}
-        <div style="position: fixed; top: 80px; right: 20px; z-index: 1000;">
-            {% for message in messages %}
-                {% if message.tags == 'success' %}
-                    <div style="background-color: #10b981; color: white; padding: 15px; margin: 10px 0; border-radius: 5px; border: 1px solid #059669;">
-                        <strong>Éxito:</strong> {{ message }}
-                    </div>
-                {% elif message.tags == 'error' %}
-                    <div style="background-color: #ef4444; color: white; padding: 15px; margin: 10px 0; border-radius: 5px; border: 1px solid #dc2626;">
-                        <strong>Error:</strong> {{ message }}
-                    </div>
-                {% else %}
-                    <div style="background-color: #3b82f6; color: white; padding: 15px; margin: 10px 0; border-radius: 5px; border: 1px solid #2563eb;">
-                        <strong>Info:</strong> {{ message }}
-                    </div>
-                {% endif %}
-            {% endfor %}
+    <div class="fixed top-20 right-4 z-[1000] flex flex-col gap-3 max-w-[90%] md:max-w-sm">
+        {% for message in messages %}
+        <div
+            class="rounded-xl shadow-xl overflow-hidden animate-slide-in transition-all duration-300 border border-slate-200">
+            <div
+                class="flex items-center p-4 {% if message.tags == 'success' %}bg-white border-l-4 border-emerald-500{% elif message.tags == 'error' %}bg-white border-l-4 border-red-500{% else %}bg-white border-l-4 border-blue-500{% endif %}">
+                <div class="flex-shrink-0 mr-3">
+                    {% if message.tags == 'success' %}
+                    <i class="fas fa-check-circle text-emerald-500 text-xl"></i>
+                    {% elif message.tags == 'error' %}
+                    <i class="fas fa-exclamation-circle text-red-500 text-xl"></i>
+                    {% else %}
+                    <i class="fas fa-info-circle text-blue-500 text-xl"></i>
+                    {% endif %}
+                </div>
+                <div class="flex-grow">
+                    <p class="text-sm font-bold text-slate-800">
+                        {% if message.tags == 'success' %}Éxito{% elif message.tags == 'error' %}Error{% else %}Información{% endif %}
+                    </p>
+                    <p class="text-xs text-slate-600">{{ message }}</p>
+                </div>
+                <button onclick="this.parentElement.parentElement.remove()"
+                    class="ml-4 text-slate-400 hover:text-slate-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
         </div>
+        {% endfor %}
+    </div>
     {% endif %}
 
     <main id="main-content" class="flex-grow-1">
@@ -179,19 +218,24 @@
                     <div class="flex items-center gap-1 mb-4">
                         <span class="font-montserrat font-black text-3xl text-white">Vet</span>
                         <span class="font-montserrat font-black text-3xl text-cyan-400">CT</span>
-                        <div class="w-2.5 h-2.5 bg-cyan-400 rounded-full animate-pulse ml-1"></div>
+                        <div class="w-2.5 h-2.5 bg-cyan-400 rounded-full ml-1"></div>
                     </div>
                     <p class="text-slate-400 leading-relaxed">
-                        Centro Veterinario Integral con tecnología de última generación. Cuidamos a tu mascota como si fuera nuestra.
+                        Centro Veterinario Integral con tecnología de última generación. Cuidamos a tu mascota como si
+                        fuera nuestra.
                     </p>
                 </div>
                 <div>
                     <h4 class="font-montserrat font-bold text-lg text-white mb-4">Enlaces rápidos</h4>
                     <ul class="space-y-2">
-                        <li><a href="{% url 'home' %}" class="text-slate-400 hover:text-cyan-400 transition-colors">Inicio</a></li>
-                        <li><a href="{% url 'servicios' %}" class="text-slate-400 hover:text-cyan-400 transition-colors">Servicios</a></li>
-                        <li><a href="{% url 'tienda' %}" class="text-slate-400 hover:text-cyan-400 transition-colors">Tienda</a></li>
-                        <li><a href="{% url 'contacto' %}" class="text-slate-400 hover:text-cyan-400 transition-colors">Contacto</a></li>
+                        <li><a href="{% url 'home' %}"
+                                class="text-slate-400 hover:text-cyan-400 transition-colors">Inicio</a></li>
+                        <li><a href="{% url 'servicios' %}"
+                                class="text-slate-400 hover:text-cyan-400 transition-colors">Servicios</a></li>
+                        <li><a href="{% url 'tienda' %}"
+                                class="text-slate-400 hover:text-cyan-400 transition-colors">Tienda</a></li>
+                        <li><a href="{% url 'contacto' %}"
+                                class="text-slate-400 hover:text-cyan-400 transition-colors">Contacto</a></li>
                     </ul>
                 </div>
                 <div>
@@ -226,12 +270,12 @@
             const menu = document.getElementById('mobileMenu');
             menu.classList.toggle('hidden');
         }
-        
+
         // Close mobile menu when clicking outside
-        document.addEventListener('click', function(event) {
+        document.addEventListener('click', function (event) {
             const menu = document.getElementById('mobileMenu');
             const menuButton = event.target.closest('button[onclick="toggleMobileMenu()"]');
-            
+
             if (!menu.contains(event.target) && !menuButton) {
                 menu.classList.add('hidden');
             }
@@ -239,4 +283,5 @@
     </script>
     {% block extra_js %}{% endblock %}
 </body>
+
 </html>

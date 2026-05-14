@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalles del Formulario - VetCT{% endblock %}
+
+{% block content %}
+<div class="bg-gray-100 py-8 min-h-screen">
+ <div class="container mx-auto px-4 max-w-4xl">
+ <!-- Título -->
+ <div class="bg-white rounded-lg shadow p-4 md:p-6 mb-6">
+ <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Detalles del Formulario de Contacto</h1>
+ </div>
+
+ <!-- Información del formulario -->
+ <div class="bg-white rounded-lg shadow p-4 md:p-6 mb-6">
+ <h2 class="text-lg font-semibold text-gray-800 mb-4">Información del Mensaje</h2>
+ 
+ <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+ <div>
+ <span class="text-sm font-medium text-gray-700">Nombre:</span>
+ <p class="text-gray-900 mt-1">{{ formulario.nombre }}</p>
+ </div>
+ <div>
+ <span class="text-sm font-medium text-gray-700">DNI:</span>
+ <p class="text-gray-900 mt-1">{{ formulario.dni }}</p>
+ </div>
+ <div>
+ <span class="text-sm font-medium text-gray-700">Email:</span>
+ <p class="text-gray-900 mt-1">{{ formulario.email }}</p>
+ </div>
+ <div>
+ <span class="text-sm font-medium text-gray-700">Teléfono:</span>
+ <p class="text-gray-900 mt-1">{{ formulario.telefono|default:"No especificado" }}</p>
+ </div>
+ </div>
+ 
+ <div class="mb-4">
+ <span class="text-sm font-medium text-gray-700">Asunto:</span>
+ <p class="text-gray-900 mt-1 font-medium">{{ formulario.asunto }}</p>
+ </div>
+ 
+ <div class="mb-4">
+ <span class="text-sm font-medium text-gray-700">Mensaje:</span>
+ <div class="bg-gray-50 p-3 rounded-lg mt-1">
+ <p class="text-gray-700">{{ formulario.mensaje|linebreaks }}</p>
+ </div>
+ </div>
+ 
+ <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
+ <div>
+ <span class="font-medium text-gray-700">Estado:</span>
+ <span class="px-3 py-1 rounded-full text-xs font-medium mt-1 inline-block
+ {% if formulario.estado == 'Pendiente' %}bg-yellow-100 text-yellow-800{% elif formulario.estado == 'Respondido' %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+ {{ formulario.get_estado_display }}
+ </span>
+ </div>
+ <div>
+ <span class="font-medium text-gray-700">Fecha de envío:</span>
+ <p class="text-gray-900 mt-1">{{ formulario.fecha_creacion|date:"d/m/Y H:i" }}</p>
+ </div>
+ {% if formulario.fecha_respuesta %}
+ <div>
+ <span class="font-medium text-gray-700">Fecha de respuesta:</span>
+ <p class="text-gray-900 mt-1">{{ formulario.fecha_respuesta|date:"d/m/Y H:i" }}</p>
+ </div>
+ {% endif %}
+ </div>
+ </div>
+
+ <!-- Respuestas -->
+ <div class="bg-white rounded-lg shadow p-4 md:p-6">
+ <h2 class="text-lg font-semibold text-gray-800 mb-4">Historial de Respuestas</h2>
+ 
+ {% if respuestas %}
+ <div class="space-y-4">
+ {% for respuesta in respuestas %}
+ <div class="border-l-4 {% if 'CLIENTE RESPONDE' in respuesta.contenido %}border-green-500{% else %}border-cyan-500{% endif %} pl-4">
+ <div class="flex items-center justify-between mb-2">
+ <span class="text-sm font-medium {% if 'CLIENTE RESPONDE' in respuesta.contenido %}text-green-700{% else %}text-cyan-700{% endif %}">
+ {% if 'CLIENTE RESPONDE' in respuesta.contenido %}
+ Tú respondiste
+ {% else %}
+ {{ respuesta.autor.username }} (VetCT)
+ {% endif %}
+ </span>
+ <span class="text-xs text-gray-500">
+ {{ respuesta.fecha_creacion|date:"d/m/Y H:i" }}
+ </span>
+ </div>
+ <div class="bg-gray-50 p-3 rounded-lg text-sm text-gray-700">
+ {{ respuesta.contenido|linebreaks }}
+ </div>
+ </div>
+ {% endfor %}
+ </div>
+ {% else %}
+ <div class="text-center py-8">
+ <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.003 9.003 0 00-8.064 4.582L12 19.584"></path>
+ </svg>
+ <h3 class="mt-2 text-sm font-medium text-gray-900">No hay respuestas</h3>
+ <p class="mt-1 text-sm text-gray-500">Este formulario aún no ha recibido ninguna respuesta.</p>
+ </div>
+ {% endif %}
+ </div>
+
+ <!-- Acciones para recepcionista -->
+ {% if es_recepcionista and formulario.estado == 'Pendiente' %}
+ <div class="bg-white rounded-lg shadow p-4 md:p-6">
+ <h2 class="text-lg font-semibold text-gray-800 mb-4">Acciones</h2>
+ <div class="flex flex-col sm:flex-row gap-3">
+ <a href="{% url 'responder_formulario' formulario.id %}" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-xl transition-colors duration-300 focus:ring-2 focus:ring-green-200">
+ Responder formulario
+ </a>
+ <a href="{% url 'panel_contactos_recepcionista' %}" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-xl transition-colors duration-300 focus:ring-2 focus:ring-gray-200">
+ Volver al panel
+ </a>
+ </div>
+ </div>
+ {% endif %}
+
+ <!-- Acciones para cliente -->
+ {% if not es_recepcionista %}
+ <div class="bg-white rounded-lg shadow p-4 md:p-6">
+ <h2 class="text-lg font-semibold text-gray-800 mb-4">Acciones</h2>
+ <div class="flex flex-col sm:flex-row gap-3">
+ {% if formulario.estado == 'Respondido' %}
+ <a href="{% url 'responder_respuesta' formulario.id %}" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-xl transition-colors duration-300 focus:ring-2 focus:ring-green-200">
+ Responder
+ </a>
+ {% endif %}
+ <a href="{% url 'panel_contactos_cliente' %}" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-xl transition-colors duration-300 focus:ring-2 focus:ring-gray-200">
+ Volver a mis solicitudes
+ </a>
+ </div>
+ </div>
+ {% endif %}
+ </div>
+</div>
+{% endblock %}

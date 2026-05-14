@@ -19,34 +19,36 @@
             <div class="p-4 md:p-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="mb-4">
-                        <label class="block text-gray-600 text-sm font-semibold mb-1">Paciente</label>
-                        <p class="text-gray-800">{{ cita.paciente }}</p>
+                        <label class="block text-gray-600 text-sm font-semibold mb-1">Paciente / Remitente</label>
+                        <p class="text-gray-800">{{ cita.paciente|default:cita.nombre }}</p>
                     </div>
                     <div class="mb-4">
                         <label class="block text-gray-600 text-sm font-semibold mb-1">Fecha</label>
-                        <p class="text-gray-800">{{ cita.fecha|date:"d/m/Y" }}</p>
+                        <p class="text-gray-800">{% if cita.fecha %}{{ cita.fecha|date:"d/m/Y" }}{% else %}{{
+                            cita.fecha_creacion|date:"d/m/Y" }}{% endif %}</p>
                     </div>
                     <div class="mb-4">
                         <label class="block text-gray-600 text-sm font-semibold mb-1">Hora</label>
                         <p class="text-gray-800">
                             {% if cita.hora %}
-                                {{ cita.hora|time:"H:i" }}
+                            {{ cita.hora|time:"H:i" }}
                             {% elif cita.fecha.hour %}
-                                {{ cita.fecha|time:"H:i" }}
+                            {{ cita.fecha|time:"H:i" }}
                             {% else %}
-                                No especificada
+                            No especificada
                             {% endif %}
                         </p>
                     </div>
                     <div class="mb-4">
                         <label class="block text-gray-600 text-sm font-semibold mb-1">Estado</label>
-                        <p class="{% if cita.estado == 'Aceptada' %}text-green-600{% elif cita.estado == 'Rechazada' %}text-red-600{% else %}text-yellow-600{% endif %} font-medium">
+                        <p
+                            class="{% if cita.estado in 'Aceptada,Respondido,Leído' %}text-green-600{% elif cita.estado in 'Rechazada,Cancelado' %}text-red-600{% else %}text-yellow-600{% endif %} font-medium">
                             {{ cita.estado }}
                         </p>
                     </div>
                     <div class="mb-4">
-                        <label class="block text-gray-600 text-sm font-semibold mb-1">Solicitante</label>
-                        <p class="text-gray-800">{{ cita.usuario.username }}</p>
+                        <label class="block text-gray-600 text-sm font-semibold mb-1">Solicitante / Email</label>
+                        <p class="text-gray-800">{{ cita.usuario.username|default:cita.email }}</p>
                     </div>
                 </div>
 
@@ -54,15 +56,15 @@
                     <label class="block text-gray-600 text-sm font-semibold mb-1">Motivo / Tipo</label>
                     <p class="text-gray-800">
                         {% if cita.motivo %}
-                            {{ cita.motivo }}
+                        {{ cita.motivo }}
                         {% elif cita.nombre %}
-                            {{ cita.nombre }}
+                        {{ cita.nombre }}
                         {% elif cita.tipo_cirugia %}
-                            {{ cita.tipo_cirugia }}
+                        {{ cita.tipo_cirugia }}
                         {% elif cita.descripcion %}
-                            {{ cita.descripcion }}
+                        {{ cita.descripcion }}
                         {% else %}
-                            -
+                        -
                         {% endif %}
                     </p>
                 </div>
@@ -78,22 +80,27 @@
 
         <!-- Botones de accion -->
         <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
-            <a href="{% url 'panel_recepcion' %}" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded font-medium">
+            <a href="{% url 'panel_recepcion' %}"
+                class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded font-medium">
                 Volver al panel
             </a>
             {% if cita.estado == 'Pendiente' %}
             <form method="post" action="{% url 'aceptar_cita' tipo cita.id %}" class="inline">
                 {% csrf_token %}
-                <button type="submit" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded font-medium">Aceptar</button>
+                <button type="submit"
+                    class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded font-medium">Aceptar</button>
             </form>
             <form method="post" action="{% url 'rechazar_cita' tipo cita.id %}" class="inline">
                 {% csrf_token %}
-                <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded font-medium">Rechazar</button>
+                <button type="submit"
+                    class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded font-medium">Rechazar</button>
             </form>
-            {% elif cita.estado == 'Aceptada' %}
+            {% elif cita.estado in 'Aceptada,Respondido,Leído' %}
             <form method="post" action="{% url 'cancelar_cita' tipo cita.id %}" class="inline">
                 {% csrf_token %}
-                <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded font-medium">Cancelar asignación</button>
+                <button type="submit"
+                    class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded font-medium">Cancelar
+                    asignación</button>
             </form>
             {% endif %}
         </div>

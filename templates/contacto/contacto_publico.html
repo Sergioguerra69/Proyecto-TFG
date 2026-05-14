@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+
+{% block title %}Contacto - VetCT{% endblock %}
+
+{% block content %}
+{# HERO #}
+<section class="relative py-24 md:py-32 bg-slate-900">
+ <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+ <span
+ class="inline-block bg-cyan-900 text-cyan-300 text-sm font-semibold uppercase tracking-widest px-4 py-2 rounded-full mb-6">
+ <i class="fas fa-comments mr-2"></i>Estamos Aquí
+ </span>
+ <h1 class="font-montserrat font-black text-4xl md:text-5xl lg:text-6xl text-white mb-4 tracking-tight">
+ Canales de <span class="text-cyan-400">Comunicación</span>
+ </h1>
+ <p class="text-lg md:text-xl text-slate-300 max-w-3xl mx-auto mb-10">
+ Utilice este formulario para enviarnos sus dudas o solicitudes de información. Le responderemos en menos de
+ 24 horas.
+ </p>
+ <div class="flex justify-center gap-4 flex-wrap">
+ <span class="flex items-center bg-slate-800 px-5 py-2.5 rounded-full text-white text-sm">
+ <i class="fas fa-clock text-cyan-400 mr-2"></i>Respuesta en 24h
+ </span>
+ <span class="flex items-center bg-slate-800 px-5 py-2.5 rounded-full text-white text-sm">
+ <i class="fas fa-shield-halved text-cyan-400 mr-2"></i>Datos Seguros
+ </span>
+ <span class="flex items-center bg-slate-800 px-5 py-2.5 rounded-full text-white text-sm">
+ <i class="fas fa-headset text-cyan-400 mr-2"></i>Soporte 24/7
+ </span>
+ </div>
+ </div>
+</section>
+
+{# CONTENIDO PRINCIPAL #}
+<section class="py-20 bg-slate-50">
+ <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+ <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+
+ {# FORMULARIO #}
+ <div class="bg-white rounded-xl shadow-md border border-slate-200 p-8 md:p-10">
+ <div class="flex items-center gap-3 mb-8">
+ <div class="w-10 h-10 bg-cyan-600 rounded-lg flex items-center justify-center">
+ <i class="fas fa-envelope text-white"></i>
+ </div>
+ <h2 class="font-montserrat font-bold text-2xl text-slate-800">Enviar Mensaje</h2>
+ </div>
+
+ <form method="post" class="space-y-5">
+ {% csrf_token %}
+ {% if messages %}
+ {% for message in messages %}
+ <div
+ class="mb-4 p-4 rounded-lg {% if message.tags == 'success' %}bg-green-100 text-green-700 border border-green-400{% else %}bg-red-100 text-red-700 border border-red-400{% endif %}">
+ {{ message }}
+ </div>
+ {% endfor %}
+ {% endif %}
+
+ <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+ <div>
+ <label class="block text-sm font-semibold text-slate-700 mb-2">
+ <i class="fas fa-user text-cyan-600 mr-1"></i>Nombre <span class="text-red-500">*</span>
+ </label>
+ {{ formulario.nombre }}
+ {% if formulario.nombre.errors %}
+ <p class="text-red-500 text-xs mt-1"><i class="fas fa-exclamation-circle mr-1"></i>{{ formulario.nombre.errors.0 }}</p>
+ {% endif %}
+ </div>
+ <div>
+ <label class="block text-sm font-semibold text-slate-700 mb-2">
+ <i class="fas fa-envelope text-cyan-600 mr-1"></i>Email <span
+ class="text-red-500">*</span>
+ </label>
+ {{ formulario.email }}
+ {% if formulario.email.errors %}
+ <p class="text-red-500 text-xs mt-1"><i class="fas fa-exclamation-circle mr-1"></i>{{ formulario.email.errors.0 }}</p>
+ {% endif %}
+ </div>
+ </div>
+
+ <div>
+ <label class="block text-sm font-semibold text-slate-700 mb-2">
+ <i class="fas fa-tag text-cyan-600 mr-1"></i>Asunto
+ </label>
+ {{ formulario.asunto }}
+ {% if formulario.asunto.errors %}
+ <p class="text-red-500 text-xs mt-1"><i class="fas fa-exclamation-circle mr-1"></i>{{ formulario.asunto.errors.0 }}</p>
+ {% endif %}
+ </div>
+
+ <div>
+ <label class="block text-sm font-semibold text-slate-700 mb-2">
+ <i class="fas fa-comment-alt text-cyan-600 mr-1"></i>Mensaje <span
+ class="text-red-500">*</span>
+ </label>
+ {{ formulario.mensaje }}
+ {% if formulario.mensaje.errors %}
+ <p class="text-red-500 text-xs mt-1"><i class="fas fa-exclamation-circle mr-1"></i>{{ formulario.mensaje.errors.0 }}</p>
+ {% endif %}
+ </div>
+
+ <button type="submit"
+ class="w-full bg-cyan-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-cyan-700 transition-colors flex items-center justify-center gap-2">
+ <i class="fas fa-paper-plane"></i>
+ Enviar Formulario
+ </button>
+ </form>
+ </div>
+
+ {# INFO CLÍNICA #}
+ <div class="space-y-8">
+
+ <div class="bg-white rounded-xl shadow-md border border-slate-200 p-8">
+ <h3
+ class="font-montserrat font-bold text-xl text-slate-800 mb-6 pb-4 border-b border-slate-100 flex items-center gap-2">
+ <i class="fas fa-info-circle text-cyan-600"></i>Información del Centro
+ </h3>
+
+ <div class="space-y-5">
+ <div class="flex items-start gap-4 hover:bg-slate-50 p-3 rounded-lg transition-colors -mx-3">
+ <div
+ class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+ <i class="fas fa-map-marker-alt text-blue-600"></i>
+ </div>
+ <div>
+ <p class="text-sm font-semibold text-slate-500 mb-0.5">Dirección</p>
+ <p class="text-slate-800 font-semibold">Avenida de la Venecia, 36</p>
+ <p class="text-slate-500 text-sm">20219 Murcia, España</p>
+ </div>
+ </div>
+
+ <div class="flex items-start gap-4 hover:bg-slate-50 p-3 rounded-lg transition-colors -mx-3">
+ <div
+ class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+ <i class="fas fa-phone text-green-600"></i>
+ </div>
+ <div>
+ <p class="text-sm font-semibold text-slate-500 mb-0.5">Teléfono</p>
+ <p class="text-xl font-bold text-slate-800">+34 722 19 49 81</p>
+ <p class="text-slate-500 text-sm">Lun-Sáb: 9:00 - 20:00</p>
+ </div>
+ </div>
+
+ <div class="flex items-start gap-4 hover:bg-slate-50 p-3 rounded-lg transition-colors -mx-3">
+ <div
+ class="w-10 h-10 bg-cyan-100 rounded-lg flex items-center justify-center flex-shrink-0">
+ <i class="fas fa-envelope text-cyan-600"></i>
+ </div>
+ <div>
+ <p class="text-sm font-semibold text-slate-500 mb-0.5">Email</p>
+ <p class="text-slate-800 font-semibold">atencion@vetct.com</p>
+ </div>
+ </div>
+ </div>
+ </div>
+
+ <div class="bg-red-600 rounded-xl shadow-md p-8 text-white relative">
+ <div class="relative flex items-center gap-4 mb-4">
+ <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
+ <i class="fas fa-phone-alt text-xl"></i>
+ </div>
+ <div>
+ <p class="font-bold text-sm uppercase tracking-wider text-red-100">Urgencias 24h</p>
+ <p class="text-2xl font-black">+34 600 123 456</p>
+ </div>
+ </div>
+ <p class="text-red-100 text-sm">Disponible las 24 horas, todos los días del año. No dude en llamar
+ ante cualquier emergencia.</p>
+ </div>
+
+ <div class="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden">
+ <div class="bg-cyan-600 text-white p-4 text-center">
+ <h4 class="font-montserrat font-bold"><i class="fas fa-map-marked-alt mr-2"></i>Nuestra
+ Ubicación</h4>
+ </div>
+ <div class="h-48 bg-slate-100 flex items-center justify-center">
+ <div class="text-center">
+ <div
+ class="w-16 h-16 bg-white rounded-xl flex items-center justify-center mx-auto mb-3 shadow-sm">
+ <i class="fas fa-map-pin text-3xl text-cyan-600"></i>
+ </div>
+ <p class="text-slate-600 font-medium">Avenida de la Venecia, 36</p>
+ <a href="#" class="inline-block mt-2 text-cyan-600 font-semibold text-sm hover:underline">
+ <i class="fas fa-external-link-alt mr-1"></i>Ver en Google Maps
+ </a>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+</section>
+{% endblock %}

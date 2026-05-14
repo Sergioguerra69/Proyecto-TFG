@@ -1,0 +1,232 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-slate-800 py-8">
+ <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+ <!-- Header -->
+ <div class="mb-8">
+ <div class="bg-white rounded-lg shadow-lg p-6 border border-slate-200">
+ <div class="flex items-center justify-between">
+ <div class="flex items-center gap-4">
+ <div class="w-12 h-12 bg-amber-500 rounded-xl flex items-center justify-center shadow-lg">
+ <i class="fas fa-comments text-white text-xl"></i>
+ </div>
+ <div>
+ <h1 class="text-2xl font-bold text-slate-800">Panel de Mensajes</h1>
+ <p class="text-slate-600">Gestiona las dudas y consultas de los clientes</p>
+ </div>
+ </div>
+ <div class="flex items-center gap-3">
+ <a href="{% url 'panel_contactos_recepcionista' %}" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors flex items-center gap-2">
+ <i class="fas fa-arrow-left"></i>
+ Volver al Panel
+ </a>
+ <div class="px-4 py-2 bg-amber-100 text-amber-800 rounded-lg font-semibold">
+ <i class="fas fa-envelope mr-2"></i>
+ {{ mensajes_pendientes.count }} Pendientes
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+
+ <!-- Pestañas -->
+ <div class="mb-6">
+ <div class="bg-white rounded-xl shadow-md p-2 border border-slate-200">
+ <div class="flex space-x-2">
+ <button onclick="showTab('pendientes')" id="tab-pendientes" class="flex-1 px-4 py-2 bg-amber-500 text-white rounded-lg font-medium transition-colors">
+ <i class="fas fa-clock mr-2"></i>
+ Mensajes Pendientes ({{ mensajes_pendientes.count }})
+ </button>
+ <button onclick="showTab('procesados')" id="tab-procesados" class="flex-1 px-4 py-2 bg-slate-100 text-slate-700 rounded-lg font-medium hover:bg-slate-200 transition-colors">
+ <i class="fas fa-check-circle mr-2"></i>
+ Mensajes Procesados ({{ mensajes_procesados.count }})
+ </button>
+ </div>
+ </div>
+ </div>
+
+ <!-- Contenido de las pestañas -->
+ <div id="content-pendientes" class="tab-content">
+ {% if mensajes_pendientes %}
+ <div class="grid gap-4">
+ {% for mensaje in mensajes_pendientes %}
+ <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow border border-slate-200 overflow-hidden">
+ <div class="p-6">
+ <div class="flex items-start justify-between mb-4">
+ <div class="flex-1">
+ <div class="flex items-center gap-3 mb-2">
+ <div class="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center">
+ <i class="fas fa-user text-amber-600"></i>
+ </div>
+ <div>
+ <h3 class="font-semibold text-slate-800">{{ mensaje.nombre }}</h3>
+ <p class="text-sm text-slate-600">{{ mensaje.email }}</p>
+ </div>
+ </div>
+ <h4 class="font-medium text-slate-800 mb-2">{{ mensaje.asunto }}</h4>
+ <p class="text-slate-600 line-clamp-2">{{ mensaje.mensaje|truncatewords:30 }}</p>
+ </div>
+ <div class="flex flex-col items-end gap-2">
+ <span class="px-3 py-1 bg-amber-100 text-amber-800 text-xs font-medium rounded-full">
+ Pendiente
+ </span>
+ <span class="text-xs text-slate-500">
+ {{ mensaje.fecha_creacion|date:"d/m/Y H:i" }}
+ </span>
+ </div>
+ </div>
+ <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+ <div class="flex items-center gap-4 text-sm text-slate-600">
+ {% if mensaje.telefono %}
+ <span><i class="fas fa-phone mr-1"></i>{{ mensaje.telefono }}</span>
+ {% endif %}
+ </div>
+ <div class="flex items-center gap-2">
+ <a href="{% url 'ver_mensaje_cliente' mensaje.id %}" class="px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors flex items-center gap-2">
+ <i class="fas fa-reply"></i>
+ Responder
+ </a>
+ <button onclick="marcarLeido({{ mensaje.id }})" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors">
+ <i class="fas fa-eye"></i>
+ Marcar leído
+ </button>
+ </div>
+ </div>
+ </div>
+ </div>
+ {% endfor %}
+ </div>
+ {% else %}
+ <div class="bg-white rounded-xl shadow-md p-12 text-center border border-slate-200">
+ <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+ <i class="fas fa-inbox text-slate-400 text-3xl"></i>
+ </div>
+ <h3 class="text-xl font-semibold text-slate-800 mb-2">No hay mensajes pendientes</h3>
+ <p class="text-slate-600">Todos los mensajes han sido procesados</p>
+ </div>
+ {% endif %}
+ </div>
+
+ <div id="content-procesados" class="tab-content hidden">
+ {% if mensajes_procesados %}
+ <div class="grid gap-4">
+ {% for mensaje in mensajes_procesados %}
+ <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow border border-slate-200 overflow-hidden">
+ <div class="p-6">
+ <div class="flex items-start justify-between mb-4">
+ <div class="flex-1">
+ <div class="flex items-center gap-3 mb-2">
+ <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+ <i class="fas fa-user text-green-600"></i>
+ </div>
+ <div>
+ <h3 class="font-semibold text-slate-800">{{ mensaje.nombre }}</h3>
+ <p class="text-sm text-slate-600">{{ mensaje.email }}</p>
+ </div>
+ </div>
+ <h4 class="font-medium text-slate-800 mb-2">{{ mensaje.asunto }}</h4>
+ <p class="text-slate-600 line-clamp-2">{{ mensaje.mensaje|truncatewords:30 }}</p>
+ </div>
+ <div class="flex flex-col items-end gap-2">
+ <span class="px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+ {{ mensaje.get_estado_display }}
+ </span>
+ <span class="text-xs text-slate-500">
+ {{ mensaje.fecha_creacion|date:"d/m/Y H:i" }}
+ </span>
+ {% if mensaje.respondido_por %}
+ <span class="text-xs text-slate-500">
+ Respondido por: {{ mensaje.respondido_por.username }}
+ </span>
+ {% endif %}
+ </div>
+ </div>
+ <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+ <div class="flex items-center gap-4 text-sm text-slate-600">
+ {% if mensaje.telefono %}
+ <span><i class="fas fa-phone mr-1"></i>{{ mensaje.telefono }}</span>
+ {% endif %}
+ </div>
+ <div class="flex items-center gap-2">
+ <a href="{% url 'ver_mensaje_cliente' mensaje.id %}" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors flex items-center gap-2">
+ <i class="fas fa-eye"></i>
+ Ver detalles
+ </a>
+ </div>
+ </div>
+ </div>
+ </div>
+ {% endfor %}
+ </div>
+ {% else %}
+ <div class="bg-white rounded-xl shadow-md p-12 text-center border border-slate-200">
+ <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+ <i class="fas fa-history text-slate-400 text-3xl"></i>
+ </div>
+ <h3 class="text-xl font-semibold text-slate-800 mb-2">No hay mensajes procesados</h3>
+ <p class="text-slate-600">Aún no se ha procesado ningún mensaje</p>
+ </div>
+ {% endif %}
+ </div>
+ </div>
+</div>
+
+<script>
+function showTab(tabName) {
+ // Ocultar todo el contenido
+ document.querySelectorAll('.tab-content').forEach(content => {
+ content.classList.add('hidden');
+ });
+ 
+ // Resetear todas las pestañas
+ document.querySelectorAll('[id^="tab-"]').forEach(tab => {
+ tab.classList.remove('bg-amber-500', 'text-white');
+ tab.classList.add('bg-slate-100', 'text-slate-700');
+ });
+ 
+ // Mostrar el contenido seleccionado
+ document.getElementById('content-' + tabName).classList.remove('hidden');
+ 
+ // Activar la pestaña seleccionada
+ const activeTab = document.getElementById('tab-' + tabName);
+ activeTab.classList.remove('bg-slate-100', 'text-slate-700');
+ activeTab.classList.add('bg-amber-500', 'text-white');
+}
+
+function marcarLeido(mensajeId) {
+ fetch(`/contacto/mensaje/${mensajeId}/marcar-leido/`, {
+ method: 'POST',
+ headers: {
+ 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+ 'Content-Type': 'application/json',
+ },
+ })
+ .then(response => response.json())
+ .then(data => {
+ if (data.success) {
+ location.reload();
+ }
+ })
+ .catch(error => {
+ console.error('Error:', error);
+ });
+}
+
+// Mostrar la primera pestaña por defecto
+document.addEventListener('DOMContentLoaded', function() {
+ showTab('pendientes');
+});
+</script>
+
+<style>
+.line-clamp-2 {
+ display: -webkit-box;
+ -webkit-line-clamp: 2;
+ -webkit-box-orient: vertical;
+ overflow: hidden;
+}
+</style>
+{% endblock %}

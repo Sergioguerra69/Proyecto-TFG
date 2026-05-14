@@ -9,6 +9,8 @@ class Notificacion(models.Model):
         ('analisis', 'Análisis'),
         ('cirugia', 'Cirugía'),
         ('urgencia', 'Urgencia'),
+        ('formulario_contacto', 'Formulario de Contacto'),
+        ('mensaje_contacto', 'Mensaje de Duda'),
     ]
     
     # Estados de una notificación
@@ -66,5 +68,17 @@ class Notificacion(models.Model):
                 from urgencias.models import Urgencia
                 return Urgencia.objects.get(id=self.objeto_id)
             except Urgencia.DoesNotExist:
+                return None
+        elif self.tipo == 'formulario_contacto':
+            try:
+                from contacto.models import FormularioContacto
+                return FormularioContacto.objects.get(id=self.objeto_id)
+            except FormularioContacto.DoesNotExist:
+                return None
+        elif self.tipo == 'mensaje_contacto':
+            try:
+                from contacto.models import MensajeCliente
+                return MensajeCliente.objects.get(id=self.objeto_id)
+            except MensajeCliente.DoesNotExist:
                 return None
         return None

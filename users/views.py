@@ -17,10 +17,18 @@ def registro(peticion):
     if peticion.method == 'POST':
         formulario = RegistroForm(peticion.POST)
         if formulario.is_valid():
-            usuario = formulario.save()
-            login(peticion, usuario)
-            messages.success(peticion, 'El registro se ha completado correctamente.')
-            return redirect('home')
+            try:
+                usuario = formulario.save()
+                login(peticion, usuario)
+                messages.success(peticion, 'El registro se ha completado correctamente.')
+                return redirect('home')
+            except Exception as e:
+                if 'UNIQUE constraint failed: auth_user.username' in str(e):
+                    messages.error(peticion, 'Ese nombre de usuario ya está en uso. Por favor, elige otro.')
+                elif 'UNIQUE constraint failed: auth_user.email' in str(e):
+                    messages.error(peticion, 'Ese correo electrónico ya está registrado. Por favor, usa otro.')
+                else:
+                    messages.error(peticion, 'Error al registrar el usuario. Por favor, inténtalo de nuevo.')
     else:
         formulario = RegistroForm()
     
@@ -56,16 +64,74 @@ def logout_view(peticion):
 # Página del perfil
 @login_required
 def perfil(peticion):
+    # Verificar si se solicita limpiar la autenticación
+    if 'clear_auth' in peticion.GET:
+        peticion.session.pop('profile_password_verified', None)
+        messages.info(peticion, 'Sesión de edición cerrada. Deberás verificar tu identidad nuevamente.')
+        return redirect('perfil')
+    
+    # Verificar si la contraseña ya fue verificada en esta sesión
+    password_verified = peticion.session.get('profile_password_verified', False)
+    
     if peticion.method == 'POST':
-        formulario = PerfilForm(peticion.POST, instance=peticion.user.perfil)
-        if formulario.is_valid():
-            formulario.save()
-            messages.success(peticion, 'Tu perfil ha sido actualizado correctamente')
-            return redirect('perfil')
+        # Verificar si es el paso de verificación de contraseña
+        if 'password_verify' in peticion.POST:
+            password = peticion.POST.get('password')
+            if peticion.user.check_password(password):
+                # Contraseña correcta, guardar en sesión y mostrar formulario de edición
+                peticion.session['profile_password_verified'] = True
+                formulario = PerfilForm(instance=peticion.user.perfil)
+                return render(peticion, 'users/perfil.html', {
+                    'formulario': formulario, 
+                    'edit_mode': True,
+                    'password_verified': True
+                })
+            else:
+                # Contraseña incorrecta
+                messages.error(peticion, 'Contraseña incorrecta. Por favor intenta nuevamente.')
+                return render(peticion, 'users/perfil.html', {
+                    'formulario': PerfilForm(instance=peticion.user.perfil),
+                    'edit_mode': False,
+                    'password_verified': False
+                })
+        
+        # Es el paso de guardar cambios
+        else:
+            formulario = PerfilForm(peticion.POST, instance=peticion.user.perfil)
+            if formulario.is_valid():
+                # Actualizar datos del usuario
+                user = peticion.user
+                user.first_name = formulario.cleaned_data.get('first_name', '')
+                user.last_name = formulario.cleaned_data.get('last_name', '')
+                user.email = formulario.cleaned_data.get('email', user.email)
+                user.save()
+                
+                # Actualizar datos del perfil
+                perfil = peticion.user.perfil
+                perfil.telefono = formulario.cleaned_data.get('telefono', '')
+                perfil.direccion = formulario.cleaned_data.get('direccion', '')
+                if perfil.rol == 'veterinario':
+                    perfil.especialidad = formulario.cleaned_data.get('especialidad', '')
+                perfil.save()
+                
+                messages.success(peticion, 'Tu perfil ha sido actualizado correctamente')
+                # Mantener la verificación de contraseña después de guardar
+                return redirect('perfil')
+            else:
+                messages.error(peticion, 'Por favor corrige los errores en el formulario')
+                return render(peticion, 'users/perfil.html', {
+                    'formulario': formulario,
+                    'edit_mode': True,
+                    'password_verified': True
+                })
     else:
         formulario = PerfilForm(instance=peticion.user.perfil)
     
-    return render(peticion, 'users/perfil.html', {'formulario': formulario})
+    return render(peticion, 'users/perfil.html', {
+        'formulario': formulario,
+        'edit_mode': password_verified,
+        'password_verified': password_verified
+    })
 
 # Lista de agentes (solo admin)
 @login_required

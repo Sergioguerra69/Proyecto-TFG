@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-slate-800 py-8">
+ <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+ <!-- Header -->
+ <div class="mb-6">
+ <div class="bg-white rounded-lg shadow-lg p-6 border border-slate-200">
+ <div class="flex items-center justify-between">
+ <div class="flex items-center gap-4">
+ <a href="{% url 'panel_mensajes_recepcionista' %}" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors flex items-center gap-2">
+ <i class="fas fa-arrow-left"></i>
+ Volver a Mensajes
+ </a>
+ <div class="w-12 h-12 bg-amber-500 rounded-xl flex items-center justify-center shadow-lg">
+ <i class="fas fa-comments text-white text-xl"></i>
+ </div>
+ <div>
+ <h1 class="text-2xl font-bold text-slate-800">Mensaje de {{ mensaje.nombre }}</h1>
+ <p class="text-slate-600">{{ mensaje.asunto }}</p>
+ </div>
+ </div>
+ <div class="flex items-center gap-3">
+ <span class="px-3 py-1 bg-{{ mensaje.estado == 'Pendiente' ? 'amber' : mensaje.estado == 'Respondido' ? 'green' : 'blue' }}-100 text-{{ mensaje.estado == 'Pendiente' ? 'amber' : mensaje.estado == 'Respondido' ? 'green' : 'blue' }}-800 text-sm font-medium rounded-full">
+ {{ mensaje.get_estado_display }}
+ </span>
+ <span class="text-sm text-slate-500">
+ {{ mensaje.fecha_creacion|date:"d/m/Y H:i" }}
+ </span>
+ </div>
+ </div>
+ </div>
+ </div>
+
+ <!-- Información del cliente -->
+ <div class="mb-6">
+ <div class="bg-white rounded-xl shadow-md p-6 border border-slate-200">
+ <h3 class="font-semibold text-slate-800 mb-4 flex items-center gap-2">
+ <i class="fas fa-user text-amber-500"></i>
+ Información del Cliente
+ </h3>
+ <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+ <div>
+ <p class="text-sm text-slate-600 mb-1">Nombre</p>
+ <p class="font-medium text-slate-800">{{ mensaje.nombre }}</p>
+ </div>
+ <div>
+ <p class="text-sm text-slate-600 mb-1">Email</p>
+ <p class="font-medium text-slate-800">{{ mensaje.email }}</p>
+ </div>
+ {% if mensaje.telefono %}
+ <div>
+ <p class="text-sm text-slate-600 mb-1">Teléfono</p>
+ <p class="font-medium text-slate-800">{{ mensaje.telefono }}</p>
+ </div>
+ {% endif %}
+ </div>
+ </div>
+ </div>
+
+ <!-- Conversación -->
+ <div class="mb-6">
+ <div class="bg-white rounded-xl shadow-md border border-slate-200">
+ <div class="p-6">
+ <h3 class="font-semibold text-slate-800 mb-4 flex items-center gap-2">
+ <i class="fas fa-comments text-amber-500"></i>
+ Conversación
+ </h3>
+ 
+ <!-- Mensaje original del cliente -->
+ <div class="mb-6">
+ <div class="flex items-start gap-3">
+ <div class="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+ <i class="fas fa-user text-amber-600 text-sm"></i>
+ </div>
+ <div class="flex-1">
+ <div class="bg-amber-50 rounded-lg p-4 border border-amber-200">
+ <div class="flex items-center justify-between mb-2">
+ <span class="font-medium text-amber-800">{{ mensaje.nombre }}</span>
+ <span class="text-xs text-amber-600">{{ mensaje.fecha_creacion|date:"d/m/Y H:i" }}</span>
+ </div>
+ <p class="text-amber-900 whitespace-pre-wrap">{{ mensaje.mensaje }}</p>
+ </div>
+ </div>
+ </div>
+ </div>
+
+ <!-- Respuestas anteriores -->
+ {% for respuesta in respuestas %}
+ <div class="mb-4">
+ <div class="flex items-start gap-3">
+ <div class="w-8 h-8 bg-{{ respuesta.es_cliente ? 'amber' : 'blue' }}-100 rounded-full flex items-center justify-center flex-shrink-0">
+ <i class="fas fa-{{ respuesta.es_cliente ? 'user' : 'user-tie' }} text-{{ respuesta.es_cliente ? 'amber' : 'blue' }}-600 text-sm"></i>
+ </div>
+ <div class="flex-1">
+ <div class="bg-{{ respuesta.es_cliente ? 'amber' : 'blue' }}-50 rounded-lg p-4 border border-{{ respuesta.es_cliente ? 'amber' : 'blue' }}-200">
+ <div class="flex items-center justify-between mb-2">
+ <span class="font-medium text-{{ respuesta.es_cliente ? 'amber' : 'blue' }}-800">
+ {{ respuesta.es_cliente ? mensaje.nombre : respuesta.autor.username }}
+ </span>
+ <span class="text-xs text-{{ respuesta.es_cliente ? 'amber' : 'blue' }}-600">
+ {{ respuesta.fecha_creacion|date:"d/m/Y H:i" }}
+ </span>
+ </div>
+ <p class="text-{{ respuesta.es_cliente ? 'amber' : 'blue' }}-900 whitespace-pre-wrap">{{ respuesta.contenido }}</p>
+ </div>
+ </div>
+ </div>
+ </div>
+ {% endfor %}
+
+ <!-- Formulario de respuesta -->
+ <div class="border-t border-slate-200 pt-6">
+ <h4 class="font-medium text-slate-800 mb-4">Responder como recepcionista</h4>
+ <form method="post" class="space-y-4">
+ {% csrf_token %}
+ <div>
+ <textarea name="contenido" rows="4" required
+ class="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-slate-50 text-slate-800 placeholder-slate-400 transition-all duration-300"
+ placeholder="Escribe tu respuesta aquí..."></textarea>
+ </div>
+ <div class="flex items-center gap-3">
+ <button type="submit" class="px-6 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors flex items-center gap-2">
+ <i class="fas fa-paper-plane"></i>
+ Enviar Respuesta
+ </button>
+ <button type="button" onclick="cerrarMensaje()" class="px-6 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors">
+ <i class="fas fa-check"></i>
+ Cerrar Mensaje
+ </button>
+ </div>
+ </form>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+</div>
+
+<script>
+function cerrarMensaje() {
+ if (confirm('¿Estás seguro de que quieres cerrar este mensaje?')) {
+ fetch(`/contacto/mensaje/{{ mensaje.id }}/cerrar/`, {
+ method: 'POST',
+ headers: {
+ 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+ 'Content-Type': 'application/json',
+ },
+ })
+ .then(response => response.json())
+ .then(data => {
+ if (data.success) {
+ window.location.href = '{% url "panel_mensajes_recepcionista" %}';
+ }
+ })
+ .catch(error => {
+ console.error('Error:', error);
+ });
+ }
+}
+
+// Auto-scroll al final de la conversación
+document.addEventListener('DOMContentLoaded', function() {
+ const conversation = document.querySelector('.bg-white.rounded-xl');
+ if (conversation) {
+ conversation.scrollTop = conversation.scrollHeight;
+ }
+});
+</script>
+{% endblock %}

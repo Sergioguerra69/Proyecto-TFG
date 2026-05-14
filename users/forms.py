@@ -81,11 +81,88 @@ class RegistroForm(UserCreationForm):
         return user
 
 class PerfilForm(forms.ModelForm):
+    # Campos de la cuenta de usuario
+    first_name = forms.CharField(
+        label="Nombre",
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm',
+            'placeholder': 'Tu nombre'
+        })
+    )
+    last_name = forms.CharField(
+        label="Apellido",
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm',
+            'placeholder': 'Tu apellido'
+        })
+    )
+    email = forms.EmailField(
+        label="Email",
+        widget=forms.EmailInput(attrs={
+            'class': 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm',
+            'placeholder': 'Tu correo electrónico'
+        })
+    )
+    
+    # Campos del perfil
+    telefono = forms.CharField(
+        label="Teléfono",
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm',
+            'placeholder': 'Tu número de teléfono'
+        })
+    )
+    direccion = forms.CharField(
+        label="Dirección",
+        required=False,
+        widget=forms.Textarea(attrs={
+            'class': 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm',
+            'rows': 3,
+            'placeholder': 'Tu dirección completa'
+        })
+    )
+    especialidad = forms.CharField(
+        label="Especialidad",
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm',
+            'placeholder': 'Tu especialidad (solo para veterinarios)'
+        })
+    )
+
     class Meta:
         model = Perfil
-        fields = ['telefono', 'direccion']
+        fields = []  # Los campos se definen manualmente arriba
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for field in self.fields.values():
-            field.widget.attrs.update({'class': 'form-control'})
+        # Inicializar campos con valores actuales del usuario
+        if self.instance and hasattr(self.instance, 'usuario'):
+            user = self.instance.usuario
+            self.fields['first_name'].initial = user.first_name
+            self.fields['last_name'].initial = user.last_name
+            self.fields['email'].initial = user.email
+            self.fields['telefono'].initial = self.instance.telefono
+            self.fields['direccion'].initial = self.instance.direccion
+            self.fields['especialidad'].initial = self.instance.especialidad
+            
+            # Ocultar especialidad si no es veterinario
+            if self.instance.rol != 'veterinario':
+                self.fields['especialidad'].widget.attrs['readonly'] = True
+                self.fields['especialidad'].widget.attrs['placeholder'] = 'Solo disponible para veterinarios'
+        
+        # Añadir clases CSS adicionales
+        for field_name, field in self.fields.items():
+            field.widget.attrs['class'] += ' focus:ring-1 focus:ring-blue-500 focus:ring-opacity-5'
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if email and self.instance and hasattr(self.instance, 'usuario'):
+            # Verificar que el email no esté en uso por otro usuario
+            existing_user = User.objects.filter(email=email).exclude(pk=self.instance.usuario.pk).first()
+            if existing_user:
+                raise forms.ValidationError("Este email ya está en uso por otro usuario")
+        return email
