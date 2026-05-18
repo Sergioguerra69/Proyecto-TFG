@@ -26,8 +26,15 @@ except ImportError:
 
 @login_required
 def lista_consultas(request):
-    # Mostramos todas las consultas ordenadas por fecha (más nuevas primero)
-    consultas = Consulta.objects.all().order_by('-fecha')
+    # Comprobar si el usuario es recepcionista, veterinario o admin
+    es_personal = request.user.is_staff or request.user.is_superuser
+    if hasattr(request.user, 'perfil') and request.user.perfil.rol in ['recepcionista', 'admin', 'veterinario']:
+        es_personal = True
+
+    if es_personal:
+        consultas = Consulta.objects.all().order_by('-fecha')
+    else:
+        consultas = Consulta.objects.filter(usuario=request.user).order_by('-fecha')
     
     # Información adicional de APIs veterinarias
     api_data = {
@@ -229,17 +236,16 @@ def api_citas_calendario(request):
     if hasattr(request.user, 'perfil') and request.user.perfil.rol in ['recepcionista', 'admin', 'veterinario', 'auxiliar']:
         es_empleado = True
 
-    # si es empleado ve todas las citas, si es cliente solo las suyas
+    eventos = []
+    from datetime import timedelta, datetime
+
+    # 1. CONSULTAS
     if es_empleado:
         consultas = Consulta.objects.all()
     else:
         consultas = Consulta.objects.filter(usuario=request.user)
 
-    eventos = []
-    from datetime import timedelta
-
     for c in consultas:
-        # asignar color segun el estado de la cita
         color = '#0891b2' # cian por defecto
         if c.estado == 'Pendiente':
             color = '#f59e0b' # amarillo
@@ -251,14 +257,8 @@ def api_citas_calendario(request):
             color = '#ef4444' # rojo
             
         end_time = c.fecha + timedelta(minutes=30)
-        
-        # titulo personalizado segun quien lo vea
-        if es_empleado:
-            nombre_paciente = c.mascota.nombre if c.mascota else c.paciente
-            titulo_evento = f'{nombre_paciente} ({c.usuario.username})'
-        else:
-            nombre_paciente = c.mascota.nombre if c.mascota else c.paciente
-            titulo_evento = f'{nombre_paciente} - {c.motivo}'
+        nombre_paciente = c.mascota.nombre if c.mascota else c.paciente
+        titulo_evento = f'[Consulta] {nombre_paciente} ({c.usuario.username})' if es_empleado else f'[Consulta] {nombre_paciente} - {c.motivo}'
 
         eventos.append({
             'id': c.id,
@@ -269,7 +269,95 @@ def api_citas_calendario(request):
             'borderColor': color,
             'url': f'/consultas/editar/{c.id}/',
         })
-        
+
+    # 2. CIRUGÍAS
+    from cirugias.models import Cirugia
+    if es_empleado:
+        cirugias = Cirugia.objects.all()
+    else:
+        cirugias = Cirugia.objects.filter(usuario=request.user)
+
+    for ci in cirugias:
+        color = '#8b5cf6' # morado para cirugías
+        end_time = ci.fecha + timedelta(minutes=60)
+        titulo_evento = f'[Cirugía] {ci.paciente} - {ci.tipo_cirugia}'
+        eventos.append({
+            'id': f'cirugia_{ci.id}',
+            'title': titulo_evento,
+            'start': ci.fecha.isoformat(),
+            'end': end_time.isoformat(),
+            'backgroundColor': color,
+            'borderColor': color,
+            'url': f'/notificaciones/ver/cirugia/{ci.id}/' if es_empleado else '',
+        })
+
+    # 3. ESTÉTICA
+    from estetica.models import ServicioEstetica
+    if es_empleado:
+        esteticas = ServicioEstetica.objects.all()
+    else:
+        esteticas = ServicioEstetica.objects.filter(usuario=request.user)
+
+    for es in esteticas:
+        color = '#ec4899' # rosa para estética
+        end_time = es.fecha + timedelta(minutes=45)
+        titulo_evento = f'[Estética] {es.paciente} - {es.tipo_servicio}'
+        eventos.append({
+            'id': f'estetica_{es.id}',
+            'title': titulo_evento,
+            'start': es.fecha.isoformat(),
+            'end': end_time.isoformat(),
+            'backgroundColor': color,
+            'borderColor': color,
+            'url': f'/notificaciones/ver/estetica/{es.id}/' if es_empleado else '',
+        })
+
+    # 4. ANÁLISIS
+    from laboratorio.models import Analisis
+    if es_empleado:
+        analisis = Analisis.objects.all()
+    else:
+        analisis = Analisis.objects.filter(usuario=request.user)
+
+    for an in analisis:
+        color = '#059669' # verde oscuro para laboratorio
+        if an.hora:
+            dt_start = datetime.combine(an.fecha, an.hora)
+            end_time = dt_start + timedelta(minutes=30)
+            titulo_evento = f'[Análisis] {an.paciente} - {an.nombre}'
+            eventos.append({
+                'id': f'analisis_{an.id}',
+                'title': titulo_evento,
+                'start': dt_start.isoformat(),
+                'end': end_time.isoformat(),
+                'backgroundColor': color,
+                'borderColor': color,
+                'url': f'/notificaciones/ver/analisis/{an.id}/' if es_empleado else '',
+            })
+
+    # 5. FORMULARIOS DE CONTACTO
+    from contacto.models import FormularioContacto
+    if es_empleado:
+        contactos = FormularioContacto.objects.all()
+    else:
+        contactos = FormularioContacto.objects.filter(usuario=request.user)
+
+    for co in contactos:
+        color = '#f97316' # naranja para contacto
+        if co.hora:
+            dt_start = datetime.combine(co.fecha, co.hora)
+            end_time = dt_start + timedelta(minutes=30)
+            titulo_evento = f'[Contacto] {co.nombre} {co.apellidos} - {co.asunto}'
+            eventos.append({
+                'id': f'contacto_{co.id}',
+                'title': titulo_evento,
+                'start': dt_start.isoformat(),
+                'end': end_time.isoformat(),
+                'backgroundColor': color,
+                'borderColor': color,
+                'url': f'/contacto/ver/{co.id}/' if es_empleado else '',
+            })
+
     return JsonResponse(eventos, safe=False)
 
 @csrf_exempt

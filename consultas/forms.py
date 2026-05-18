@@ -54,11 +54,18 @@ class ConsultaForm(forms.ModelForm):
         cleaned_data = super().clean()
         mascota = cleaned_data.get('mascota')
         paciente = cleaned_data.get('paciente')
+        fecha = cleaned_data.get('fecha')
         
         if mascota and not paciente:
             cleaned_data['paciente'] = mascota.nombre
         elif not mascota and not paciente:
             self.add_error('mascota', 'Debes seleccionar una mascota o escribir el nombre del paciente.')
             self.add_error('paciente', 'Debes seleccionar una mascota o escribir el nombre del paciente.')
+            
+        if fecha:
+            from consultas.utils import fecha_hora_disponible
+            exclude_id = self.instance.id if self.instance and self.instance.pk else None
+            if not fecha_hora_disponible(fecha, exclude_model='Consulta', exclude_id=exclude_id):
+                self.add_error('fecha', 'Esta fecha y hora ya están reservadas por otro usuario. Por favor, elige otro horario disponible.')
             
         return cleaned_data

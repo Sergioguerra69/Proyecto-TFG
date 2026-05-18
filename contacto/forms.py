@@ -49,6 +49,19 @@ class FormularioContactoForm(forms.ModelForm):
             }),
         }
 
+    def clean(self):
+        cleaned_data = super().clean()
+        fecha = cleaned_data.get('fecha')
+        hora = cleaned_data.get('hora')
+        if fecha and hora:
+            import datetime
+            from consultas.utils import fecha_hora_disponible
+            fecha_dt = datetime.datetime.combine(fecha, hora)
+            exclude_id = self.instance.id if self.instance and self.instance.pk else None
+            if not fecha_hora_disponible(fecha_dt, exclude_model='FormularioContacto', exclude_id=exclude_id):
+                self.add_error('fecha', 'Esta fecha y hora ya están reservadas por otro usuario. Por favor, elige otro horario disponible.')
+        return cleaned_data
+
 class RespuestaContactoForm(forms.Form):
     contenido = forms.CharField(
         widget=forms.Textarea(attrs={
