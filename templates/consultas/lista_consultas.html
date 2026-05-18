@@ -27,7 +27,7 @@
  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
  <div>
  <h3 style="color: #333; margin: 0;">{{ consulta.paciente|default:consulta.mascota|default:"Paciente" }}</h3>
- <p style="color: #666; margin: 5px 0; font-size: 14px;">{{ consulta.usuario.username|default:consulta.propietario|default:"Propietario" }}</p>
+ <p style="color: #666; margin: 5px 0; font-size: 14px;">{{ consulta.usuario.username|default:"Propietario" }}</p>
  </div>
  {% if consulta.estado == 'Pendiente' %}
  <span style="padding: 5px 10px; border-radius: 3px; font-size: 12px; font-weight: bold; background-color: #fef3c7; color: #92400e;">
@@ -37,7 +37,7 @@
  <span style="padding: 5px 10px; border-radius: 3px; font-size: 12px; font-weight: bold; background-color: #dbeafe; color: #1e40af;">
  {{ consulta.estado|default:"Pendiente" }}
  </span>
- {% elif consulta.estado == 'Completada' %}
+ {% elif consulta.estado == 'Completado' %}
  <span style="padding: 5px 10px; border-radius: 3px; font-size: 12px; font-weight: bold; background-color: #d1fae5; color: #065f46;">
  {{ consulta.estado|default:"Pendiente" }}
  </span>
@@ -59,7 +59,7 @@
  </p>
  <p style="color: #666; margin: 5px 0; font-size: 14px;">
  <i class="fas fa-notes-medical" style="color: #3b82f6; margin-right: 5px;"></i>
- {{ consulta.motivo|default:consulta.tipo|default:"Sin motivo" }}
+ {{ consulta.motivo|default:"Sin motivo" }}
  </p>
  </div>
  
@@ -80,8 +80,8 @@
  <select name="estado" style="flex: 1; padding: 5px; border: 1px solid #ddd; border-radius: 3px;">
  <option value="Pendiente" {% if consulta.estado == 'Pendiente' %}selected{% endif %}>Pendiente</option>
  <option value="En Proceso" {% if consulta.estado == 'En Proceso' %}selected{% endif %}>En Proceso</option>
- <option value="Completada" {% if consulta.estado == 'Completada' %}selected{% endif %}>Completada</option>
- <option value="Cancelada" {% if consulta.estado == 'Cancelada' %}selected{% endif %}>Cancelada</option>
+ <option value="Completado" {% if consulta.estado == 'Completado' %}selected{% endif %}>Completado</option>
+ <option value="Rechazada" {% if consulta.estado == 'Rechazada' %}selected{% endif %}>Rechazada</option>
  </select>
  <button type="submit" style="background-color: #06b6d4; color: white; padding: 5px 10px; border: none; border-radius: 3px; cursor: pointer;">
  Actualizar

@@ -22,6 +22,10 @@ class FormularioContacto(models.Model):
     asunto = models.CharField(max_length=200, verbose_name='Asunto')
     mensaje = models.TextField(verbose_name='Mensaje')
     
+    # Información de la solicitud
+    fecha = models.DateField(null=True, blank=True, verbose_name='Fecha preferida')
+    hora = models.TimeField(null=True, blank=True, verbose_name='Hora preferida')
+    
     # Control del sistema
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='Pendiente')
     fecha_creacion = models.DateTimeField(auto_now_add=True, verbose_name='Fecha de creación')

@@ -56,6 +56,8 @@ urlpatterns = [
     path('urgencias/', include('urgencias.urls')),
     path('estetica/', include('estetica.urls')),
     path('cirugias/', include('cirugias.urls')),
+    path('mascotas/', include('mascotas.urls')),
+    path('metricas/', include('metricas.urls')),
 
     # API REST MANUAL (Requisito de 2º DAW)
     path('api/servicios/', servicios_views.api_servicios, name='api_servicios'),

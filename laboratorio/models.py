@@ -21,8 +21,10 @@ class Analisis(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='analisis')
     # Nombre de la prueba (ej. 'Hemograma')
     nombre = models.CharField(max_length=100)
-    # De quién es la muestra
+    # De quién es la muestra (legado)
     paciente = models.CharField(max_length=100)
+    # Mascota vinculada (nuevo sistema)
+    mascota = models.ForeignKey('mascotas.Mascota', on_delete=models.CASCADE, null=True, blank=True, related_name='analisis')
     # Tipo de animal
     tipo_animal = models.CharField(max_length=20, choices=TIPO_ANIMAL_CHOICES, default='Perro')
     # Especificar otro tipo de animal (cuando selecciona "Otro")

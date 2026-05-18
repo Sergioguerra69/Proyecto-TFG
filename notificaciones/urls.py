@@ -16,6 +16,7 @@ urlpatterns = [
     # Gestión de citas - Panel veterinario
     path('ver/<str:tipo>/<int:cita_id>/', views.ver_cita, name='ver_cita'),
     path('aceptar/<str:tipo>/<int:cita_id>/', views.aceptar_cita, name='aceptar_cita'),
+    path('completar/<str:tipo>/<int:cita_id>/', views.completar_cita, name='completar_cita'),
     path('rechazar/<str:tipo>/<int:cita_id>/', views.rechazar_cita, name='rechazar_cita'),
     path('cancelar/<str:tipo>/<int:cita_id>/', views.cancelar_cita, name='cancelar_cita'),
     path('eliminar/<str:tipo>/<int:cita_id>/', views.eliminar_cita, name='eliminar_cita'),

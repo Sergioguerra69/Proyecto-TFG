@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 class Urgencia(models.Model):
     # Opciones de prioridad que aparecen en un desplegable
     PRIORIDAD_CHOICES = [
+        ('Pendiente', 'Pendiente de Valoración'),
         ('Baja', 'Baja'),
         ('Media', 'Media'),
         ('Alta', 'Alta'),
@@ -27,16 +28,20 @@ class Urgencia(models.Model):
     ]
     # Usuario que solicita la urgencia
     usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='urgencias')
-    # Nombre de la mascota o el dueño
+    # Nombre de la mascota o el dueño (legado)
     paciente = models.CharField(max_length=100)
+    # Mascota vinculada (nuevo sistema)
+    mascota = models.ForeignKey('mascotas.Mascota', on_delete=models.CASCADE, null=True, blank=True, related_name='urgencias')
     # Tipo de animal
     tipo_animal = models.CharField(max_length=20, choices=TIPO_ANIMAL_CHOICES, default='Perro')
     # Especificar otro tipo de animal (cuando selecciona "Otro")
     tipo_animal_otro = models.CharField(max_length=50, blank=True, verbose_name='Especificar otro animal')
     # Cuándo llegó (se pone solo al crear el registro)
     fecha = models.DateTimeField(auto_now_add=True)
-    # Cómo de grave es
-    prioridad = models.CharField(max_length=20, choices=PRIORIDAD_CHOICES)
+    # Indicador del cliente sobre si considera que tiene prioridad
+    solicita_prioridad = models.BooleanField(default=False, verbose_name='¿Considera que requiere atención prioritaria inmediata?')
+    # Cómo de grave es (lo asigna el veterinario)
+    prioridad = models.CharField(max_length=20, choices=PRIORIDAD_CHOICES, default='Pendiente')
     # Qué le pasa exactamente
     descripcion = models.TextField()
     # Datos de contacto del solicitante

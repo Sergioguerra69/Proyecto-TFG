@@ -20,59 +20,67 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="mb-4">
                         <label class="block text-gray-600 text-sm font-semibold mb-1">Paciente / Remitente</label>
-                        <p class="text-gray-800">{{ cita.paciente|default:cita.nombre }}</p>
+                        <p class="text-gray-800">{{ paciente_nombre|default:"-" }}</p>
                     </div>
                     <div class="mb-4">
                         <label class="block text-gray-600 text-sm font-semibold mb-1">Fecha</label>
-                        <p class="text-gray-800">{% if cita.fecha %}{{ cita.fecha|date:"d/m/Y" }}{% else %}{{
-                            cita.fecha_creacion|date:"d/m/Y" }}{% endif %}</p>
+                        <p class="text-gray-800">{{ fecha_str|default:"-" }}</p>
                     </div>
                     <div class="mb-4">
                         <label class="block text-gray-600 text-sm font-semibold mb-1">Hora</label>
-                        <p class="text-gray-800">
-                            {% if cita.hora %}
-                            {{ cita.hora|time:"H:i" }}
-                            {% elif cita.fecha.hour %}
-                            {{ cita.fecha|time:"H:i" }}
-                            {% else %}
-                            No especificada
-                            {% endif %}
-                        </p>
+                        <p class="text-gray-800">{{ hora_str|default:"No especificada" }}</p>
                     </div>
                     <div class="mb-4">
                         <label class="block text-gray-600 text-sm font-semibold mb-1">Estado</label>
-                        <p
-                            class="{% if cita.estado in 'Aceptada,Respondido,Leído' %}text-green-600{% elif cita.estado in 'Rechazada,Cancelado' %}text-red-600{% else %}text-yellow-600{% endif %} font-medium">
+                        <p class="{% if cita.estado in 'Aceptada,Respondido,Leído' %}text-green-600{% elif cita.estado in 'Rechazada,Cancelado' %}text-red-600{% else %}text-yellow-600{% endif %} font-medium">
                             {{ cita.estado }}
                         </p>
                     </div>
                     <div class="mb-4">
                         <label class="block text-gray-600 text-sm font-semibold mb-1">Solicitante / Email</label>
-                        <p class="text-gray-800">{{ cita.usuario.username|default:cita.email }}</p>
+                        <p class="text-gray-800">{{ solicitante_str|default:"-" }}</p>
                     </div>
                 </div>
 
                 <div class="mb-4">
                     <label class="block text-gray-600 text-sm font-semibold mb-1">Motivo / Tipo</label>
-                    <p class="text-gray-800">
-                        {% if cita.motivo %}
-                        {{ cita.motivo }}
-                        {% elif cita.nombre %}
-                        {{ cita.nombre }}
-                        {% elif cita.tipo_cirugia %}
-                        {{ cita.tipo_cirugia }}
-                        {% elif cita.descripcion %}
-                        {{ cita.descripcion }}
-                        {% else %}
-                        -
-                        {% endif %}
-                    </p>
+                    <p class="text-gray-800">{{ motivo_str|default:"-" }}</p>
                 </div>
 
-                {% if cita.mensaje %}
+                {% if mensaje_str %}
                 <div class="mb-4">
-                    <label class="block text-gray-600 text-sm font-semibold mb-1">Mensaje adicional</label>
-                    <p class="text-gray-800 bg-gray-50 p-3 rounded">{{ cita.mensaje }}</p>
+                    <label class="block text-gray-600 text-sm font-semibold mb-1">Mensaje adicional / Notas</label>
+                    <p class="text-gray-800 bg-gray-50 p-3 rounded">{{ mensaje_str }}</p>
+                </div>
+                {% endif %}
+
+                {% if tipo == 'urgencia' %}
+                <div class="mt-6 p-4 bg-amber-50 rounded-lg border border-amber-200">
+                    <div class="mb-4">
+                        <label class="block text-amber-900 text-sm font-bold mb-1">Indicación del Cliente sobre Prioridad:</label>
+                        <p class="text-amber-950 font-medium flex items-center">
+                            {% if cita.solicita_prioridad %}
+                            <span class="bg-red-100 text-red-800 px-2 py-1 rounded font-bold text-xs mr-2 uppercase">Sí solicita prioridad</span> El cliente considera que requiere atención prioritaria inmediata.
+                            {% else %}
+                            <span class="bg-amber-100 text-amber-800 px-2 py-1 rounded font-bold text-xs mr-2 uppercase">Atención Normal</span> El cliente no ha indicado que sea una urgencia de riesgo vital inmediato.
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <form method="post" action="{% url 'actualizar_prioridad_urgencia' cita.id %}" class="mt-4 pt-4 border-t border-amber-200">
+                        {% csrf_token %}
+                        <label class="block text-amber-900 text-sm font-bold mb-2">Valoración Veterinaria: Asignar Nivel de Prioridad Real</label>
+                        <div class="flex gap-2 items-center">
+                            <select name="prioridad" class="bg-white border border-amber-300 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 flex-1 h-10 shadow-sm focus:outline-none focus:border-amber-500">
+                                <option value="Pendiente" {% if cita.prioridad == 'Pendiente' %}selected{% endif %}>Pendiente de Valoración</option>
+                                <option value="Baja" {% if cita.prioridad == 'Baja' %}selected{% endif %}>Baja</option>
+                                <option value="Media" {% if cita.prioridad == 'Media' %}selected{% endif %}>Media</option>
+                                <option value="Alta" {% if cita.prioridad == 'Alta' %}selected{% endif %}>Alta</option>
+                                <option value="Crítica" {% if cita.prioridad == 'Crítica' %}selected{% endif %}>Crítica</option>
+                            </select>
+                            <button type="submit" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors shadow-sm h-10 flex items-center justify-center whitespace-nowrap">Actualizar Prioridad</button>
+                        </div>
+                    </form>
                 </div>
                 {% endif %}
             </div>

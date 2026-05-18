@@ -26,8 +26,11 @@ class Consulta(models.Model):
     # Dueño de la mascota
     usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='consultas')
     
-    # Nombre de la mascota
+    # Nombre de la mascota (legado)
     paciente = models.CharField(max_length=100)
+    
+    # Mascota vinculada (nuevo sistema)
+    mascota = models.ForeignKey('mascotas.Mascota', on_delete=models.CASCADE, null=True, blank=True, related_name='consultas')
     
     # Tipo de animal (perro, gato, etc.)
     tipo_animal = models.CharField(max_length=20, choices=TIPO_ANIMAL_CHOICES, default='Perro')

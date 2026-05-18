@@ -30,7 +30,7 @@ urlpatterns = [
     path('gestionar-solicitud/<int:notificacion_id>/', views.gestionar_solicitud_veterinario, name='gestionar_solicitud_veterinario'),
     
     # Panel de veterinarios
-    path('panel-veterinario/', views.panel_veterinario, name='panel_veterinario'),
+    path('panel-veterinario/', views.panel_veterinario, name='panel_contactos_veterinario'),
     
     # Ver formulario de contacto
     path('formulario-contacto/<int:formulario_id>/', views.ver_formulario_contacto, name='ver_formulario_contacto'),

@@ -92,6 +92,10 @@
 
                 <div class="hidden lg:flex items-center space-x-3">
                     {% if user.is_authenticated %}
+                    <a href="{% url 'calendario_recepcion' %}"
+                        class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-full font-medium text-sm transition-colors hover:shadow-sm">
+                        <i class="far fa-calendar-alt mr-1"></i>Calendario
+                    </a>
                     {% if user.perfil and user.perfil.rol == 'recepcionista' %}
                     <a href="{% url 'panel_recepcion' %}"
                         class="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-full font-medium text-sm transition-colors hover:shadow-sm">
@@ -102,6 +106,12 @@
                     <a href="{% url 'panel_veterinario' %}"
                         class="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-full font-medium text-sm transition-colors hover:shadow-sm">
                         <i class="fas fa-user-md mr-1"></i>Panel Veterinario
+                    </a>
+                    {% endif %}
+                    {% if user.is_superuser or user.perfil.rol == 'admin' %}
+                    <a href="{% url 'metricas:dashboard' %}"
+                        class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-full font-medium text-sm transition-colors hover:shadow-sm">
+                        <i class="fas fa-chart-line mr-1"></i>Dashboard
                     </a>
                     {% endif %}
                     <a href="{% url 'perfil' %}"
@@ -138,6 +148,10 @@
                     <a href="{% url 'contacto' %}"
                         class="text-slate-700 hover:text-cyan-600 transition-colors font-semibold py-2">Contacto</a>
                     {% if user.is_authenticated %}
+                    <a href="{% url 'calendario_recepcion' %}"
+                        class="bg-indigo-500 text-white px-4 py-2 rounded-full font-medium text-center hover:bg-indigo-600">
+                        <i class="far fa-calendar-alt mr-1"></i>Calendario
+                    </a>
                     {% if user.perfil and user.perfil.rol == 'recepcionista' %}
                     <a href="{% url 'panel_recepcion' %}"
                         class="bg-cyan-600 text-white px-4 py-2 rounded-full font-medium text-center hover:bg-cyan-700">
@@ -148,6 +162,12 @@
                     <a href="{% url 'panel_veterinario' %}"
                         class="bg-cyan-600 text-white px-4 py-2 rounded-full font-medium text-center hover:bg-cyan-700">
                         <i class="fas fa-user-md mr-1"></i>Panel Veterinario
+                    </a>
+                    {% endif %}
+                    {% if user.is_superuser or user.perfil.rol == 'admin' %}
+                    <a href="{% url 'metricas:dashboard' %}"
+                        class="bg-emerald-600 text-white px-4 py-2 rounded-full font-medium text-center hover:bg-emerald-700">
+                        <i class="fas fa-chart-line mr-1"></i>Dashboard
                     </a>
                     {% endif %}
                     <a href="{% url 'perfil' %}" class="flex items-center gap-2 text-cyan-600 font-bold py-2">

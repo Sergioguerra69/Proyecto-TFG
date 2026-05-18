@@ -81,7 +81,8 @@
                                 class="input-field w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent bg-slate-50 text-slate-800 placeholder-slate-400 transition-all duration-300"
                                 placeholder="Tu nombre" required>
                             {% if form.nombre.errors %}
-                            <p class="text-red-500 text-xs mt-1"><i class="fas fa-exclamation-circle mr-1"></i>{{ form.nombre.errors|striptags }}</p>
+                            <p class="text-red-500 text-xs mt-1"><i class="fas fa-exclamation-circle mr-1"></i>{{
+                                form.nombre.errors|striptags }}</p>
                             {% endif %}
                         </div>
                         <div>
@@ -94,7 +95,8 @@
                                 class="input-field w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent bg-slate-50 text-slate-800 placeholder-slate-400 transition-all duration-300"
                                 placeholder="Tus apellidos" required>
                             {% if form.apellidos.errors %}
-                            <p class="text-red-500 text-xs mt-1"><i class="fas fa-exclamation-circle mr-1"></i>{{ form.apellidos.errors|striptags }}</p>
+                            <p class="text-red-500 text-xs mt-1"><i class="fas fa-exclamation-circle mr-1"></i>{{
+                                form.apellidos.errors|striptags }}</p>
                             {% endif %}
                         </div>
                         <div>
@@ -105,7 +107,8 @@
                                 class="input-field w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent bg-slate-50 text-slate-800 placeholder-slate-400 transition-all duration-300"
                                 placeholder="Tu DNI" required>
                             {% if form.dni.errors %}
-                            <p class="text-red-500 text-xs mt-1"><i class="fas fa-exclamation-circle mr-1"></i>{{ form.dni.errors|striptags }}</p>
+                            <p class="text-red-500 text-xs mt-1"><i class="fas fa-exclamation-circle mr-1"></i>{{
+                                form.dni.errors|striptags }}</p>
                             {% endif %}
                         </div>
                         <div>
@@ -117,7 +120,8 @@
                                 class="input-field w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent bg-slate-50 text-slate-800 placeholder-slate-400 transition-all duration-300"
                                 placeholder="tu@email.com" required>
                             {% if form.email.errors %}
-                            <p class="text-red-500 text-xs mt-1"><i class="fas fa-exclamation-circle mr-1"></i>{{ form.email.errors|striptags }}</p>
+                            <p class="text-red-500 text-xs mt-1"><i class="fas fa-exclamation-circle mr-1"></i>{{
+                                form.email.errors|striptags }}</p>
                             {% endif %}
                         </div>
                         <div>
@@ -130,8 +134,23 @@
                                 class="input-field w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent bg-slate-50 text-slate-800 placeholder-slate-400 transition-all duration-300"
                                 placeholder="Tu teléfono" required>
                             {% if form.telefono.errors %}
-                            <p class="text-red-500 text-xs mt-1"><i class="fas fa-exclamation-circle mr-1"></i>{{ form.telefono.errors|striptags }}</p>
+                            <p class="text-red-500 text-xs mt-1"><i class="fas fa-exclamation-circle mr-1"></i>{{
+                                form.telefono.errors|striptags }}</p>
                             {% endif %}
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">
+                                <i class="fas fa-calendar-alt text-cyan-500 mr-1"></i>Fecha preferida
+                            </label>
+                            <input type="date" name="fecha" id="id_fecha" value="{{ form.fecha.value|default:'' }}"
+                                class="input-field w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent bg-slate-50 text-slate-800 placeholder-slate-400 transition-all duration-300">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">
+                                <i class="fas fa-clock text-cyan-500 mr-1"></i>Hora preferida
+                            </label>
+                            <input type="time" name="hora" id="id_hora" value="{{ form.hora.value|default:'' }}"
+                                class="input-field w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent bg-slate-50 text-slate-800 placeholder-slate-400 transition-all duration-300">
                         </div>
                     </div>
 
@@ -143,7 +162,8 @@
                             class="input-field w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent bg-slate-50 text-slate-800 placeholder-slate-400 transition-all duration-300"
                             placeholder="¿Sobre qué nos quieres consultar?">
                         {% if form.asunto.errors %}
-                        <p class="text-red-500 text-xs mt-1"><i class="fas fa-exclamation-circle mr-1"></i>{{ form.asunto.errors|striptags }}</p>
+                        <p class="text-red-500 text-xs mt-1"><i class="fas fa-exclamation-circle mr-1"></i>{{
+                            form.asunto.errors|striptags }}</p>
                         {% endif %}
                     </div>
 
@@ -157,7 +177,8 @@
                             placeholder="Describe detalladamente tu consulta o mensaje..."
                             required>{{ form.mensaje.value|default:'' }}</textarea>
                         {% if form.mensaje.errors %}
-                        <p class="text-red-500 text-xs mt-1"><i class="fas fa-exclamation-circle mr-1"></i>{{ form.mensaje.errors|striptags }}</p>
+                        <p class="text-red-500 text-xs mt-1"><i class="fas fa-exclamation-circle mr-1"></i>{{
+                            form.mensaje.errors|striptags }}</p>
                         {% endif %}
                     </div>
 

@@ -1,71 +1,92 @@
-<!DOCTYPE html>
 {% extends 'base.html' %}
 
 {% block title %}Laboratorio Clínico - VetCT{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Laboratorio Clínico</h1>
-    <div class="d-grid gap-2 d-md-flex">
-        <a href="{% url 'crear_analisis' %}" class="btn btn-primary">Nuevo Análisis</a>
+<div class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
+        <h1 class="text-3xl font-black text-slate-800 font-montserrat flex items-center gap-3">
+            <i class="fas fa-microscope text-cyan-500"></i> Laboratorio Clínico
+        </h1>
+        <div>
+            <a href="{% url 'crear_analisis' %}" class="bg-cyan-600 hover:bg-cyan-700 text-white px-5 py-2.5 rounded-full font-semibold transition-colors shadow-sm flex items-center gap-2">
+                <i class="fas fa-plus"></i> Nuevo Análisis
+            </a>
+        </div>
     </div>
-</div>
 
-<div class="card shadow-sm">
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead class="table-light">
-                    <tr>
-                        <th>Análisis</th>
-                        <th>Paciente</th>
-                        <th>Fecha</th>
-                        <th>Resultado</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-50 text-slate-700 border-b border-slate-200 text-sm">
+                        <th class="py-4 px-6 font-semibold">Análisis</th>
+                        <th class="py-4 px-6 font-semibold">Paciente</th>
+                        <th class="py-4 px-6 font-semibold">Fecha</th>
+                        <th class="py-4 px-6 font-semibold">Resultado</th>
+                        <th class="py-4 px-6 font-semibold">Estado</th>
+                        <th class="py-4 px-6 font-semibold text-center">Acciones</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="text-slate-600 text-sm">
                     {% for a in analisis %}
-                    <tr>
-                        <td>{{ a.nombre }}</td>
-                        <td>{{ a.paciente }}</td>
-                        <td>{{ a.fecha }}</td>
-                        <td>
-                            {% if a.resultado %}
-                            <a href="{{ a.resultado.url }}" class="btn btn-sm btn-link">PDF</a>
+                    <tr class="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                        <td class="py-4 px-6 font-medium text-slate-800">{{ a.nombre }}</td>
+                        <td class="py-4 px-6">
+                            {% if a.mascota %}
+                                {{ a.mascota.nombre }} <span class="text-xs text-slate-400">({{ a.usuario.username }})</span>
                             {% else %}
-                            <span class="text-muted">Pendiente</span>
+                                {{ a.paciente }}
                             {% endif %}
                         </td>
-                        <td>
+                        <td class="py-4 px-6">{{ a.fecha|date:"d M Y" }}</td>
+                        <td class="py-4 px-6">
                             {% if a.estado == 'Completado' %}
-                            <span class="badge bg-success">Completado</span>
-                            {% elif a.estado == 'En Proceso' %}
-                            <span class="badge bg-warning text-dark">En Proceso</span>
+                            <a href="{% url 'generar_pdf_analisis' a.id %}" class="text-cyan-600 hover:text-cyan-800 font-medium flex items-center gap-1">
+                                <i class="fas fa-file-pdf text-red-500"></i> PDF
+                            </a>
                             {% else %}
-                            <span class="badge bg-secondary">Pendiente</span>
+                            <span class="text-slate-400 italic">Pendiente</span>
                             {% endif %}
                         </td>
-                        <td>
-                            <div class="d-grid gap-2 d-md-flex">
-                                <a href="#" class="btn btn-sm btn-outline-info">Ver</a>
-                                {% if user.is_staff %}
-                                <form action="{% url 'actualizar_estado_analisis' a.id %}" method="POST" class="d-inline">
+                        <td class="py-4 px-6">
+                            {% if a.estado == 'Completado' %}
+                            <span class="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-xs font-semibold">Completado</span>
+                            {% elif a.estado == 'En Proceso' %}
+                            <span class="bg-sky-100 text-sky-800 px-3 py-1 rounded-full text-xs font-semibold">En Proceso</span>
+                            {% else %}
+                            <span class="bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-xs font-semibold">Pendiente</span>
+                            {% endif %}
+                        </td>
+                        <td class="py-4 px-6 text-center">
+                            <div class="flex items-center justify-center gap-2">
+                                <a href="{% url 'editar_analisis' a.id %}" class="text-slate-400 hover:text-cyan-600 transition-colors" title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                {% if user.is_staff or user.perfil.rol == 'veterinario' %}
+                                <form action="{% url 'actualizar_estado_analisis' a.id %}" method="POST" class="inline">
                                     {% csrf_token %}
-                                    <select name="estado" class="form-select form-select-sm" onchange="this.form.submit()">
+                                    <select name="estado" class="border-slate-300 rounded text-xs py-1 px-2 text-slate-700 bg-white" onchange="this.form.submit()">
                                         <option value="Pendiente"{% if a.estado == 'Pendiente' %} selected{% endif %}>Pendiente</option>
                                         <option value="En Proceso"{% if a.estado == 'En Proceso' %} selected{% endif %}>En Proceso</option>
                                         <option value="Completado"{% if a.estado == 'Completado' %} selected{% endif %}>Completado</option>
                                     </select>
                                 </form>
                                 {% endif %}
+                                <a href="{% url 'eliminar_analisis' a.id %}" class="text-slate-400 hover:text-red-500 transition-colors ml-2" title="Eliminar">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
                             </div>
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="6" class="text-center">No hay análisis registrados.</td>
+                        <td colspan="6" class="py-10 text-center text-slate-500">
+                            <div class="flex flex-col items-center justify-center">
+                                <i class="fas fa-flask text-4xl text-slate-300 mb-3"></i>
+                                <p>No hay análisis registrados en el sistema.</p>
+                            </div>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>

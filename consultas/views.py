@@ -12,6 +12,8 @@ from asgiref.sync import async_to_sync
 import os
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import json
+from django.views.decorators.csrf import csrf_exempt
 
 # APIs externas para información veterinaria
 try:
@@ -43,24 +45,33 @@ def lista_consultas(request):
             api_data['nearby_clinics'] = API_MANAGER.get_nearby_clinics(lat, lng)[:2]
             api_data['emergency_clinics'] = API_MANAGER.get_emergency_clinics(lat, lng)[:1]
             api_data['health_tips'] = API_MANAGER.get_pet_health_tips('Perro', 'adulto')[:2]
-            
             messages.info(request, 'Datos de APIs veterinarias cargados')
         except Exception as e:
             messages.warning(request, f'Error con APIs: {str(e)}')
-    
-    return render(request, 'consultas/lista_consultas.html', {
+            
+    return render(request, 'consultas/consultas.html', {
         'consultas': consultas,
         'api_data': api_data,
         'api_available': API_AVAILABLE
+    })
+
+# VER DETALLE DE CONSULTA - Información completa de la cita
+@login_required
+def detalle_consulta(request, id):
+    consulta = get_object_or_404(Consulta, id=id)
+    return render(request, 'consultas/detalle_consulta.html', {
+        'consulta': consulta
     })
 
 # CREAR NUEVA CONSULTA - Cuando un cliente pide cita
 @login_required
 def crear_consulta(request):
     if request.method == 'POST':
-        form = ConsultaForm(request.POST)
+        form = ConsultaForm(request.POST, user=request.user)
         if form.is_valid():
             consulta = form.save(commit=False)  # Guardamos pero sin confirmar aún
+            if consulta.mascota and not consulta.paciente:
+                consulta.paciente = consulta.mascota.nombre
             consulta.estado = 'Pendiente'  # Siempre empieza como pendiente
             consulta.usuario = request.user  # Asignamos el usuario que solicita
             consulta.save()
@@ -95,22 +106,19 @@ def crear_consulta(request):
                 pass
             
             messages.success(request, '¡Consulta solicitada! El recepcionista la revisará pronto.')
-            return redirect('lista_consultas')
+            return redirect('calendario_recepcion')
     else:
-        form = ConsultaForm()
+        form = ConsultaForm(user=request.user)
     
     return render(request, 'form_generico.html', {
         'form': form,
         'titulo': 'Pedir Nueva Consulta Veterinaria',
-        'url_cancelar': '/consultas/'
+        'url_cancelar': '/consultas/calendario/'
     })
 
 # CAMBIAR ESTADO - Actualizar cómo va la consulta
 @login_required
 def actualizar_estado_consulta(request, id):
-    # TEMPORAL: Cualquier usuario puede cambiar estados (para pruebas)
-    pass
-
     if request.method == 'POST':
         nuevo_estado = request.POST.get('estado')
         consulta = get_object_or_404(Consulta, id=id)
@@ -132,29 +140,29 @@ def actualizar_estado_consulta(request, id):
         
         messages.success(request, f'Estado actualizado a: {nuevo_estado}')
         
-    return redirect('lista_consultas')
+    return redirect('calendario_recepcion')
 
 # EDITAR CONSULTA - Cambiar datos de una cita
 @login_required
 def editar_consulta(request, id):
-    # TEMPORAL: Cualquier usuario puede editar (para pruebas)
-    pass
-    
     consulta = get_object_or_404(Consulta, id=id)
     
     if request.method == 'POST':
-        form = ConsultaForm(request.POST, instance=consulta)
+        form = ConsultaForm(request.POST, instance=consulta, user=request.user)
         if form.is_valid():
-            form.save()
+            c = form.save(commit=False)
+            if c.mascota and not c.paciente:
+                c.paciente = c.mascota.nombre
+            c.save()
             messages.success(request, '¡Consulta actualizada!')
-            return redirect('lista_consultas')
+            return redirect('calendario_recepcion')
     else:
-        form = ConsultaForm(instance=consulta)
+        form = ConsultaForm(instance=consulta, user=request.user)
     
     return render(request, 'form_generico.html', {
         'form': form,
         'titulo': 'Editar Datos de la Consulta',
-        'url_cancelar': '/consultas/'
+        'url_cancelar': '/consultas/calendario/'
     })
 
 # ELIMINAR CONSULTA - Borrar una cita para siempre
@@ -198,3 +206,99 @@ def api_clinics_cercanas(request):
         })
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)})
+
+# --- CALENDARIO INTERACTIVO ---
+
+@login_required
+def calendario_recepcion(request):
+    # comprobar si el usuario es empleado (recepcionista, admin, veterinario, auxiliar)
+    es_empleado = request.user.is_staff or request.user.is_superuser
+    if hasattr(request.user, 'perfil') and request.user.perfil.rol in ['recepcionista', 'admin', 'veterinario', 'auxiliar']:
+        es_empleado = True
+
+    titulo = 'Calendario General de Citas' if es_empleado else 'Mi Calendario de Citas'
+    return render(request, 'consultas/calendario.html', {
+        'titulo': titulo,
+        'es_empleado': es_empleado
+    })
+
+@login_required
+def api_citas_calendario(request):
+    # comprobar si el usuario es empleado o cliente
+    es_empleado = request.user.is_staff or request.user.is_superuser
+    if hasattr(request.user, 'perfil') and request.user.perfil.rol in ['recepcionista', 'admin', 'veterinario', 'auxiliar']:
+        es_empleado = True
+
+    # si es empleado ve todas las citas, si es cliente solo las suyas
+    if es_empleado:
+        consultas = Consulta.objects.all()
+    else:
+        consultas = Consulta.objects.filter(usuario=request.user)
+
+    eventos = []
+    from datetime import timedelta
+
+    for c in consultas:
+        # asignar color segun el estado de la cita
+        color = '#0891b2' # cian por defecto
+        if c.estado == 'Pendiente':
+            color = '#f59e0b' # amarillo
+        elif c.estado == 'En Proceso':
+            color = '#0ea5e9' # azul
+        elif c.estado == 'Completado':
+            color = '#10b981' # verde
+        elif c.estado == 'Rechazada':
+            color = '#ef4444' # rojo
+            
+        end_time = c.fecha + timedelta(minutes=30)
+        
+        # titulo personalizado segun quien lo vea
+        if es_empleado:
+            nombre_paciente = c.mascota.nombre if c.mascota else c.paciente
+            titulo_evento = f'{nombre_paciente} ({c.usuario.username})'
+        else:
+            nombre_paciente = c.mascota.nombre if c.mascota else c.paciente
+            titulo_evento = f'{nombre_paciente} - {c.motivo}'
+
+        eventos.append({
+            'id': c.id,
+            'title': titulo_evento,
+            'start': c.fecha.isoformat(),
+            'end': end_time.isoformat(),
+            'backgroundColor': color,
+            'borderColor': color,
+            'url': f'/consultas/editar/{c.id}/',
+        })
+        
+    return JsonResponse(eventos, safe=False)
+
+@csrf_exempt
+@login_required
+def api_actualizar_cita(request, id):
+    # actualizar fecha de la cita tras moverla en el calendario
+    if request.method == 'POST':
+        try:
+            # verificar si tiene permiso para mover citas (solo empleados)
+            es_empleado = request.user.is_staff or request.user.is_superuser
+            if hasattr(request.user, 'perfil') and request.user.perfil.rol in ['recepcionista', 'admin', 'veterinario', 'auxiliar']:
+                es_empleado = True
+
+            if not es_empleado:
+                return JsonResponse({'success': False, 'error': 'Solo el personal de recepción puede reubicar citas en el calendario'})
+
+            data = json.loads(request.body)
+            nueva_fecha_str = data.get('start')
+            
+            if nueva_fecha_str:
+                from dateutil.parser import parse
+                nueva_fecha = parse(nueva_fecha_str)
+                
+                consulta = get_object_or_404(Consulta, id=id)
+                consulta.fecha = nueva_fecha
+                consulta.save()
+                
+                return JsonResponse({'success': True})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+            
+    return JsonResponse({'success': False, 'error': 'Método no permitido'})

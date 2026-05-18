@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
 from .models import Urgencia
-from .forms import UrgenciaForm
+from .forms import UrgenciaForm, UrgenciaVeterinarioForm
 # from channels.layers import get_channel_layer
 # from asgiref.sync import async_to_sync  # Temporalmente desactivado
 
@@ -74,25 +74,24 @@ def actualizar_estado_urgencia(request, id):
         urgencia.estado = nuevo_estado
         urgencia.save()
         
-        # Enviar notificación por WebSocket simple
-        # try:
-        #     channel_layer = get_channel_layer()
-        #     async_to_sync(channel_layer.group_send)(
-        #         'clinica_notificaciones',
-        #         {
-        #             'type': 'enviar.notificacion',
-        #             'message': f'Estado urgencia: {nuevo_estado}',
-        #             'tipo': 'urgencia'
-        #         }
-        #     )
-        # except:
-        #     # Si no funciona, seguimos adelante
-        #     pass
-        
         # Mensaje de éxito para el usuario
         messages.success(request, f'Estado actualizado a: {nuevo_estado}')
         
     return redirect('lista_urgencias')
+
+@login_required
+def actualizar_prioridad_urgencia(request, id):
+    urgencia = get_object_or_404(Urgencia, id=id)
+    if request.method == 'POST':
+        nueva_prioridad = request.POST.get('prioridad')
+        if nueva_prioridad:
+            urgencia.prioridad = nueva_prioridad
+            urgencia.save()
+            messages.success(request, f'Prioridad de la urgencia actualizada a {nueva_prioridad}')
+    referer = request.META.get('HTTP_REFERER')
+    if referer:
+        return redirect(referer)
+    return redirect('ver_cita', tipo='urgencia', cita_id=id)
 
 # Editar urgencia existente
 @login_required
@@ -101,13 +100,13 @@ def editar_urgencia(request, id):
     urgencia = get_object_or_404(Urgencia, id=id)
     
     if request.method == 'POST':
-        form = UrgenciaForm(request.POST, instance=urgencia)
+        form = UrgenciaVeterinarioForm(request.POST, instance=urgencia)
         if form.is_valid():
             form.save()
             messages.success(request, 'Urgencia actualizada correctamente')
             return redirect('lista_urgencias')
     else:
-        form = UrgenciaForm(instance=urgencia)
+        form = UrgenciaVeterinarioForm(instance=urgencia)
     
     return render(request, 'form_generico.html', {
         'form': form,

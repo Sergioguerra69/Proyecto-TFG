@@ -8,7 +8,7 @@ CLASE_INPUT = 'w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border
 class FormularioContactoForm(forms.ModelForm):
     class Meta:
         model = FormularioContacto
-        fields = ['nombre', 'apellidos', 'dni', 'email', 'telefono', 'asunto', 'mensaje']
+        fields = ['nombre', 'apellidos', 'dni', 'email', 'telefono', 'asunto', 'mensaje', 'fecha', 'hora']
         widgets = {
             'nombre': forms.TextInput(attrs={
                 'class': CLASE_INPUT,
@@ -38,7 +38,15 @@ class FormularioContactoForm(forms.ModelForm):
                 'class': CLASE_INPUT,
                 'rows': 5,
                 'placeholder': 'Escribe tu mensaje aquí...'
-            })
+            }),
+            'fecha': forms.DateInput(attrs={
+                'class': CLASE_INPUT,
+                'type': 'date'
+            }),
+            'hora': forms.TimeInput(attrs={
+                'class': CLASE_INPUT,
+                'type': 'time'
+            }),
         }
 
 class RespuestaContactoForm(forms.Form):

@@ -3,23 +3,23 @@
 {% block title %}{{ titulo }}{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-slate-800 py-8">
+<div class="min-h-screen bg-gray-100 py-8">
  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
  <!-- Header -->
  <div class="mb-8">
- <div class="bg-white rounded-lg shadow-lg p-6 border border-slate-200">
+ <div class="bg-white rounded-lg shadow p-6 border-l-4 border-cyan-500 mb-6">
  <div class="flex items-center justify-between">
  <div class="flex items-center gap-4">
- <div class="w-12 h-12 bg-purple-600 rounded-xl flex items-center justify-center shadow-lg">
- <i class="fas fa-user-md text-white text-xl"></i>
+ <div class="w-12 h-12 bg-cyan-600 rounded-xl flex items-center justify-center shadow-lg">
+ <i class="fas fa-envelope text-white text-xl"></i>
  </div>
  <div>
- <h1 class="text-2xl font-bold text-slate-800">Panel Veterinario</h1>
+ <h1 class="text-2xl font-bold text-slate-800">Panel de Contactos</h1>
  <p class="text-slate-600">Gestiona tus solicitudes asignadas</p>
  </div>
  </div>
  <div class="flex items-center gap-3">
- <a href="{% url 'ver_notificaciones_veterinario' %}" class="px-4 py-2 bg-purple-100 text-purple-800 rounded-lg hover:bg-purple-200 transition-colors flex items-center gap-2 relative">
+ <a href="{% url 'ver_notificaciones_veterinario' %}" class="px-4 py-2 bg-cyan-100 text-cyan-800 rounded-lg hover:bg-cyan-200 transition-colors flex items-center gap-2 relative font-medium">
  <i class="fas fa-bell"></i>
  Notificaciones
  {% if notificaciones_no_leidas.count %}
@@ -36,22 +36,23 @@
  </div>
 
  <!-- Pestañas -->
- <div class="mb-6">
- <div class="bg-white rounded-xl shadow-md p-2 border border-slate-200">
- <div class="flex space-x-2">
- <button onclick="showTab('pendientes')" id="tab-pendientes" class="flex-1 px-4 py-2 bg-purple-500 text-white rounded-lg font-medium transition-colors">
+ <div class="bg-white rounded-lg shadow mb-6 border border-slate-200">
+ <div class="bg-cyan-600 text-white px-4 py-3 rounded-t-lg">
+ <h3 class="font-bold">Solicitudes Asignadas</h3>
+ </div>
+ <div class="flex border-b overflow-x-auto">
+ <button onclick="showTab('pendientes')" id="tab-pendientes" class="tab-btn flex-1 py-3 px-4 font-medium bg-cyan-600 text-white min-w-[150px]">
  <i class="fas fa-clock mr-2"></i>
  Solicitudes Pendientes ({{ asignaciones_pendientes.count }})
  </button>
- <button onclick="showTab('aceptadas')" id="tab-aceptadas" class="flex-1 px-4 py-2 bg-slate-100 text-slate-700 rounded-lg font-medium hover:bg-slate-200 transition-colors">
+ <button onclick="showTab('aceptadas')" id="tab-aceptadas" class="tab-btn flex-1 py-3 px-4 font-medium text-gray-700 hover:bg-gray-100 min-w-[150px]">
  <i class="fas fa-check-circle mr-2"></i>
  Solicitudes Aceptadas ({{ asignaciones_aceptadas.count }})
  </button>
- <button onclick="showTab('completadas')" id="tab-completadas" class="flex-1 px-4 py-2 bg-slate-100 text-slate-700 rounded-lg font-medium hover:bg-slate-200 transition-colors">
+ <button onclick="showTab('completadas')" id="tab-completadas" class="tab-btn flex-1 py-3 px-4 font-medium text-gray-700 hover:bg-gray-100 min-w-[150px]">
  <i class="fas fa-flag-checkered mr-2"></i>
  Solicitudes Completadas ({{ asignaciones_completadas.count }})
  </button>
- </div>
  </div>
  </div>
 

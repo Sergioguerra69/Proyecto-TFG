@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+
+{% block title %}Estadísticas - VetCT{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto py-8 px-4">
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-slate-800 flex items-center gap-3">
+            <i class="fas fa-chart-pie text-cyan-500"></i> Estadísticas de la Clínica
+        </h1>
+        <p class="text-slate-500 mt-1">Resumen mensual y datos económicos del centro.</p>
+    </div>
+
+    <!-- tarjetas de resumen superior -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <!-- consultas del mes -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex items-center">
+            <div class="w-14 h-14 rounded-full bg-cyan-100 flex items-center justify-center text-cyan-600 mr-4">
+                <i class="fas fa-paw text-2xl"></i>
+            </div>
+            <div>
+                <p class="text-slate-500 text-sm font-medium">Consultas (Este mes)</p>
+                <div class="flex items-end gap-3">
+                    <h3 class="text-3xl font-bold text-slate-800 m-0">{{ mes_actual }}</h3>
+                    {% if mes_actual > mes_anterior %}
+                        <span class="text-emerald-500 text-sm font-semibold flex items-center mb-1">
+                            <i class="fas fa-arrow-up mr-1"></i> 
+                            {% if mes_anterior > 0 %}
+                                {{ mes_actual|add:"-"|add:mes_anterior }} vs anterior
+                            {% else %}
+                                100%
+                            {% endif %}
+                        </span>
+                    {% elif mes_actual < mes_anterior %}
+                        <span class="text-red-500 text-sm font-semibold flex items-center mb-1">
+                            <i class="fas fa-arrow-down mr-1"></i> 
+                            {{ mes_anterior|add:"-"|add:mes_actual }} vs anterior
+                        </span>
+                    {% else %}
+                        <span class="text-slate-400 text-sm font-semibold mb-1">Igual que anterior</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- servicio que da mas dinero -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex items-center">
+            <div class="w-14 h-14 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 mr-4">
+                <i class="fas fa-euro-sign text-2xl"></i>
+            </div>
+            <div>
+                <p class="text-slate-500 text-sm font-medium">Mejor Servicio</p>
+                <h3 class="text-2xl font-bold text-slate-800 m-0">Cirugías</h3>
+                <p class="text-emerald-500 text-sm font-semibold mt-1">Mayor rentabilidad</p>
+            </div>
+        </div>
+
+        <!-- urgencias por la noche -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex items-center">
+            <div class="w-14 h-14 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 mr-4">
+                <i class="fas fa-moon text-2xl"></i>
+            </div>
+            <div>
+                <p class="text-slate-500 text-sm font-medium">Urgencias Nocturnas</p>
+                <div class="flex items-end gap-3">
+                    <h3 class="text-3xl font-bold text-slate-800 m-0">{{ pct_nocturnas }}%</h3>
+                    <span class="text-slate-500 text-sm font-medium mb-1">del total ({{ urgencias_nocturnas }})</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- seccion de graficas -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- grafica de lineas: consultas -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+            <h4 class="text-lg font-bold text-slate-800 mb-4">Evolución de Consultas (Últimos 6 meses)</h4>
+            <div class="relative h-64">
+                <canvas id="evolucionChart"></canvas>
+            </div>
+        </div>
+
+        <!-- grafica de barras: ingresos por servicio -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+            <h4 class="text-lg font-bold text-slate-800 mb-4">Ingresos Estimados por Servicio</h4>
+            <div class="relative h-64">
+                <canvas id="rentabilidadChart"></canvas>
+            </div>
+        </div>
+
+        <!-- grafica de donut: urgencias -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 lg:col-span-2">
+            <h4 class="text-lg font-bold text-slate-800 mb-4">Distribución de Urgencias: Diurnas vs Nocturnas</h4>
+            <div class="relative h-64 flex justify-center">
+                <div class="w-full max-w-md">
+                    <canvas id="urgenciasChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- pasar datos de django a javascript de forma limpia -->
+{{ labels_meses|json_script:"labels-meses" }}
+{{ datos_evolucion|json_script:"datos-evolucion" }}
+{{ rentabilidad_labels|json_script:"rentabilidad-labels" }}
+{{ rentabilidad_data|json_script:"rentabilidad-data" }}
+{{ pct_diurnas|json_script:"pct-diurnas" }}
+{{ pct_nocturnas|json_script:"pct-nocturnas" }}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // cargar los datos desde el html
+    const labelsMeses = JSON.parse(document.getElementById('labels-meses').textContent);
+    const datosEvolucion = JSON.parse(document.getElementById('datos-evolucion').textContent);
+    const rentabilidadLabels = JSON.parse(document.getElementById('rentabilidad-labels').textContent);
+    const rentabilidadData = JSON.parse(document.getElementById('rentabilidad-data').textContent);
+    const pctDiurnas = JSON.parse(document.getElementById('pct-diurnas').textContent);
+    const pctNocturnas = JSON.parse(document.getElementById('pct-nocturnas').textContent);
+
+    // colores basicos para las graficas
+    const colorCian = '#06b6d4';
+    const colorCianClaro = 'rgba(6, 182, 212, 0.2)';
+    const colorVerde = '#10b981';
+    const colorAmarillo = '#f59e0b';
+    const colorMorado = '#a855f7';
+    const colorIndigo = '#6366f1';
+
+    // 1. grafica de evolucion mensual (lineas)
+    const ctxEvolucion = document.getElementById('evolucionChart').getContext('2d');
+    new Chart(ctxEvolucion, {
+        type: 'line',
+        data: {
+            labels: labelsMeses,
+            datasets: [{
+                label: 'Número de consultas',
+                data: datosEvolucion,
+                borderColor: colorCian,
+                backgroundColor: colorCianClaro,
+                borderWidth: 2,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+
+    // 2. grafica de ingresos por servicio (barras)
+    const ctxRentabilidad = document.getElementById('rentabilidadChart').getContext('2d');
+    new Chart(ctxRentabilidad, {
+        type: 'bar',
+        data: {
+            labels: rentabilidadLabels,
+            datasets: [{
+                label: 'Ingresos estimados (€)',
+                data: rentabilidadData,
+                backgroundColor: [colorVerde, colorCian, colorAmarillo, colorMorado]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+
+    // 3. grafica comparativa de urgencias (donut)
+    const ctxUrgencias = document.getElementById('urgenciasChart').getContext('2d');
+    new Chart(ctxUrgencias, {
+        type: 'doughnut',
+        data: {
+            labels: ['Diurnas (08:00 - 20:00)', 'Nocturnas (20:00 - 08:00)'],
+            datasets: [{
+                data: [pctDiurnas, pctNocturnas],
+                backgroundColor: [colorAmarillo, colorIndigo]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+});
+</script>
+{% endblock %}

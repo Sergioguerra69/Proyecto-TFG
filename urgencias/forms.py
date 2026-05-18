@@ -5,4 +5,9 @@ from .models import Urgencia
 class UrgenciaForm(forms.ModelForm):
     class Meta:
         model = Urgencia
-        fields = ['paciente', 'prioridad', 'descripcion', 'estado']
+        fields = ['paciente', 'solicita_prioridad', 'descripcion']
+
+class UrgenciaVeterinarioForm(forms.ModelForm):
+    class Meta:
+        model = Urgencia
+        fields = ['paciente', 'solicita_prioridad', 'prioridad', 'descripcion', 'estado']

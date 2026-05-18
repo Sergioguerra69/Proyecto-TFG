@@ -12,264 +12,664 @@
 
         <!-- Estado de la conexion WebSocket -->
         <div id="estado-ws" class="mb-4 p-3 rounded text-center text-sm font-medium"
-            style="background: #fef9c3; color: #854d0e;">
+            style="display: none;">
             Conectando al sistema de notificaciones...
         </div>
 
         <!-- Cabecera -->
         <div class="bg-white rounded-xl shadow-sm p-6 mb-6 border-l-4 border-cyan-600">
             <h1 class="font-montserrat font-black text-2xl md:text-3xl text-slate-800">Panel Veterinario</h1>
-            <p class="text-slate-500 mt-1">Gestión de citas y solicitudes asignadas</p>
-            <div class="mt-4 flex flex-wrap gap-2">
-                <span
-                    class="bg-slate-50 text-slate-700 px-3 py-1.5 rounded-lg text-sm font-bold border border-slate-200 shadow-sm transition-all hover:shadow">
-                    <i class="fas fa-clock mr-1.5 text-cyan-600"></i>Pendientes: {{ notificaciones_pendientes|length }}
-                </span>
-                <span
-                    class="bg-slate-50 text-slate-700 px-3 py-1.5 rounded-lg text-sm font-bold border border-slate-200 shadow-sm transition-all hover:shadow">
-                    <i class="fas fa-check-circle mr-1.5 text-emerald-600"></i>Aceptadas: {{ notificaciones_aceptadas|length }}
-                </span>
-                <span
-                    class="bg-slate-50 text-slate-700 px-3 py-1.5 rounded-lg text-sm font-bold border border-slate-200 shadow-sm transition-all hover:shadow">
-                    <i class="fas fa-times-circle mr-1.5 text-red-600"></i>Rechazadas: {{ notificaciones_rechazadas|length }}
-                </span>
-            </div>
+            <p class="text-slate-500 mt-1">Gestión de consultas, análisis, cirugías y urgencias asignadas</p>
         </div>
 
-        <!-- Pestañas -->
-        <div class="bg-white rounded-xl shadow-sm mb-6 border border-slate-200 overflow-hidden">
-            <div class="flex border-b border-slate-200">
-                <button onclick="verTab('pendientes')" id="btn-pendientes"
-                    class="flex-1 py-3 px-4 font-bold text-sm uppercase tracking-wider bg-cyan-600 text-white transition-all duration-300">
-                    Pendientes
+        <!-- Pestañas principales -->
+        <div class="bg-white rounded-lg shadow-sm mb-6 border border-slate-200 overflow-hidden">
+            <div class="flex border-b">
+                <button onclick="mostrarTab('consultas')" id="tab-consultas"
+                    class="tab-btn flex-1 py-3 px-4 font-bold bg-cyan-600 text-white uppercase tracking-wider text-xs md:text-sm transition-all duration-300">
+                    Consultas
                 </button>
-                <button onclick="verTab('aceptadas')" id="btn-aceptadas"
-                    class="flex-1 py-3 px-4 font-bold text-sm uppercase tracking-wider text-slate-600 hover:bg-slate-50 transition-all duration-300 border-l border-slate-200">
-                    Aceptadas
+                <button onclick="mostrarTab('analisis')" id="tab-analisis"
+                    class="tab-btn flex-1 py-3 px-4 font-bold text-slate-600 hover:bg-slate-50 uppercase tracking-wider text-xs md:text-sm transition-all duration-300 border-l border-slate-200">
+                    Análisis
                 </button>
-                <button onclick="verTab('rechazadas')" id="btn-rechazadas"
-                    class="flex-1 py-3 px-4 font-bold text-sm uppercase tracking-wider text-slate-600 hover:bg-slate-50 transition-all duration-300 border-l border-slate-200">
-                    Rechazadas
+                <button onclick="mostrarTab('cirugias')" id="tab-cirugias"
+                    class="tab-btn flex-1 py-3 px-4 font-bold text-slate-600 hover:bg-slate-50 uppercase tracking-wider text-xs md:text-sm transition-all duration-300 border-l border-slate-200">
+                    Cirugías
+                </button>
+                <button onclick="mostrarTab('urgencias')" id="tab-urgencias"
+                    class="tab-btn flex-1 py-3 px-4 font-bold text-slate-600 hover:bg-slate-50 uppercase tracking-wider text-xs md:text-sm transition-all duration-300 border-l border-slate-200">
+                    Urgencias
                 </button>
             </div>
         </div>
 
-        <!-- PANEL PENDIENTES -->
-        <div id="tab-pendientes">
-            {% if notificaciones_pendientes %}
-            <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6 border border-slate-200">
-                <div class="bg-amber-50 px-4 py-3 border-b border-amber-100 flex justify-between items-center">
-                    <h3 class="font-bold text-amber-800 flex items-center">
-                        <i class="fas fa-exclamation-circle mr-2"></i> Citas pendientes de confirmación
-                    </h3>
-                    <span class="bg-amber-100 text-amber-800 text-xs font-bold px-2 py-0.5 rounded-full">{{ notificaciones_pendientes|length }}</span>
+        <!-- Contenido de pestañas -->
+        <div id="tab-content">
+            <!-- Consultas -->
+            <div id="consultas" class="tab-panel block">
+                <!-- Estadísticas simples -->
+                <div class="grid grid-cols-3 gap-4 mb-6">
+                    <div class="bg-white border-b-4 border-amber-400 rounded-lg p-4 shadow-sm text-center">
+                        <p class="text-slate-500 text-xs font-bold uppercase">Pendientes de Atender</p>
+                        <p class="text-3xl font-black text-slate-800">{{ consultas_pendientes|length }}</p>
+                    </div>
+                    <div class="bg-white border-b-4 border-cyan-600 rounded-lg p-4 shadow-sm text-center">
+                        <p class="text-slate-500 text-xs font-bold uppercase">En Proceso</p>
+                        <p class="text-3xl font-black text-slate-800">{{ consultas_en_proceso|length }}</p>
+                    </div>
+                    <div class="bg-white border-b-4 border-emerald-600 rounded-lg p-4 shadow-sm text-center">
+                        <p class="text-slate-500 text-xs font-bold uppercase">Completadas</p>
+                        <p class="text-3xl font-black text-slate-800">{{ consultas_completadas|length }}</p>
+                    </div>
                 </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead>
-                            <tr class="bg-slate-50 border-b text-left text-xs font-bold text-slate-700 uppercase">
-                                <th class="px-4 py-3">Tipo</th>
-                                <th class="px-4 py-3">Paciente</th>
-                                <th class="px-4 py-3">Fecha</th>
-                                <th class="px-4 py-3">Motivo</th>
-                                <th class="px-4 py-3">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in notificaciones_pendientes %}
-                            <tr class="border-b hover:bg-slate-50 transition-colors">
-                                <td class="px-4 py-4 text-sm text-slate-600">{{ item.tipo_display }}</td>
-                                <td class="px-4 py-4 text-slate-800 font-bold">{{ item.paciente }}</td>
-                                <td class="px-4 py-4 text-sm text-slate-500">
-                                    {% if item.fecha_cita %}{{ item.fecha_cita|date:"d/m/Y" }}{% else %}-{% endif %}
-                                </td>
-                                <td class="px-4 py-4 text-sm text-slate-600">{{ item.detalle|truncatechars:40 }}</td>
-                                <td class="px-4 py-4">
-                                    <div class="flex flex-wrap gap-2">
-                                        <a href="{% url 'ver_cita' item.tipo item.objeto_id %}"
-                                            class="bg-cyan-50 hover:bg-cyan-100 text-cyan-600 px-3 py-1.5 rounded-sm text-xs font-bold transition-all border border-cyan-200">
-                                            Info
-                                        </a>
-                                        <form method="post" action="{% url 'aceptar_cita' item.tipo item.objeto_id %}"
-                                            class="inline">
-                                            {% csrf_token %}
-                                            <button type="submit"
-                                                class="bg-cyan-600 hover:bg-cyan-700 text-white px-3 py-1.5 rounded-sm text-xs font-bold shadow-sm transition-all focus:ring-2 focus:ring-cyan-500">
-                                                Aceptar
-                                            </button>
-                                        </form>
-                                        <form method="post" action="{% url 'rechazar_cita' item.tipo item.objeto_id %}"
-                                            class="inline">
-                                            {% csrf_token %}
-                                            <button type="submit"
-                                                class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-1.5 rounded-sm text-xs font-bold transition-all border border-slate-200">
-                                                Rechazar
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            {% else %}
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-12 text-center">
-                <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-check-double text-slate-400 text-2xl"></i>
-                </div>
-                <h3 class="text-slate-800 font-bold text-lg mb-1">¡Todo al día!</h3>
-                <p class="text-slate-500">No tienes citas pendientes por confirmar.</p>
-            </div>
-            {% endif %}
-        </div>
 
-        <!-- PANEL ACEPTADAS -->
-        <div id="tab-aceptadas" style="display: none;">
-            {% if notificaciones_aceptadas %}
-            <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6 border border-slate-200">
-                <div class="bg-cyan-50 px-4 py-3 border-b border-cyan-100 flex justify-between items-center">
-                    <h3 class="font-bold text-cyan-800 flex items-center">
-                        <i class="fas fa-calendar-check mr-2"></i> Citas aceptadas
-                    </h3>
-                    <span class="bg-cyan-100 text-cyan-800 text-xs font-bold px-2 py-0.5 rounded-full">{{ notificaciones_aceptadas|length }}</span>
+                <!-- Pendientes de Atender -->
+                <div class="bg-white rounded-lg shadow-sm mb-6 border border-slate-200 overflow-hidden">
+                    <div class="bg-amber-50 px-4 py-3 border-b border-amber-100 flex justify-between items-center">
+                        <h3 class="font-bold text-amber-800 flex items-center"><i class="fas fa-exclamation-circle mr-2"></i> Consultas Pendientes de Atender</h3>
+                        <span class="bg-amber-100 text-amber-800 text-xs font-bold px-2 py-0.5 rounded-full">{{ consultas_pendientes|length }}</span>
+                    </div>
+                    <div class="p-4 overflow-x-auto">
+                        {% if consultas_pendientes %}
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-slate-50 text-left">
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Paciente</th>
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Fecha</th>
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Motivo</th>
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for consulta in consultas_pendientes %}
+                                <tr class="border-b hover:bg-slate-50 transition-colors">
+                                    <td class="px-3 py-3 text-slate-700 font-medium">{{ consulta.paciente }}</td>
+                                    <td class="px-3 py-3 text-slate-500 text-sm">{{ consulta.fecha|date:"d/m/Y H:i" }}</td>
+                                    <td class="px-3 py-3 text-slate-500 text-sm">{{ consulta.motivo|truncatechars:40 }}</td>
+                                    <td class="px-3 py-3">
+                                        <div class="flex gap-2 items-center">
+                                            <a href="{% url 'ver_cita' 'consulta' consulta.id %}" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 shadow-sm hover:shadow h-10 inline-flex items-center justify-center whitespace-nowrap">Info</a>
+                                            <form method="post" action="{% url 'aceptar_cita' 'consulta' consulta.id %}" class="m-0 p-0 inline">
+                                                {% csrf_token %}
+                                                <button type="submit" class="bg-cyan-600 hover:bg-cyan-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 shadow-sm hover:shadow h-10 flex items-center justify-center whitespace-nowrap">Atender (En Proceso)</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <p class="text-slate-500 text-center py-8">No hay consultas pendientes de atender</p>
+                        {% endif %}
+                    </div>
                 </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead>
-                            <tr class="bg-slate-50 border-b text-left text-xs font-bold text-slate-700 uppercase">
-                                <th class="px-4 py-3">Tipo</th>
-                                <th class="px-4 py-3">Paciente</th>
-                                <th class="px-4 py-3">Fecha</th>
-                                <th class="px-4 py-3">Motivo</th>
-                                <th class="px-4 py-3">Estado</th>
-                                <th class="px-4 py-3">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in notificaciones_aceptadas %}
-                            <tr class="border-b hover:bg-slate-50 transition-colors">
-                                <td class="px-4 py-4 text-sm text-slate-600">{{ item.tipo_display }}</td>
-                                <td class="px-4 py-4 text-slate-800 font-bold">{{ item.paciente }}</td>
-                                <td class="px-4 py-4 text-sm text-slate-500">
-                                    {% if item.fecha_cita %}{{ item.fecha_cita|date:"d/m/Y" }}{% else %}-{% endif %}
-                                </td>
-                                <td class="px-4 py-4 text-sm text-slate-600">{{ item.detalle|truncatechars:40 }}</td>
-                                <td class="px-4 py-4">
-                                    <span
-                                        class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider">Aceptada</span>
-                                </td>
-                                <td class="px-4 py-4">
-                                    <div class="flex gap-2">
-                                        <a href="{% url 'ver_cita' item.tipo item.objeto_id %}"
-                                            class="bg-cyan-50 hover:bg-cyan-100 text-cyan-600 px-3 py-1.5 rounded-sm text-xs font-bold transition-all border border-cyan-200">
-                                            Info
-                                        </a>
-                                        <form method="post" action="{% url 'cancelar_cita' item.tipo item.objeto_id %}"
-                                            class="inline">
-                                            {% csrf_token %}
-                                            <button type="submit"
-                                                class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-1.5 rounded-sm text-xs font-bold transition-all border border-slate-200">
-                                                Cancelar
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            {% else %}
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-12 text-center">
-                <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-calendar-times text-slate-400 text-2xl"></i>
-                </div>
-                <p class="text-slate-500">No tienes citas aceptadas en este momento.</p>
-            </div>
-            {% endif %}
-        </div>
 
-        <!-- PANEL RECHAZADAS -->
-        <div id="tab-rechazadas" style="display: none;">
-            {% if notificaciones_rechazadas %}
-            <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6 border border-slate-200">
-                <div class="bg-slate-50 px-4 py-3 border-b border-slate-100 flex justify-between items-center">
-                    <h3 class="font-bold text-slate-800 flex items-center">
-                        <i class="fas fa-times-circle mr-2"></i> Citas rechazadas
-                    </h3>
-                    <span class="bg-slate-200 text-slate-700 text-xs font-bold px-2 py-0.5 rounded-full">{{ notificaciones_rechazadas|length }}</span>
+                <!-- En Proceso -->
+                <div class="bg-white rounded-lg shadow-sm mb-6 border border-slate-200 overflow-hidden">
+                    <div class="bg-cyan-50 px-4 py-3 border-b border-cyan-100 flex justify-between items-center">
+                        <h3 class="font-bold text-cyan-800 flex items-center"><i class="fas fa-spinner fa-spin mr-2"></i> Consultas en Proceso</h3>
+                        <span class="bg-cyan-100 text-cyan-800 text-xs font-bold px-2 py-0.5 rounded-full">{{ consultas_en_proceso|length }}</span>
+                    </div>
+                    <div class="p-4 overflow-x-auto">
+                        {% if consultas_en_proceso %}
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-slate-50 text-left">
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Paciente</th>
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Fecha</th>
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Motivo</th>
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for consulta in consultas_en_proceso %}
+                                <tr class="border-b hover:bg-slate-50 transition-colors">
+                                    <td class="px-3 py-3 text-slate-700 font-medium">{{ consulta.paciente }}</td>
+                                    <td class="px-3 py-3 text-slate-500 text-sm">{{ consulta.fecha|date:"d/m/Y H:i" }}</td>
+                                    <td class="px-3 py-3 text-slate-500 text-sm">{{ consulta.motivo|truncatechars:40 }}</td>
+                                    <td class="px-3 py-3">
+                                        <div class="flex gap-2 items-center">
+                                            <a href="{% url 'ver_cita' 'consulta' consulta.id %}" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 shadow-sm hover:shadow h-10 inline-flex items-center justify-center whitespace-nowrap">Info</a>
+                                            <form method="post" action="{% url 'completar_cita' 'consulta' consulta.id %}" class="m-0 p-0 inline">
+                                                {% csrf_token %}
+                                                <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 shadow-sm hover:shadow h-10 flex items-center justify-center whitespace-nowrap">Completar</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <p class="text-slate-500 text-center py-8">No hay consultas en proceso</p>
+                        {% endif %}
+                    </div>
                 </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead>
-                            <tr class="bg-slate-50 border-b text-left text-xs font-bold text-slate-700 uppercase">
-                                <th class="px-4 py-3">Tipo</th>
-                                <th class="px-4 py-3">Paciente</th>
-                                <th class="px-4 py-3">Fecha</th>
-                                <th class="px-4 py-3">Motivo</th>
-                                <th class="px-4 py-3">Estado</th>
-                                <th class="px-4 py-3">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in notificaciones_rechazadas %}
-                            <tr class="border-b hover:bg-slate-50 transition-colors">
-                                <td class="px-4 py-4 text-sm text-slate-600">{{ item.tipo_display }}</td>
-                                <td class="px-4 py-4 text-slate-800 font-bold">{{ item.paciente }}</td>
-                                <td class="px-4 py-4 text-sm text-slate-500">
-                                    {% if item.fecha_cita %}{{ item.fecha_cita|date:"d/m/Y" }}{% else %}-{% endif %}
-                                </td>
-                                <td class="px-4 py-4 text-sm text-slate-600">{{ item.detalle|truncatechars:40 }}</td>
-                                <td class="px-4 py-4">
-                                    <span
-                                        class="bg-red-100 text-red-800 px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider">Rechazada</span>
-                                </td>
-                                <td class="px-4 py-4">
-                                    <a href="{% url 'ver_cita' item.tipo item.objeto_id %}"
-                                        class="bg-cyan-50 hover:bg-cyan-100 text-cyan-600 px-3 py-1.5 rounded-sm text-xs font-bold transition-all border border-cyan-200">
-                                        Info
-                                    </a>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+
+                <!-- Completadas -->
+                <div class="bg-white rounded-lg shadow-sm mb-6 border border-slate-200 overflow-hidden">
+                    <div class="bg-emerald-50 px-4 py-3 border-b border-emerald-100 flex justify-between items-center">
+                        <h3 class="font-bold text-emerald-800 flex items-center"><i class="fas fa-check-circle mr-2"></i> Consultas Completadas</h3>
+                        <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2 py-0.5 rounded-full">{{ consultas_completadas|length }}</span>
+                    </div>
+                    <div class="p-4 overflow-x-auto">
+                        {% if consultas_completadas %}
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-slate-50 text-left">
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Paciente</th>
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Fecha</th>
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Motivo</th>
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for consulta in consultas_completadas %}
+                                <tr class="border-b hover:bg-slate-50 transition-colors">
+                                    <td class="px-3 py-3 text-slate-700 font-medium">{{ consulta.paciente }}</td>
+                                    <td class="px-3 py-3 text-slate-500 text-sm">{{ consulta.fecha|date:"d/m/Y H:i" }}</td>
+                                    <td class="px-3 py-3 text-slate-500 text-sm">{{ consulta.motivo|truncatechars:40 }}</td>
+                                    <td class="px-3 py-3">
+                                        <span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider">Completado</span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <p class="text-slate-500 text-center py-8">No hay consultas completadas</p>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
-            {% else %}
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-12 text-center">
-                <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-trash-alt text-slate-400 text-2xl"></i>
+
+            <!-- Análisis -->
+            <div id="analisis" class="tab-panel hidden">
+                <!-- Estadísticas simples -->
+                <div class="grid grid-cols-3 gap-4 mb-6">
+                    <div class="bg-white border-b-4 border-amber-400 rounded-lg p-4 shadow-sm text-center">
+                        <p class="text-slate-500 text-xs font-bold uppercase">Pendientes de Atender</p>
+                        <p class="text-3xl font-black text-slate-800">{{ analisis_pendientes|length }}</p>
+                    </div>
+                    <div class="bg-white border-b-4 border-cyan-600 rounded-lg p-4 shadow-sm text-center">
+                        <p class="text-slate-500 text-xs font-bold uppercase">En Proceso</p>
+                        <p class="text-3xl font-black text-slate-800">{{ analisis_en_proceso|length }}</p>
+                    </div>
+                    <div class="bg-white border-b-4 border-emerald-600 rounded-lg p-4 shadow-sm text-center">
+                        <p class="text-slate-500 text-xs font-bold uppercase">Completados</p>
+                        <p class="text-3xl font-black text-slate-800">{{ analisis_completados|length }}</p>
+                    </div>
                 </div>
-                <p class="text-slate-500">No hay registros de citas rechazadas.</p>
+
+                <!-- Pendientes de Atender -->
+                <div class="bg-white rounded-lg shadow-sm mb-6 border border-slate-200 overflow-hidden">
+                    <div class="bg-amber-50 px-4 py-3 border-b border-amber-100 flex justify-between items-center">
+                        <h3 class="font-bold text-amber-800 flex items-center"><i class="fas fa-vial mr-2"></i> Análisis Pendientes de Atender</h3>
+                        <span class="bg-amber-100 text-amber-800 text-xs font-bold px-2 py-0.5 rounded-full">{{ analisis_pendientes|length }}</span>
+                    </div>
+                    <div class="p-4 overflow-x-auto">
+                        {% if analisis_pendientes %}
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-slate-50 text-left">
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Paciente</th>
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Prueba</th>
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Fecha</th>
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in analisis_pendientes %}
+                                <tr class="border-b hover:bg-slate-50 transition-colors">
+                                    <td class="px-3 py-3 text-slate-700 font-medium">{{ item.paciente }}</td>
+                                    <td class="px-3 py-3 text-slate-700 font-bold">{{ item.nombre }}</td>
+                                    <td class="px-3 py-3 text-slate-500 text-sm">{{ item.fecha|date:"d/m/Y" }} {{ item.hora }}</td>
+                                    <td class="px-3 py-3">
+                                        <div class="flex gap-2 items-center">
+                                            <a href="{% url 'ver_cita' 'analisis' item.id %}" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 shadow-sm hover:shadow h-10 inline-flex items-center justify-center whitespace-nowrap">Info</a>
+                                            <form method="post" action="{% url 'aceptar_cita' 'analisis' item.id %}" class="m-0 p-0 inline">
+                                                {% csrf_token %}
+                                                <button type="submit" class="bg-cyan-600 hover:bg-cyan-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 shadow-sm hover:shadow h-10 flex items-center justify-center whitespace-nowrap">Atender (En Proceso)</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <p class="text-slate-500 text-center py-8">No hay análisis pendientes de atender</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- En Proceso -->
+                <div class="bg-white rounded-lg shadow-sm mb-6 border border-slate-200 overflow-hidden">
+                    <div class="bg-cyan-50 px-4 py-3 border-b border-cyan-100 flex justify-between items-center">
+                        <h3 class="font-bold text-cyan-800 flex items-center"><i class="fas fa-spinner fa-spin mr-2"></i> Análisis en Proceso</h3>
+                        <span class="bg-cyan-100 text-cyan-800 text-xs font-bold px-2 py-0.5 rounded-full">{{ analisis_en_proceso|length }}</span>
+                    </div>
+                    <div class="p-4 overflow-x-auto">
+                        {% if analisis_en_proceso %}
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-slate-50 text-left">
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Paciente</th>
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Prueba</th>
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Fecha</th>
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in analisis_en_proceso %}
+                                <tr class="border-b hover:bg-slate-50 transition-colors">
+                                    <td class="px-3 py-3 text-slate-700 font-medium">{{ item.paciente }}</td>
+                                    <td class="px-3 py-3 text-slate-700 font-bold">{{ item.nombre }}</td>
+                                    <td class="px-3 py-3 text-slate-500 text-sm">{{ item.fecha|date:"d/m/Y" }} {{ item.hora }}</td>
+                                    <td class="px-3 py-3">
+                                        <div class="flex gap-2 items-center">
+                                            <a href="{% url 'ver_cita' 'analisis' item.id %}" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 shadow-sm hover:shadow h-10 inline-flex items-center justify-center whitespace-nowrap">Info</a>
+                                            <form method="post" action="{% url 'completar_cita' 'analisis' item.id %}" class="m-0 p-0 inline">
+                                                {% csrf_token %}
+                                                <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 shadow-sm hover:shadow h-10 flex items-center justify-center whitespace-nowrap">Completar</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <p class="text-slate-500 text-center py-8">No hay análisis en proceso</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Completados -->
+                <div class="bg-white rounded-lg shadow-sm mb-6 border border-slate-200 overflow-hidden">
+                    <div class="bg-emerald-50 px-4 py-3 border-b border-emerald-100 flex justify-between items-center">
+                        <h3 class="font-bold text-emerald-800 flex items-center"><i class="fas fa-check-circle mr-2"></i> Análisis Completados</h3>
+                        <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2 py-0.5 rounded-full">{{ analisis_completados|length }}</span>
+                    </div>
+                    <div class="p-4 overflow-x-auto">
+                        {% if analisis_completados %}
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-slate-50 text-left">
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Paciente</th>
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Prueba</th>
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Fecha</th>
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in analisis_completados %}
+                                <tr class="border-b hover:bg-slate-50 transition-colors">
+                                    <td class="px-3 py-3 text-slate-700 font-medium">{{ item.paciente }}</td>
+                                    <td class="px-3 py-3 text-slate-700 font-bold">{{ item.nombre }}</td>
+                                    <td class="px-3 py-3 text-slate-500 text-sm">{{ item.fecha|date:"d/m/Y" }} {{ item.hora }}</td>
+                                    <td class="px-3 py-3">
+                                        <span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider">Completado</span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <p class="text-slate-500 text-center py-8">No hay análisis completados</p>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
-            {% endif %}
+
+            <!-- Cirugías -->
+            <div id="cirugias" class="tab-panel hidden">
+                <!-- Estadísticas simples -->
+                <div class="grid grid-cols-3 gap-4 mb-6">
+                    <div class="bg-white border-b-4 border-amber-400 rounded-lg p-4 shadow-sm text-center">
+                        <p class="text-slate-500 text-xs font-bold uppercase">Pendientes de Atender</p>
+                        <p class="text-3xl font-black text-slate-800">{{ cirugias_pendientes|length }}</p>
+                    </div>
+                    <div class="bg-white border-b-4 border-cyan-600 rounded-lg p-4 shadow-sm text-center">
+                        <p class="text-slate-500 text-xs font-bold uppercase">En Proceso</p>
+                        <p class="text-3xl font-black text-slate-800">{{ cirugias_en_proceso|length }}</p>
+                    </div>
+                    <div class="bg-white border-b-4 border-emerald-600 rounded-lg p-4 shadow-sm text-center">
+                        <p class="text-slate-500 text-xs font-bold uppercase">Completadas</p>
+                        <p class="text-3xl font-black text-slate-800">{{ cirugias_completadas|length }}</p>
+                    </div>
+                </div>
+
+                <!-- Pendientes de Atender -->
+                <div class="bg-white rounded-lg shadow-sm mb-6 border border-slate-200 overflow-hidden">
+                    <div class="bg-amber-50 px-4 py-3 border-b border-amber-100 flex justify-between items-center">
+                        <h3 class="font-bold text-amber-800 flex items-center"><i class="fas fa-procedures mr-2"></i> Cirugías Pendientes de Atender</h3>
+                        <span class="bg-amber-100 text-amber-800 text-xs font-bold px-2 py-0.5 rounded-full">{{ cirugias_pendientes|length }}</span>
+                    </div>
+                    <div class="p-4 overflow-x-auto">
+                        {% if cirugias_pendientes %}
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-slate-50 text-left">
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Paciente</th>
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Operación</th>
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Fecha</th>
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Quirófano</th>
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in cirugias_pendientes %}
+                                <tr class="border-b hover:bg-slate-50 transition-colors">
+                                    <td class="px-3 py-3 text-slate-700 font-medium">{{ item.paciente }}</td>
+                                    <td class="px-3 py-3 text-slate-700 font-bold">{{ item.tipo_cirugia }}</td>
+                                    <td class="px-3 py-3 text-slate-500 text-sm">{{ item.fecha|date:"d/m/Y H:i" }}</td>
+                                    <td class="px-3 py-3 text-slate-500 text-sm">{{ item.quirofano }}</td>
+                                    <td class="px-3 py-3">
+                                        <div class="flex gap-2 items-center">
+                                            <a href="{% url 'ver_cita' 'cirugia' item.id %}" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 shadow-sm hover:shadow h-10 inline-flex items-center justify-center whitespace-nowrap">Info</a>
+                                            <form method="post" action="{% url 'aceptar_cita' 'cirugia' item.id %}" class="m-0 p-0 inline">
+                                                {% csrf_token %}
+                                                <button type="submit" class="bg-cyan-600 hover:bg-cyan-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 shadow-sm hover:shadow h-10 flex items-center justify-center whitespace-nowrap">Atender (En Proceso)</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <p class="text-slate-500 text-center py-8">No hay cirugías pendientes de atender</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- En Proceso -->
+                <div class="bg-white rounded-lg shadow-sm mb-6 border border-slate-200 overflow-hidden">
+                    <div class="bg-cyan-50 px-4 py-3 border-b border-cyan-100 flex justify-between items-center">
+                        <h3 class="font-bold text-cyan-800 flex items-center"><i class="fas fa-spinner fa-spin mr-2"></i> Cirugías en Proceso</h3>
+                        <span class="bg-cyan-100 text-cyan-800 text-xs font-bold px-2 py-0.5 rounded-full">{{ cirugias_en_proceso|length }}</span>
+                    </div>
+                    <div class="p-4 overflow-x-auto">
+                        {% if cirugias_en_proceso %}
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-slate-50 text-left">
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Paciente</th>
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Operación</th>
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Fecha</th>
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Quirófano</th>
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in cirugias_en_proceso %}
+                                <tr class="border-b hover:bg-slate-50 transition-colors">
+                                    <td class="px-3 py-3 text-slate-700 font-medium">{{ item.paciente }}</td>
+                                    <td class="px-3 py-3 text-slate-700 font-bold">{{ item.tipo_cirugia }}</td>
+                                    <td class="px-3 py-3 text-slate-500 text-sm">{{ item.fecha|date:"d/m/Y H:i" }}</td>
+                                    <td class="px-3 py-3 text-slate-500 text-sm">{{ item.quirofano }}</td>
+                                    <td class="px-3 py-3">
+                                        <div class="flex gap-2 items-center">
+                                            <a href="{% url 'ver_cita' 'cirugia' item.id %}" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 shadow-sm hover:shadow h-10 inline-flex items-center justify-center whitespace-nowrap">Info</a>
+                                            <form method="post" action="{% url 'completar_cita' 'cirugia' item.id %}" class="m-0 p-0 inline">
+                                                {% csrf_token %}
+                                                <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 shadow-sm hover:shadow h-10 flex items-center justify-center whitespace-nowrap">Completar</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <p class="text-slate-500 text-center py-8">No hay cirugías en proceso</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Completadas -->
+                <div class="bg-white rounded-lg shadow-sm mb-6 border border-slate-200 overflow-hidden">
+                    <div class="bg-emerald-50 px-4 py-3 border-b border-emerald-100 flex justify-between items-center">
+                        <h3 class="font-bold text-emerald-800 flex items-center"><i class="fas fa-check-circle mr-2"></i> Cirugías Completadas</h3>
+                        <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2 py-0.5 rounded-full">{{ cirugias_completadas|length }}</span>
+                    </div>
+                    <div class="p-4 overflow-x-auto">
+                        {% if cirugias_completadas %}
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-slate-50 text-left">
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Paciente</th>
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Operación</th>
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Fecha</th>
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Quirófano</th>
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in cirugias_completadas %}
+                                <tr class="border-b hover:bg-slate-50 transition-colors">
+                                    <td class="px-3 py-3 text-slate-700 font-medium">{{ item.paciente }}</td>
+                                    <td class="px-3 py-3 text-slate-700 font-bold">{{ item.tipo_cirugia }}</td>
+                                    <td class="px-3 py-3 text-slate-500 text-sm">{{ item.fecha|date:"d/m/Y H:i" }}</td>
+                                    <td class="px-3 py-3 text-slate-500 text-sm">{{ item.quirofano }}</td>
+                                    <td class="px-3 py-3">
+                                        <span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider">Completado</span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <p class="text-slate-500 text-center py-8">No hay cirugías completadas</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Urgencias -->
+            <div id="urgencias" class="tab-panel hidden">
+                <!-- Estadísticas simples -->
+                <div class="grid grid-cols-3 gap-4 mb-6">
+                    <div class="bg-white border-b-4 border-amber-400 rounded-lg p-4 shadow-sm text-center">
+                        <p class="text-slate-500 text-xs font-bold uppercase">Pendientes de Atender</p>
+                        <p class="text-3xl font-black text-slate-800">{{ urgencias_pendientes|length }}</p>
+                    </div>
+                    <div class="bg-white border-b-4 border-cyan-600 rounded-lg p-4 shadow-sm text-center">
+                        <p class="text-slate-500 text-xs font-bold uppercase">En Proceso</p>
+                        <p class="text-3xl font-black text-slate-800">{{ urgencias_en_proceso|length }}</p>
+                    </div>
+                    <div class="bg-white border-b-4 border-emerald-600 rounded-lg p-4 shadow-sm text-center">
+                        <p class="text-slate-500 text-xs font-bold uppercase">Completadas</p>
+                        <p class="text-3xl font-black text-slate-800">{{ urgencias_completadas|length }}</p>
+                    </div>
+                </div>
+
+                <!-- Pendientes de Atender -->
+                <div class="bg-white rounded-lg shadow-sm mb-6 border border-slate-200 overflow-hidden">
+                    <div class="bg-amber-50 px-4 py-3 border-b border-amber-100 flex justify-between items-center">
+                        <h3 class="font-bold text-amber-800 flex items-center"><i class="fas fa-ambulance mr-2"></i> Urgencias Pendientes de Atender</h3>
+                        <span class="bg-amber-100 text-amber-800 text-xs font-bold px-2 py-0.5 rounded-full">{{ urgencias_pendientes|length }}</span>
+                    </div>
+                    <div class="p-4 overflow-x-auto">
+                        {% if urgencias_pendientes %}
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-slate-50 text-left">
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Paciente</th>
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Prioridad</th>
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Descripción</th>
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in urgencias_pendientes %}
+                                <tr class="border-b hover:bg-slate-50 transition-colors">
+                                    <td class="px-3 py-3 text-slate-700 font-medium">{{ item.paciente }}</td>
+                                    <td class="px-3 py-3">
+                                        {% if item.prioridad == 'Pendiente' %}
+                                        <form method="post" action="{% url 'actualizar_prioridad_urgencia' item.id %}" class="m-0 p-0 flex gap-1 items-center">
+                                            {% csrf_token %}
+                                            <select name="prioridad" class="bg-amber-50 border border-amber-300 rounded px-2 py-1 text-xs font-bold text-amber-900 focus:outline-none focus:border-amber-500">
+                                                <option value="">Asignar...</option>
+                                                <option value="Baja">Baja</option>
+                                                <option value="Media">Media</option>
+                                                <option value="Alta">Alta</option>
+                                                <option value="Crítica">Crítica</option>
+                                            </select>
+                                            <button type="submit" class="bg-amber-600 hover:bg-amber-700 text-white px-2 py-1 rounded text-xs font-bold transition-colors shadow-sm">Guardar</button>
+                                        </form>
+                                        {% else %}
+                                        <span class="px-2 py-1 rounded text-xs font-bold
+                                            {% if item.prioridad == 'Crítica' %}bg-red-600 text-white
+                                            {% elif item.prioridad == 'Alta' %}bg-orange-500 text-white
+                                            {% elif item.prioridad == 'Media' %}bg-amber-400 text-slate-800
+                                            {% else %}bg-blue-100 text-blue-800{% endif %}">
+                                            {{ item.prioridad }}
+                                        </span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-3 py-3 text-slate-500 text-sm">{{ item.descripcion|truncatechars:40 }}</td>
+                                    <td class="px-3 py-3">
+                                        <div class="flex gap-2 items-center">
+                                            <a href="{% url 'ver_cita' 'urgencia' item.id %}" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 shadow-sm hover:shadow h-10 inline-flex items-center justify-center whitespace-nowrap">Info</a>
+                                            <form method="post" action="{% url 'aceptar_cita' 'urgencia' item.id %}" class="m-0 p-0 inline">
+                                                {% csrf_token %}
+                                                <button type="submit" class="bg-cyan-600 hover:bg-cyan-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 shadow-sm hover:shadow h-10 flex items-center justify-center whitespace-nowrap">Atender (En Proceso)</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <p class="text-slate-500 text-center py-8">No hay urgencias pendientes de atender</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- En Proceso -->
+                <div class="bg-white rounded-lg shadow-sm mb-6 border border-slate-200 overflow-hidden">
+                    <div class="bg-cyan-50 px-4 py-3 border-b border-cyan-100 flex justify-between items-center">
+                        <h3 class="font-bold text-cyan-800 flex items-center"><i class="fas fa-spinner fa-spin mr-2"></i> Urgencias en Proceso</h3>
+                        <span class="bg-cyan-100 text-cyan-800 text-xs font-bold px-2 py-0.5 rounded-full">{{ urgencias_en_proceso|length }}</span>
+                    </div>
+                    <div class="p-4 overflow-x-auto">
+                        {% if urgencias_en_proceso %}
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-slate-50 text-left">
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Paciente</th>
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Prioridad</th>
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Descripción</th>
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in urgencias_en_proceso %}
+                                <tr class="border-b hover:bg-slate-50 transition-colors">
+                                    <td class="px-3 py-3 text-slate-700 font-medium">{{ item.paciente }}</td>
+                                    <td class="px-3 py-3">
+                                        <span class="px-2 py-1 rounded text-xs font-bold
+                                            {% if item.prioridad == 'Crítica' %}bg-red-600 text-white
+                                            {% elif item.prioridad == 'Alta' %}bg-orange-500 text-white
+                                            {% elif item.prioridad == 'Media' %}bg-amber-400 text-slate-800
+                                            {% else %}bg-blue-100 text-blue-800{% endif %}">
+                                            {{ item.prioridad }}
+                                        </span>
+                                    </td>
+                                    <td class="px-3 py-3 text-slate-500 text-sm">{{ item.descripcion|truncatechars:40 }}</td>
+                                    <td class="px-3 py-3">
+                                        <div class="flex gap-2 items-center">
+                                            <a href="{% url 'ver_cita' 'urgencia' item.id %}" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 shadow-sm hover:shadow h-10 inline-flex items-center justify-center whitespace-nowrap">Info</a>
+                                            <form method="post" action="{% url 'completar_cita' 'urgencia' item.id %}" class="m-0 p-0 inline">
+                                                {% csrf_token %}
+                                                <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 shadow-sm hover:shadow h-10 flex items-center justify-center whitespace-nowrap">Completar</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <p class="text-slate-500 text-center py-8">No hay urgencias en proceso</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Completadas -->
+                <div class="bg-white rounded-lg shadow-sm mb-6 border border-slate-200 overflow-hidden">
+                    <div class="bg-emerald-50 px-4 py-3 border-b border-emerald-100 flex justify-between items-center">
+                        <h3 class="font-bold text-emerald-800 flex items-center"><i class="fas fa-check-circle mr-2"></i> Urgencias Completadas</h3>
+                        <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2 py-0.5 rounded-full">{{ urgencias_completadas|length }}</span>
+                    </div>
+                    <div class="p-4 overflow-x-auto">
+                        {% if urgencias_completadas %}
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-slate-50 text-left">
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Paciente</th>
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Prioridad</th>
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Descripción</th>
+                                    <th class="px-3 py-2 text-xs font-bold text-slate-700 uppercase">Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in urgencias_completadas %}
+                                <tr class="border-b hover:bg-slate-50 transition-colors">
+                                    <td class="px-3 py-3 text-slate-700 font-medium">{{ item.paciente }}</td>
+                                    <td class="px-3 py-3">
+                                        <span class="px-2 py-1 rounded text-xs font-bold
+                                            {% if item.prioridad == 'Crítica' %}bg-red-600 text-white
+                                            {% elif item.prioridad == 'Alta' %}bg-orange-500 text-white
+                                            {% elif item.prioridad == 'Media' %}bg-amber-400 text-slate-800
+                                            {% else %}bg-blue-100 text-blue-800{% endif %}">
+                                            {{ item.prioridad }}
+                                        </span>
+                                    </td>
+                                    <td class="px-3 py-3 text-slate-500 text-sm">{{ item.descripcion|truncatechars:40 }}</td>
+                                    <td class="px-3 py-3">
+                                        <span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider">Completado</span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <p class="text-slate-500 text-center py-8">No hay urgencias completadas</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
         </div>
 
     </div>
 </div>
 
 <script>
-    // ---- Cambiar pestana ----
-    function verTab(nombre) {
+    // ---- Cambiar pestana principal ----
+    function mostrarTab(nombre) {
         // Ocultar todos los paneles
-        document.getElementById('tab-pendientes').style.display = 'none';
-        document.getElementById('tab-aceptadas').style.display = 'none';
-        document.getElementById('tab-rechazadas').style.display = 'none';
+        var paneles = document.getElementsByClassName('tab-panel');
+        for (var i = 0; i < paneles.length; i++) {
+            paneles[i].style.display = 'none';
+        }
 
         // Mostrar el que queremos
-        document.getElementById('tab-' + nombre).style.display = 'block';
+        document.getElementById(nombre).style.display = 'block';
 
         // Resetear botones
-        document.getElementById('btn-pendientes').className = 'flex-1 py-3 px-4 font-bold rounded-tl-lg transition-colors text-slate-600 hover:bg-slate-50';
-        document.getElementById('btn-aceptadas').className = 'flex-1 py-3 px-4 font-bold transition-colors text-slate-600 hover:bg-slate-50';
-        document.getElementById('btn-rechazadas').className = 'flex-1 py-3 px-4 font-bold rounded-tr-lg transition-colors text-slate-600 hover:bg-slate-50';
+        var botones = document.getElementsByClassName('tab-btn');
+        for (var i = 0; i < botones.length; i++) {
+            botones[i].className = 'tab-btn flex-1 py-3 px-4 font-bold text-slate-600 hover:bg-slate-50 uppercase tracking-wider text-xs md:text-sm transition-all duration-300 border-l border-slate-200';
+        }
 
-        document.getElementById('btn-' + nombre).classList.remove('text-slate-600', 'hover:bg-slate-50');
-        document.getElementById('btn-' + nombre).classList.add('bg-cyan-600', 'text-white');
+        var btnActivo = document.getElementById('tab-' + nombre);
+        btnActivo.className = 'tab-btn flex-1 py-3 px-4 font-bold bg-cyan-600 text-white uppercase tracking-wider text-xs md:text-sm transition-all duration-300';
     }
 
     // ---- Mostrar aviso flotante ----
@@ -287,7 +687,6 @@
         div.textContent = texto;
         caja.appendChild(div);
 
-        // Borrarlo a los 6 segundos
         setTimeout(function () {
             div.remove();
         }, 6000);
@@ -306,10 +705,9 @@
 
         socket.onopen = function () {
             intentos = 0;
-            estadoDiv.textContent = 'Conectado - recibiras avisos en tiempo real';
+            estadoDiv.textContent = 'Conectado - recibirás avisos en tiempo real';
             estadoDiv.style.background = '#dcfce7';
             estadoDiv.style.color = '#166534';
-            // Ocultarlo a los 4 segundos
             setTimeout(function () {
                 estadoDiv.style.display = 'none';
             }, 4000);
@@ -319,9 +717,7 @@
             var datos = JSON.parse(evento.data);
 
             if (datos.tipo === 'notificacion_nueva') {
-                // Recepcion acepto una cita y nos la asigno
-                mostrarAviso('Nueva cita: ' + datos.tipo_cita + ' - Paciente: ' + datos.paciente, '#16a34a');
-                // Recargar la pagina para ver la nueva cita en Pendientes
+                mostrarAviso('Nueva cita asignada: ' + datos.tipo_cita + ' - Paciente: ' + datos.paciente, '#16a34a');
                 location.reload();
             }
 
@@ -331,10 +727,10 @@
         };
 
         socket.onerror = function () {
-            estadoDiv.textContent = 'Error de conexion WebSocket';
+            estadoDiv.textContent = 'Error de conexión WebSocket';
             estadoDiv.style.background = '#fee2e2';
             estadoDiv.style.color = '#991b1b';
-            estadoDiv.style.display = 'block';
+            estadoDiv.style.display = 'none';
         };
 
         socket.onclose = function () {
@@ -343,13 +739,11 @@
             estadoDiv.textContent = 'Desconectado. Reconectando en ' + segundos + ' segundos...';
             estadoDiv.style.background = '#ffedd5';
             estadoDiv.style.color = '#9a3412';
-            estadoDiv.style.display = 'block';
-            // Intentar reconectar
+            estadoDiv.style.display = 'none';
             setTimeout(conectarWS, segundos * 1000);
         };
     }
 
-    // Iniciar conexion
     conectarWS();
 </script>
 

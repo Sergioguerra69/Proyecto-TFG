@@ -133,15 +133,17 @@
  
  <div class="flex justify-between items-start mb-5">
  <div>
- <h3 class="font-montserrat font-extrabold text-xl text-slate-800 mb-1 group-hover:text-cyan-700 transition-colors">{{ consulta.mascota }}</h3>
- <p class="text-sm text-slate-500"><i class="fas fa-user mr-1 text-cyan-500"></i>{{ consulta.propietario }}</p>
+ <a href="{% url 'detalle_consulta' consulta.id %}">
+ <h3 class="font-montserrat font-extrabold text-xl text-slate-800 mb-1 group-hover:text-cyan-700 transition-colors">{{ consulta.mascota|default:consulta.paciente }}</h3>
+ </a>
+ <p class="text-sm text-slate-500"><i class="fas fa-user mr-1 text-cyan-500"></i>{{ consulta.usuario.username }}</p>
  </div>
  <span class="px-3 py-1 text-xs font-bold rounded-full
- {% if consulta.estado == 'pendiente' %}bg-amber-100 text-amber-700
- {% elif consulta.estado == 'en_proceso' %}bg-blue-100 text-blue-700
- {% elif consulta.estado == 'completada' %}bg-emerald-100 text-emerald-700
+ {% if consulta.estado == 'Pendiente' %}bg-amber-100 text-amber-700
+ {% elif consulta.estado == 'En Proceso' %}bg-blue-100 text-blue-700
+ {% elif consulta.estado == 'Completado' %}bg-emerald-100 text-emerald-700
  {% else %}bg-slate-100 text-slate-600{% endif %}">
- {{ consulta.get_estado_display }}
+ {{ consulta.estado }}
  </span>
  </div>
  
@@ -166,6 +168,12 @@
  </div>
  </div>
  
+ <div class="mt-4 pt-4 border-t border-slate-100 flex gap-2">
+ <a href="{% url 'detalle_consulta' consulta.id %}" class="flex-1 bg-cyan-50 hover:bg-cyan-100 text-cyan-700 text-sm font-bold py-2.5 rounded-xl transition-colors text-center flex items-center justify-center gap-1">
+ <i class="fas fa-eye mr-1"></i>Ver Ficha
+ </a>
+ </div>
+ 
  {% if perms.consultas.change_consulta or perms.consultas.delete_consulta %}
  <div class="border-t border-slate-100 pt-4 space-y-3">
  {% if perms.consultas.change_consulta %}
@@ -173,10 +181,10 @@
  {% csrf_token %}
  <div class="flex gap-2">
  <select name="estado" class="flex-1 border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-slate-50 focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
- <option value="pendiente" {% if consulta.estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
- <option value="en_proceso" {% if consulta.estado == 'en_proceso' %}selected{% endif %}>En Proceso</option>
- <option value="completada" {% if consulta.estado == 'completada' %}selected{% endif %}>Completada</option>
- <option value="cancelada" {% if consulta.estado == 'cancelada' %}selected{% endif %}>Cancelada</option>
+ <option value="Pendiente" {% if consulta.estado == 'Pendiente' %}selected{% endif %}>Pendiente</option>
+ <option value="En Proceso" {% if consulta.estado == 'En Proceso' %}selected{% endif %}>En Proceso</option>
+ <option value="Completado" {% if consulta.estado == 'Completado' %}selected{% endif %}>Completado</option>
+ <option value="Rechazada" {% if consulta.estado == 'Rechazada' %}selected{% endif %}>Rechazada</option>
  </select>
  <button type="submit" class="bg-cyan-500 text-white text-sm font-bold px-4 py-2.5 rounded-xl hover:bg-cyan-600 transition-colors">
  <i class="fas fa-sync-alt"></i>

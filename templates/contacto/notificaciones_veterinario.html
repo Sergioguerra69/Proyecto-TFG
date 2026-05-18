@@ -3,15 +3,15 @@
 {% block title %}Notificaciones Veterinario - VetCT{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-slate-800 py-8">
+<div class="min-h-screen bg-gray-100 py-8">
  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
  <!-- Header -->
  <div class="mb-8">
- <div class="bg-white rounded-lg shadow-lg p-6 border border-slate-200">
+ <div class="bg-white rounded-lg shadow p-6 border-l-4 border-cyan-500 mb-6">
  <div class="flex items-center justify-between">
  <div class="flex items-center gap-4">
- <div class="w-12 h-12 bg-purple-600 rounded-xl flex items-center justify-center shadow-lg">
- <i class="fas fa-user-md text-white text-xl"></i>
+ <div class="w-12 h-12 bg-cyan-600 rounded-xl flex items-center justify-center shadow-lg">
+ <i class="fas fa-bell text-white text-xl"></i>
  </div>
  <div>
  <h1 class="text-2xl font-bold text-slate-800">Notificaciones</h1>
@@ -19,7 +19,7 @@
  </div>
  </div>
  <div class="flex items-center gap-3">
- <a href="{% url 'panel_veterinario' %}" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors flex items-center gap-2">
+ <a href="{% url 'panel_contactos_veterinario' %}" class="px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition-colors flex items-center gap-2 font-medium shadow-sm">
  <i class="fas fa-arrow-left"></i>
  Volver al Panel
  </a>
@@ -37,6 +37,7 @@
  <!-- Lista de notificaciones -->
  <div class="bg-white rounded-xl shadow-md border border-slate-200">
  {% if notificaciones %}
+ {% csrf_token %}
  <div class="overflow-x-auto">
  <table class="w-full">
  <thead>

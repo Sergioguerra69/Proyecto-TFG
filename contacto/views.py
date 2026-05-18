@@ -458,7 +458,7 @@ def ver_solicitud_asignada(request, asignacion_id):
             
             messages.success(request, 'Solicitud completada.')
             
-        return redirect('panel_veterinario')
+        return redirect('panel_contactos_veterinario')
     
     return render(request, 'contacto/ver_solicitud_asignada.html', {
         'asignacion': asignacion,
@@ -532,7 +532,7 @@ def gestionar_solicitud_veterinario(request, notificacion_id):
             
             messages.success(request, 'Solicitud rechazada.')
             
-        return redirect('panel_veterinario')
+        return redirect('panel_contactos_veterinario')
     
     return render(request, 'contacto/gestionar_solicitud_veterinario.html', {
         'formulario': formulario,

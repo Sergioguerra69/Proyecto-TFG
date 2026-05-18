@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Calendario de Citas{% endblock %}
+
+{% block extra_css %}
+<!-- FullCalendar CSS -->
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
+<style>
+    /* Fullcalendar overrides to match Tailwind */
+    .fc {
+        font-family: 'Poppins', sans-serif;
+    }
+    .fc-theme-standard td, .fc-theme-standard th, .fc-theme-standard .fc-scrollgrid {
+        border-color: #e2e8f0;
+    }
+    .fc-button-primary {
+        background-color: #0891b2 !important; /* cyan-600 */
+        border-color: #0891b2 !important;
+    }
+    .fc-button-primary:hover {
+        background-color: #0e7490 !important; /* cyan-700 */
+        border-color: #0e7490 !important;
+    }
+    .fc-button-primary:not(:disabled):active, .fc-button-primary:not(:disabled).fc-button-active {
+        background-color: #155e75 !important; /* cyan-800 */
+        border-color: #155e75 !important;
+    }
+    .fc-event {
+        cursor: pointer;
+        border-radius: 4px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
+        <h2 class="text-3xl font-black text-slate-800 font-montserrat flex items-center gap-3">
+            <i class="far fa-calendar-alt text-cyan-500"></i> 
+            Calendario de Citas
+        </h2>
+        <div class="flex gap-3">
+            <a href="{% url 'crear_consulta' %}" class="bg-cyan-600 hover:bg-cyan-700 text-white px-5 py-2.5 rounded-full font-semibold transition-colors shadow-sm flex items-center gap-2">
+                <i class="fas fa-plus"></i> Nueva Cita
+            </a>
+            <a href="{% url 'lista_consultas' %}" class="bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 px-5 py-2.5 rounded-full font-semibold transition-colors flex items-center gap-2">
+                <i class="fas fa-list"></i> Ver Lista
+            </a>
+        </div>
+    </div>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <!-- Sidebar / Leyenda -->
+        <div class="lg:col-span-1 space-y-6">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-slate-50 px-5 py-4 border-b border-slate-200">
+                    <h5 class="font-bold text-slate-800 m-0">Leyenda</h5>
+                </div>
+                <div class="p-5 space-y-3">
+                    <div class="flex items-center gap-3">
+                        <span class="w-4 h-4 rounded" style="background-color: #f59e0b;"></span>
+                        <span class="text-sm font-medium text-slate-700">Pendiente</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="w-4 h-4 rounded" style="background-color: #0ea5e9;"></span>
+                        <span class="text-sm font-medium text-slate-700">En Proceso</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="w-4 h-4 rounded" style="background-color: #10b981;"></span>
+                        <span class="text-sm font-medium text-slate-700">Completado</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="w-4 h-4 rounded" style="background-color: #ef4444;"></span>
+                        <span class="text-sm font-medium text-slate-700">Rechazada</span>
+                    </div>
+                </div>
+            </div>
+            
+            {% if es_empleado %}
+            <div class="bg-cyan-50 border border-cyan-100 rounded-xl p-4 flex gap-3 text-cyan-800">
+                <i class="fas fa-info-circle mt-1 text-cyan-500"></i>
+                <div class="text-sm">
+                    <strong>Consejo de recepción:</strong> Puedes arrastrar y soltar las citas en el calendario para cambiar su horario rápidamente.
+                </div>
+            </div>
+            {% else %}
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 flex gap-3 text-slate-700">
+                <i class="fas fa-info-circle mt-1 text-slate-500"></i>
+                <div class="text-sm">
+                    <strong>Aviso:</strong> Para reprogramar o cancelar tu cita, por favor ponte en contacto con la recepción de la clínica.
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Calendario -->
+        <div class="lg:col-span-3 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+            <div id='calendar'></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- FullCalendar JS -->
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/es.js'></script>
+
+<!-- pasar variable es_empleado de django a js sin errores de sintaxis -->
+{{ es_empleado|json_script:"es-empleado" }}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const esEmpleado = JSON.parse(document.getElementById('es-empleado').textContent);
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'timeGridWeek',
+            locale: 'es',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            slotMinTime: '08:00:00',
+            slotMaxTime: '20:00:00',
+            allDaySlot: false,
+            events: '/consultas/api/calendario/eventos/',
+            editable: esEmpleado,
+            droppable: esEmpleado,
+            eventDrop: function(info) {
+                if (!esEmpleado) {
+                    info.revert();
+                    return;
+                }
+
+                if (!confirm("¿Estás seguro de que quieres reubicar esta cita?")) {
+                    info.revert();
+                    return;
+                }
+                
+                fetch(`/consultas/api/calendario/actualizar/${info.event.id}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        start: info.event.start.toISOString()
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.success) {
+                        alert("Error al actualizar: " + (data.error || "Desconocido"));
+                        info.revert();
+                    }
+                })
+                .catch(error => {
+                    alert("Error de conexión");
+                    info.revert();
+                });
+            }
+        });
+        calendar.render();
+    });
+</script>
+{% endblock %}

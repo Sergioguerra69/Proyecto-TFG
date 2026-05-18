@@ -329,7 +329,7 @@
                                         <td class="px-3 py-3 text-slate-700 font-medium">{{ analisis.paciente }}</td>
                                         <td class="px-3 py-3 text-slate-500 text-sm">{{ analisis.fecha|date:"d/m/Y" }}
                                         </td>
-                                        <td class="px-3 py-3 text-slate-500 text-sm">{{ analisis.tipo }}</td>
+                                        <td class="px-3 py-3 text-slate-500 text-sm">{{ analisis.nombre }}</td>
                                         <td class="px-3 py-3">
                                             <div class="flex gap-2">
                                                 <form method="post"
@@ -381,7 +381,7 @@
                                         <td class="px-3 py-3 text-slate-700 font-medium">{{ analisis.paciente }}</td>
                                         <td class="px-3 py-3 text-slate-500 text-sm">{{ analisis.fecha|date:"d/m/Y" }}
                                         </td>
-                                        <td class="px-3 py-3 text-slate-500 text-sm">{{ analisis.tipo }}</td>
+                                        <td class="px-3 py-3 text-slate-500 text-sm">{{ analisis.nombre }}</td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
@@ -415,7 +415,7 @@
                                         <td class="px-3 py-3 text-slate-700 font-medium">{{ analisis.paciente }}</td>
                                         <td class="px-3 py-3 text-slate-500 text-sm">{{ analisis.fecha|date:"d/m/Y" }}
                                         </td>
-                                        <td class="px-3 py-3 text-slate-500 text-sm">{{ analisis.tipo }}</td>
+                                        <td class="px-3 py-3 text-slate-500 text-sm">{{ analisis.nombre }}</td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
@@ -469,7 +469,7 @@
                                         <td class="px-3 py-3 text-slate-700 font-medium">{{ cirugia.paciente }}</td>
                                         <td class="px-3 py-3 text-slate-500 text-sm">{{ cirugia.fecha|date:"d/m/Y" }}
                                         </td>
-                                        <td class="px-3 py-3 text-slate-500 text-sm">{{ cirugia.tipo }}</td>
+                                        <td class="px-3 py-3 text-slate-500 text-sm">{{ cirugia.tipo_cirugia }}</td>
                                         <td class="px-3 py-3">
                                             <div class="flex gap-2">
                                                 <form method="post"
@@ -521,7 +521,7 @@
                                         <td class="px-3 py-3 text-slate-700 font-medium">{{ cirugia.paciente }}</td>
                                         <td class="px-3 py-3 text-slate-500 text-sm">{{ cirugia.fecha|date:"d/m/Y" }}
                                         </td>
-                                        <td class="px-3 py-3 text-slate-500 text-sm">{{ cirugia.tipo }}</td>
+                                        <td class="px-3 py-3 text-slate-500 text-sm">{{ cirugia.tipo_cirugia }}</td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
@@ -555,7 +555,7 @@
                                         <td class="px-3 py-3 text-slate-700 font-medium">{{ cirugia.paciente }}</td>
                                         <td class="px-3 py-3 text-slate-500 text-sm">{{ cirugia.fecha|date:"d/m/Y" }}
                                         </td>
-                                        <td class="px-3 py-3 text-slate-500 text-sm">{{ cirugia.tipo }}</td>
+                                        <td class="px-3 py-3 text-slate-500 text-sm">{{ cirugia.tipo_cirugia }}</td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
@@ -609,7 +609,7 @@
                                         <td class="px-3 py-3 text-slate-700 font-medium">{{ urgencia.paciente }}</td>
                                         <td class="px-3 py-3 text-slate-500 text-sm">{{ urgencia.fecha|date:"d/m/Y" }}
                                         </td>
-                                        <td class="px-3 py-3 text-slate-500 text-sm">{{ urgencia.motivo|truncatechars:30 }}</td>
+                                        <td class="px-3 py-3 text-slate-500 text-sm">{{ urgencia.descripcion|truncatechars:30 }}</td>
                                         <td class="px-3 py-3">
                                             <div class="flex gap-2">
                                                 <form method="post"
@@ -662,7 +662,7 @@
                                         <td class="px-3 py-3 text-slate-700 font-medium">{{ urgencia.paciente }}</td>
                                         <td class="px-3 py-3 text-slate-500 text-sm">{{ urgencia.fecha|date:"d/m/Y" }}
                                         </td>
-                                        <td class="px-3 py-3 text-slate-500 text-sm">{{ urgencia.motivo|truncatechars:30 }}</td>
+                                        <td class="px-3 py-3 text-slate-500 text-sm">{{ urgencia.descripcion|truncatechars:30 }}</td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
@@ -696,7 +696,7 @@
                                         <td class="px-3 py-3 text-slate-700 font-medium">{{ urgencia.paciente }}</td>
                                         <td class="px-3 py-3 text-slate-500 text-sm">{{ urgencia.fecha|date:"d/m/Y" }}
                                         </td>
-                                        <td class="px-3 py-3 text-slate-500 text-sm">{{ urgencia.motivo|truncatechars:30 }}</td>
+                                        <td class="px-3 py-3 text-slate-500 text-sm">{{ urgencia.descripcion|truncatechars:30 }}</td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>

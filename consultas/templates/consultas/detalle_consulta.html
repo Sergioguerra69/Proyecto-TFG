@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalle de Consulta - VetCT{% endblock %}
+
+{% block content %}
+<div class="py-20 bg-slate-50 min-h-screen">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Botón Volver -->
+        <div class="mb-8 flex flex-wrap gap-6">
+            <a href="{% url 'lista_consultas' %}" class="inline-flex items-center text-slate-600 hover:text-cyan-600 font-semibold transition-colors">
+                <i class="fas fa-arrow-left mr-2"></i> Volver a Consultas
+            </a>
+            <a href="{% url 'calendario_recepcion' %}" class="inline-flex items-center text-slate-600 hover:text-cyan-600 font-semibold transition-colors">
+                <i class="far fa-calendar-alt mr-2"></i> Ver en Calendario
+            </a>
+        </div>
+
+        <!-- Tarjeta Principal -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <!-- Cabecera -->
+            <div class="bg-slate-800 p-8 text-white relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl"></div>
+                <div class="relative flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <span class="inline-block bg-cyan-500/20 text-cyan-300 text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-3 border border-cyan-500/30">
+                            Ficha Clínica #{{ consulta.id }}
+                        </span>
+                        <h1 class="font-montserrat font-black text-3xl md:text-4xl mb-1">
+                            {{ consulta.mascota|default:consulta.paciente }}
+                        </h1>
+                        <p class="text-slate-300 text-sm flex items-center gap-2 mt-2">
+                            <i class="fas fa-user text-cyan-400"></i> Propietario: {{ consulta.usuario.username }}
+                        </p>
+                    </div>
+                    <span class="px-4 py-1.5 text-sm font-bold rounded-full shadow-sm
+                        {% if consulta.estado == 'Pendiente' %}bg-amber-500 text-white
+                        {% elif consulta.estado == 'En Proceso' %}bg-blue-500 text-white
+                        {% elif consulta.estado == 'Completado' %}bg-emerald-500 text-white
+                        {% else %}bg-rose-500 text-white{% endif %}">
+                        {{ consulta.estado }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Cuerpo del Detalle -->
+            <div class="p-8 space-y-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Columna Izquierda: Detalles de Cita -->
+                    <div class="space-y-6 bg-slate-50 p-6 rounded-xl border border-slate-100">
+                        <h3 class="font-bold text-slate-800 text-lg border-b border-slate-200 pb-3 flex items-center gap-2">
+                            <i class="fas fa-calendar-check text-cyan-600"></i> Datos de la Cita
+                        </h3>
+                        <div class="space-y-4">
+                            <div>
+                                <span class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Fecha y Hora</span>
+                                <p class="text-slate-800 font-semibold mt-1 flex items-center gap-2">
+                                    <i class="far fa-clock text-slate-400"></i> {{ consulta.fecha|date:"l, d de F de Y - H:i" }}
+                                </p>
+                            </div>
+                            <div>
+                                <span class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Veterinario Asignado</span>
+                                <p class="text-slate-800 font-semibold mt-1 flex items-center gap-2">
+                                    <i class="fas fa-user-md text-slate-400"></i> Dr. {{ consulta.veterinario|default:"Sin asignar" }}
+                                </p>
+                            </div>
+                            <div>
+                                <span class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Fecha de Solicitud</span>
+                                <p class="text-slate-600 text-sm mt-1">
+                                    {{ consulta.fecha_creacion|date:"d/m/Y H:i" }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Columna Derecha: Contacto -->
+                    <div class="space-y-6 bg-slate-50 p-6 rounded-xl border border-slate-100">
+                        <h3 class="font-bold text-slate-800 text-lg border-b border-slate-200 pb-3 flex items-center gap-2">
+                            <i class="fas fa-address-card text-cyan-600"></i> Contacto del Solicitante
+                        </h3>
+                        <div class="space-y-4">
+                            <div>
+                                <span class="block text-xs font-bold text-slate-500 uppercase tracking-wider">DNI</span>
+                                <p class="text-slate-800 font-semibold mt-1">{{ consulta.dni|default:"No especificado" }}</p>
+                            </div>
+                            <div>
+                                <span class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Teléfono</span>
+                                <p class="text-slate-800 font-semibold mt-1 flex items-center gap-2">
+                                    <i class="fas fa-phone text-slate-400"></i> {{ consulta.telefono|default:"No especificado" }}
+                                </p>
+                            </div>
+                            <div>
+                                <span class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Correo Electrónico</span>
+                                <p class="text-slate-800 font-semibold mt-1 flex items-center gap-2">
+                                    <i class="fas fa-envelope text-slate-400"></i> {{ consulta.correo|default:"No especificado" }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información Médica -->
+                <div class="space-y-6 pt-4 border-t border-slate-100">
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-lg mb-3 flex items-center gap-2">
+                            <i class="fas fa-comment-medical text-cyan-600"></i> Motivo de la Consulta
+                        </h3>
+                        <div class="bg-cyan-50/50 border border-cyan-100 rounded-xl p-5 text-slate-700 leading-relaxed">
+                            {{ consulta.motivo }}
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-lg mb-3 flex items-center gap-2">
+                            <i class="fas fa-stethoscope text-cyan-600"></i> Diagnóstico Veterinario
+                        </h3>
+                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 text-slate-700 leading-relaxed min-h-[100px]">
+                            {% if consulta.diagnostico %}
+                                {{ consulta.diagnostico }}
+                            {% else %}
+                                <span class="text-slate-400 italic">El veterinario aún no ha registrado el diagnóstico para esta consulta.</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones de Acción -->
+                <div class="pt-6 border-t border-slate-100 flex flex-col sm:flex-row gap-4 justify-end">
+                    {% if perms.consultas.change_consulta %}
+                    <a href="{% url 'editar_consulta' consulta.id %}" class="bg-cyan-600 hover:bg-cyan-700 text-white font-bold px-8 py-3 rounded-xl transition-colors shadow-sm flex items-center justify-center gap-2">
+                        <i class="fas fa-edit"></i> Editar Consulta
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

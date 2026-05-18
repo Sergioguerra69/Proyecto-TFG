@@ -11,6 +11,7 @@ from consultas.models import Consulta
 from laboratorio.models import Analisis
 from cirugias.models import Cirugia
 from urgencias.models import Urgencia
+from mascotas.models import Mascota
 
 # Página de registro
 def registro(peticion):
@@ -127,10 +128,14 @@ def perfil(peticion):
     else:
         formulario = PerfilForm(instance=peticion.user.perfil)
     
+    # obtener las mascotas del usuario
+    mascotas = Mascota.objects.filter(dueno=peticion.user)
+
     return render(peticion, 'users/perfil.html', {
         'formulario': formulario,
         'edit_mode': password_verified,
-        'password_verified': password_verified
+        'password_verified': password_verified,
+        'mascotas': mascotas
     })
 
 # Lista de agentes (solo admin)

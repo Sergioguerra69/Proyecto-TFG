@@ -20,8 +20,10 @@ class Cirugia(models.Model):
     ]
     # Usuario que solicita la cirugía
     usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='cirugias')
-    # Nombre del animal a operar
+    # Nombre del animal a operar (legado)
     paciente = models.CharField(max_length=100)
+    # Mascota vinculada (nuevo sistema)
+    mascota = models.ForeignKey('mascotas.Mascota', on_delete=models.CASCADE, null=True, blank=True, related_name='cirugias')
     # Tipo de animal
     tipo_animal = models.CharField(max_length=20, choices=TIPO_ANIMAL_CHOICES, default='Perro')
     # Especificar otro tipo de animal (cuando selecciona "Otro")

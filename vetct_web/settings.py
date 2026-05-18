@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'tienda',           # Tienda online
     'contacto',         # Formularios de contacto
     'users',
+    'mascotas',         # Gestión de Mascotas
     'notificaciones',   # Sistema de notificaciones
     'metricas',         # Métricas del sistema
 

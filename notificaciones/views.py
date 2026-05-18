@@ -4,6 +4,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
 from django.contrib.auth.models import User, Group
+from django.db import models
 from .models import Notificacion
 
 # Importaciones de modelos usados en varias vistas
@@ -148,8 +149,8 @@ def aceptar_solicitud(request, notificacion_id):
     notificacion.estado = 'aceptada'
     notificacion.save()
     
-    # Creamos notificación para todos los veterinarios (por rol de perfil)
-    veterinarios = User.objects.filter(perfil__rol='veterinario')
+    # Creamos notificación para todos los veterinarios (por rol de perfil o grupo)
+    veterinarios = User.objects.filter(models.Q(perfil__rol='veterinario') | models.Q(groups__name='veterinarios')).distinct()
     for vet in veterinarios:
         Notificacion.objects.create(
             tipo=notificacion.tipo,
@@ -219,58 +220,92 @@ def rechazar_solicitud(request, notificacion_id):
 # PANEL VETERINARIO: Aquí los veterinarios ven sus tareas
 @login_required
 def panel_veterinario(request):
-    # Verificar si es veterinario
-    if not (hasattr(request.user, 'perfil') and request.user.perfil.rol == 'veterinario'):
+    es_vet = (hasattr(request.user, 'perfil') and request.user.perfil.rol == 'veterinario') or request.user.groups.filter(name='veterinarios').exists()
+    if not es_vet:
         messages.error(request, 'No tienes permisos para acceder a esta página.')
         return redirect('home')
     
-    # Separamos las notificaciones por estado
-    notificaciones_pendientes_qs = Notificacion.objects.filter(
-        receptor=request.user,
-        estado='pendiente'
-    ).order_by('-fecha_creacion')
+    # Cargar los modelos para el veterinario
+    # Para el veterinario:
+    # "Pendientes de Atender" son las que Recepción aceptó (estado='Aceptada')
+    # "En Proceso" son las que el Veterinario está atendiendo (estado='En Proceso')
+    # "Completadas" son las ya finalizadas (estado='Completado')
     
-    notificaciones_aceptadas_qs = Notificacion.objects.filter(
-        receptor=request.user,
-        estado='aceptada'
-    ).order_by('-fecha_creacion')
-    
-    notificaciones_rechazadas_qs = Notificacion.objects.filter(
-        receptor=request.user,
-        estado='rechazada'
-    ).order_by('-fecha_creacion')
-    
-    def enriquecer(notifs):
-        """Añade el objeto cita real a cada notificación para la plantilla."""
-        resultado = []
-        for notif in notifs:
-            cita = notif.get_objeto()
-            resultado.append({
-                'notif': notif,
-                'cita': cita,
-                'tipo': notif.tipo,
-                'tipo_display': notif.get_tipo_display(),
-                'estado': notif.estado,
-                'fecha_notif': notif.fecha_creacion,
-                'emisor': notif.emisor,
-                'objeto_id': notif.objeto_id,
-                # Campos comunes del objeto (mapeados según el tipo)
-                'paciente': (getattr(cita, 'paciente', None) or getattr(cita, 'nombre', '-')) if cita else '-',
-                'fecha_cita': (getattr(cita, 'fecha', None) or getattr(cita, 'fecha_creacion', None)) if cita else None,
-                'detalle': (getattr(cita, 'motivo', None) or getattr(cita, 'asunto', '-')) if cita else '-',
-            })
-        return resultado
-    
-    # Contador de notificaciones pendientes
-    notificaciones_pendientes_count = notificaciones_pendientes_qs.count()
-    
-    # Mostramos las notificaciones organizadas por estado, enriquecidas con datos de la cita
+    if Consulta:
+        consultas_pendientes = Consulta.objects.filter(estado='Aceptada').order_by('fecha')
+        consultas_en_proceso = Consulta.objects.filter(estado='En Proceso').order_by('fecha')
+        consultas_completadas = Consulta.objects.filter(estado='Completado').order_by('-fecha')
+    else:
+        consultas_pendientes = consultas_en_proceso = consultas_completadas = []
+
+    if Analisis:
+        analisis_pendientes = Analisis.objects.filter(estado='Aceptada').order_by('fecha')
+        analisis_en_proceso = Analisis.objects.filter(estado='En Proceso').order_by('fecha')
+        analisis_completados = Analisis.objects.filter(estado='Completado').order_by('-fecha')
+    else:
+        analisis_pendientes = analisis_en_proceso = analisis_completados = []
+
+    if Cirugia:
+        cirugias_pendientes = Cirugia.objects.filter(estado='Aceptada').order_by('fecha')
+        cirugias_en_proceso = Cirugia.objects.filter(estado='En Proceso').order_by('fecha')
+        cirugias_completadas = Cirugia.objects.filter(estado='Completado').order_by('-fecha')
+    else:
+        cirugias_pendientes = cirugias_en_proceso = cirugias_completadas = []
+
+    if Urgencia:
+        urgencias_pendientes = Urgencia.objects.filter(estado='Aceptada').order_by('fecha')
+        urgencias_en_proceso = Urgencia.objects.filter(estado='En Proceso').order_by('fecha')
+        urgencias_completadas = Urgencia.objects.filter(estado='Completado').order_by('-fecha')
+    else:
+        urgencias_pendientes = urgencias_en_proceso = urgencias_completadas = []
+
     return render(request, 'notificaciones/panel_veterinario.html', {
-        'notificaciones_pendientes': enriquecer(notificaciones_pendientes_qs),
-        'notificaciones_aceptadas': enriquecer(notificaciones_aceptadas_qs),
-        'notificaciones_rechazadas': enriquecer(notificaciones_rechazadas_qs),
-        'notificaciones_pendientes_count': notificaciones_pendientes_count,
+        'consultas_pendientes': consultas_pendientes,
+        'consultas_en_proceso': consultas_en_proceso,
+        'consultas_completadas': consultas_completadas,
+        
+        'analisis_pendientes': analisis_pendientes,
+        'analisis_en_proceso': analisis_en_proceso,
+        'analisis_completados': analisis_completados,
+        
+        'cirugias_pendientes': cirugias_pendientes,
+        'cirugias_en_proceso': cirugias_en_proceso,
+        'cirugias_completadas': cirugias_completadas,
+        
+        'urgencias_pendientes': urgencias_pendientes,
+        'urgencias_en_proceso': urgencias_en_proceso,
+        'urgencias_completadas': urgencias_completadas,
     })
+
+@login_required
+def completar_cita(request, tipo, cita_id):
+    if tipo == 'consulta':
+        objeto = get_object_or_404(Consulta, id=cita_id)
+    elif tipo == 'analisis':
+        objeto = get_object_or_404(Analisis, id=cita_id)
+    elif tipo == 'cirugia':
+        objeto = get_object_or_404(Cirugia, id=cita_id)
+    elif tipo == 'urgencia':
+        objeto = get_object_or_404(Urgencia, id=cita_id)
+    else:
+        messages.error(request, 'Tipo de cita no válido')
+        return redirect('panel_veterinario')
+    
+    objeto.estado = 'Completado'
+    objeto.save()
+    
+    # Actualizar la notificación si existe
+    notificacion = Notificacion.objects.filter(
+        tipo=tipo,
+        objeto_id=cita_id,
+        receptor=request.user
+    ).first()
+    if notificacion:
+        notificacion.estado = 'aceptada'
+        notificacion.save()
+        
+    messages.success(request, f'{tipo.title()} marcada como completada correctamente.')
+    return redirect('panel_veterinario')
 
 # MIS NOTIFICACIONES: Lista de mensajes para el veterinario
 @login_required
@@ -319,7 +354,8 @@ def aceptar_cita(request, tipo, cita_id):
         messages.error(request, 'Tipo de cita no válido')
         return redirect('panel_recepcion')
     
-    es_recepcionista = (hasattr(request.user, 'perfil') and request.user.perfil.rol == 'recepcionista') or request.user.is_staff
+    es_vet = (hasattr(request.user, 'perfil') and request.user.perfil.rol == 'veterinario') or request.user.groups.filter(name='veterinarios').exists()
+    es_recepcionista = not es_vet
     
     if es_recepcionista:
         # --- FLUJO RECEPCIONISTA ---
@@ -335,8 +371,8 @@ def aceptar_cita(request, tipo, cita_id):
             notif_recep.estado = 'aceptada'
             notif_recep.save()
         
-        # Crear notificación pendiente para TODOS los veterinarios (por rol de perfil)
-        veterinarios = User.objects.filter(perfil__rol='veterinario')
+        # Crear notificación pendiente para TODOS los veterinarios (por rol de perfil o grupo)
+        veterinarios = User.objects.filter(models.Q(perfil__rol='veterinario') | models.Q(groups__name='veterinarios')).distinct()
         for vet in veterinarios:
             # Evitar duplicados: solo crear si no existe ya una notif pendiente para ese vet+cita
             ya_existe = Notificacion.objects.filter(
@@ -379,7 +415,7 @@ def aceptar_cita(request, tipo, cita_id):
         elif tipo == 'mensaje_contacto':
             objeto.estado = 'Leído'
         else:
-            objeto.estado = 'Aceptada'
+            objeto.estado = 'En Proceso'
         objeto.save()
         
         # Marcar la notificación del veterinario como aceptada
@@ -447,7 +483,8 @@ def rechazar_cita(request, tipo, cita_id):
         notificacion.estado = 'rechazada'
         notificacion.save()
     
-    es_recepcionista = (hasattr(request.user, 'perfil') and request.user.perfil.rol == 'recepcionista') or request.user.is_staff
+    es_vet = (hasattr(request.user, 'perfil') and request.user.perfil.rol == 'veterinario') or request.user.groups.filter(name='veterinarios').exists()
+    es_recepcionista = not es_vet
 
     paciente = getattr(objeto, 'paciente', '-')
     if es_recepcionista:
@@ -533,18 +570,62 @@ def eliminar_cita(request, tipo, cita_id):
 @login_required
 def ver_cita(request, tipo, cita_id):
     # Obtener el objeto según el tipo
+    paciente_nombre = ""
+    fecha_str = ""
+    hora_str = ""
+    solicitante_str = ""
+    motivo_str = ""
+    mensaje_str = ""
+
     if tipo == 'consulta':
         objeto = get_object_or_404(Consulta, id=cita_id)
+        paciente_nombre = objeto.paciente
+        fecha_str = objeto.fecha.strftime('%d/%m/%Y') if hasattr(objeto.fecha, 'strftime') else str(objeto.fecha)
+        hora_str = objeto.fecha.strftime('%H:%M') if hasattr(objeto.fecha, 'strftime') else ''
+        solicitante_str = objeto.usuario.username if objeto.usuario else ''
+        motivo_str = objeto.motivo
+        mensaje_str = getattr(objeto, 'diagnostico', '')
     elif tipo == 'analisis':
         objeto = get_object_or_404(Analisis, id=cita_id)
+        paciente_nombre = objeto.paciente
+        fecha_str = objeto.fecha.strftime('%d/%m/%Y') if hasattr(objeto.fecha, 'strftime') else str(objeto.fecha)
+        hora_str = objeto.hora.strftime('%H:%M') if hasattr(objeto.hora, 'strftime') else str(objeto.hora)
+        solicitante_str = objeto.usuario.username if objeto.usuario else ''
+        motivo_str = objeto.nombre
+        mensaje_str = getattr(objeto, 'notas', '')
     elif tipo == 'cirugia':
         objeto = get_object_or_404(Cirugia, id=cita_id)
+        paciente_nombre = objeto.paciente
+        fecha_str = objeto.fecha.strftime('%d/%m/%Y') if hasattr(objeto.fecha, 'strftime') else str(objeto.fecha)
+        hora_str = objeto.fecha.strftime('%H:%M') if hasattr(objeto.fecha, 'strftime') else ''
+        solicitante_str = objeto.usuario.username if objeto.usuario else ''
+        motivo_str = objeto.tipo_cirugia
+        mensaje_str = f"Quirófano: {objeto.quirofano}" if getattr(objeto, 'quirofano', '') else ''
     elif tipo == 'urgencia':
         objeto = get_object_or_404(Urgencia, id=cita_id)
+        paciente_nombre = objeto.paciente
+        fecha_str = objeto.fecha.strftime('%d/%m/%Y') if hasattr(objeto.fecha, 'strftime') else str(objeto.fecha)
+        hora_str = objeto.fecha.strftime('%H:%M') if hasattr(objeto.fecha, 'strftime') else ''
+        solicitante_str = objeto.usuario.username if objeto.usuario else ''
+        motivo_str = objeto.descripcion
+        mensaje_str = f"Prioridad: {objeto.prioridad}" if getattr(objeto, 'prioridad', '') else ''
     elif tipo == 'formulario_contacto':
         objeto = get_object_or_404(FormularioContacto, id=cita_id)
+        paciente_nombre = f"{objeto.nombre} {getattr(objeto, 'apellidos', '')}".strip()
+        fecha_val = getattr(objeto, 'fecha', None) or objeto.fecha_creacion
+        fecha_str = fecha_val.strftime('%d/%m/%Y') if hasattr(fecha_val, 'strftime') else str(fecha_val)
+        hora_str = objeto.hora.strftime('%H:%M') if getattr(objeto, 'hora', None) and hasattr(objeto.hora, 'strftime') else 'No especificada'
+        solicitante_str = objeto.email
+        motivo_str = objeto.asunto
+        mensaje_str = objeto.mensaje
     elif tipo == 'mensaje_contacto':
         objeto = get_object_or_404(MensajeCliente, id=cita_id)
+        paciente_nombre = objeto.nombre
+        fecha_str = objeto.fecha_creacion.strftime('%d/%m/%Y') if hasattr(objeto.fecha_creacion, 'strftime') else str(objeto.fecha_creacion)
+        hora_str = objeto.fecha_creacion.strftime('%H:%M') if hasattr(objeto.fecha_creacion, 'strftime') else 'No especificada'
+        solicitante_str = objeto.email
+        motivo_str = objeto.asunto
+        mensaje_str = objeto.mensaje
     else:
         messages.error(request, 'Tipo de cita no válido')
         return redirect('panel_recepcion')
@@ -552,6 +633,12 @@ def ver_cita(request, tipo, cita_id):
     return render(request, 'notificaciones/ver_cita.html', {
         'tipo': tipo,
         'cita': objeto,
+        'paciente_nombre': paciente_nombre,
+        'fecha_str': fecha_str,
+        'hora_str': hora_str,
+        'solicitante_str': solicitante_str,
+        'motivo_str': motivo_str,
+        'mensaje_str': mensaje_str,
     })
 
 # Crear nueva cita - Formulario para añadir solicitudes
@@ -714,8 +801,8 @@ def aceptar_cita_recepcion(request, tipo, cita_id):
         notificacion.estado = 'aceptada'
         notificacion.save()
     
-    # Notificar a veterinarios (por rol de perfil)
-    veterinarios = User.objects.filter(perfil__rol='veterinario')
+    # Notificar a veterinarios (por rol de perfil o grupo)
+    veterinarios = User.objects.filter(models.Q(perfil__rol='veterinario') | models.Q(groups__name='veterinarios')).distinct()
     for vet in veterinarios:
         Notificacion.objects.create(
             tipo=tipo,

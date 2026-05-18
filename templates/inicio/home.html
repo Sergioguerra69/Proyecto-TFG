@@ -40,10 +40,16 @@
                     class="border-2 border-white/30 text-white font-bold text-sm uppercase tracking-wider px-8 py-4 rounded-full transition-all duration-500 hover:bg-white/10 hover:border-white/60 backdrop-blur-sm">
                     <i class="fas fa-calendar-check mr-2"></i>Contáctanos
                 </a>
+                {% if user.is_authenticated %}
+                <a href="{% url 'lista_consultas' %}"
+                    class="bg-cyan-600 text-white font-bold text-sm uppercase tracking-wider px-8 py-4 rounded-full transition-all duration-500 hover:bg-cyan-700 shadow-lg hover:shadow-xl flex items-center">
+                    <i class="fas fa-notes-medical mr-2"></i>Consultas Médicas
+                </a>
+                {% endif %}
             </div>
 
             {% if user.is_authenticated %}
-            <div class="mt-12 p-6 bg-white/10 backdrop-blur-xl rounded-xl border border-white/10 max-w-md mx-auto ">
+            <div class="mt-12 p-6 bg-white/10 backdrop-blur-xl rounded-xl border border-white/10 max-w-2xl mx-auto ">
                 <p class="mb-4 text-white text-lg flex items-center justify-center gap-2">Bienvenido, <span
                         class="text-cyan-300 font-bold">{{ request.user.username }}</span></p>
                 <div class="flex gap-3 justify-center flex-wrap">
