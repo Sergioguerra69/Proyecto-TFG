@@ -200,12 +200,13 @@ if redis_url and 'redis:' in redis_url and config('DEBUG', default=True, cast=bo
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Configuración de email
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_HOST = 'infoVetct@gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
+DEFAULT_FROM_EMAIL = 'info@vetct.com'
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
