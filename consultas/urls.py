@@ -25,4 +25,7 @@ urlpatterns = [
     path('calendario/', views.calendario_recepcion, name='calendario_recepcion'),
     path('api/calendario/eventos/', views.api_citas_calendario, name='api_citas_calendario'),
     path('api/calendario/actualizar/<int:id>/', views.api_actualizar_cita, name='api_actualizar_cita'),
+    
+    # Generar PDF
+    path('pdf/<int:consulta_id>/', views.pdf_consulta, name='pdf_consulta'),
 ]

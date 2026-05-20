@@ -1,9 +1,11 @@
 # Vistas del módulo de Urgencias
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.contrib import messages
+from django.http import HttpResponse
 from .models import Urgencia
-from .forms import UrgenciaForm, UrgenciaVeterinarioForm
+from .forms import UrgenciaForm
+from consultas.pdf_utils import generar_pdf_urgencia
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 
@@ -130,3 +132,20 @@ def eliminar_urgencia(request, id):
         'titulo': 'Eliminar Urgencia',
         'url_cancelar': '/urgencias/'
     })
+
+# Generar PDF de urgencia
+@login_required
+def pdf_urgencia(request, urgencia_id):
+    urgencia = get_object_or_404(Urgencia, id=urgencia_id)
+    
+    # Verificar permisos: solo el dueño o personal puede ver el PDF
+    es_personal = request.user.is_staff or request.user.is_superuser
+    if not es_personal and urgencia.usuario != request.user:
+        messages.error(request, 'No tienes permisos para ver este reporte')
+        return redirect('home')
+    
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="urgencia_{urgencia_id}_{urgencia.paciente or "paciente"}.pdf"'
+    
+    generar_pdf_urgencia(urgencia, response)
+    return response

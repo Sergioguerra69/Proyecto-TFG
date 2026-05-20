@@ -92,6 +92,27 @@
                 class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded font-medium">
                 Volver al panel
             </a>
+            {% if tipo == 'consulta' %}
+            <a href="{% url 'pdf_consulta' cita.id %}"
+                class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded font-medium">
+                <i class="fas fa-file-pdf mr-2"></i>Descargar PDF
+            </a>
+            {% elif tipo == 'cirugia' %}
+            <a href="{% url 'pdf_cirugia' cita.id %}"
+                class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded font-medium">
+                <i class="fas fa-file-pdf mr-2"></i>Descargar PDF
+            </a>
+            {% elif tipo == 'urgencia' %}
+            <a href="{% url 'pdf_urgencia' cita.id %}"
+                class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded font-medium">
+                <i class="fas fa-file-pdf mr-2"></i>Descargar PDF
+            </a>
+            {% else %}
+            <a href="#" onclick="alert('PDF no disponible para este tipo de cita')"
+                class="bg-gray-400 text-gray-700 px-4 py-2 rounded font-medium cursor-not-allowed">
+                <i class="fas fa-file-pdf mr-2"></i>PDF no disponible
+            </a>
+            {% endif %}
             {% if cita.estado == 'Pendiente' %}
             <form method="post" action="{% url 'aceptar_cita' tipo cita.id %}" class="inline">
                 {% csrf_token %}

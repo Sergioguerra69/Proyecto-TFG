@@ -2,8 +2,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.contrib import messages
+from django.http import HttpResponse
 from .models import Cirugia
 from .forms import CirugiaForm
+from consultas.pdf_utils import generar_pdf_cirugia
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 
@@ -137,3 +139,20 @@ def eliminar_cirugia(request, id):
         'titulo': 'Eliminar Cirugía',
         'url_cancelar': '/cirugias/'
     })
+
+# Generar PDF de cirugía
+@login_required
+def pdf_cirugia(request, cirugia_id):
+    cirugia = get_object_or_404(Cirugia, id=cirugia_id)
+    
+    # Verificar permisos: solo el dueño o personal puede ver el PDF
+    es_personal = request.user.is_staff or request.user.is_superuser
+    if not es_personal and cirugia.usuario != request.user:
+        messages.error(request, 'No tienes permisos para ver este reporte')
+        return redirect('home')
+    
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="cirugia_{cirugia_id}_{cirugia.paciente or "paciente"}.pdf"'
+    
+    generar_pdf_cirugia(cirugia, response)
+    return response

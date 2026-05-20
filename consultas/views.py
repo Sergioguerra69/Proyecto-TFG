@@ -4,9 +4,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from .models import Consulta
 from .forms import ConsultaForm
+from .pdf_utils import generar_pdf_consulta
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 import os
@@ -376,17 +377,34 @@ def api_actualizar_cita(request, id):
 
             data = json.loads(request.body)
             nueva_fecha_str = data.get('start')
-            
+
             if nueva_fecha_str:
                 from dateutil.parser import parse
                 nueva_fecha = parse(nueva_fecha_str)
-                
+
                 consulta = get_object_or_404(Consulta, id=id)
                 consulta.fecha = nueva_fecha
                 consulta.save()
-                
+
                 return JsonResponse({'success': True})
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
-            
+
     return JsonResponse({'success': False, 'error': 'Método no permitido'})
+
+# Generar PDF de consulta
+@login_required
+def pdf_consulta(request, consulta_id):
+    consulta = get_object_or_404(Consulta, id=consulta_id)
+    
+    # Verificar permisos: solo el dueño o personal puede ver el PDF
+    es_personal = request.user.is_staff or request.user.is_superuser
+    if not es_personal and consulta.usuario != request.user:
+        messages.error(request, 'No tienes permisos para ver este reporte')
+        return redirect('home')
+    
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="consulta_{consulta_id}_{consulta.paciente or "paciente"}.pdf"'
+    
+    generar_pdf_consulta(consulta, response)
+    return response
