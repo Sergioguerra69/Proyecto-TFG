@@ -10,9 +10,9 @@ from .models import Analisis
 
 from .forms import AnalisisForm
 
-# from channels.layers import get_channel_layer
+from channels.layers import get_channel_layer
 
-# from asgiref.sync import async_to_sync  # Temporalmente desactivado
+from asgiref.sync import async_to_sync
 
 
 

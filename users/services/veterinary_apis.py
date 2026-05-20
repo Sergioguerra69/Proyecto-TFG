@@ -54,6 +54,51 @@ class VeterinaryAPIManager:
         except requests.RequestException as e:
             print(f"Error obteniendo clínicas: {e}")
             return []
+
+    def get_nearby_clinics(self, lat: float, lng: float, radius: int = 10) -> List[Dict]:
+        """Obtener clínicas cercanas (método alternativo para compatibilidad)"""
+        return self.get_clinicas_cercanas(lat, lng, radius)
+
+    def get_emergency_clinics(self, lat: float, lng: float, radius: int = 10) -> List[Dict]:
+        """Obtener clínicas de urgencias 24h cercanas"""
+        try:
+            url = f"{self.urgencias_base_url}/urgencias/cercanas"
+            params = {
+                'lat': lat,
+                'lng': lng,
+                'radio': radius,
+                'api_key': self.api_urgencias_key
+            }
+            
+            response = requests.get(url, params=params, timeout=10)
+            response.raise_for_status()
+            
+            data = response.json()
+            return data.get('urgencias', [])
+            
+        except requests.RequestException as e:
+            print(f"Error obteniendo urgencias: {e}")
+            return []
+
+    def get_pet_health_tips(self, tipo_mascota: str, edad: str = 'adulto') -> List[Dict]:
+        """Obtener consejos de salud para mascotas"""
+        try:
+            url = f"{self.mascotas_base_url}/consejos/salud"
+            params = {
+                'tipo': tipo_mascota,
+                'edad': edad,
+                'api_key': self.api_mascotas_key
+            }
+            
+            response = requests.get(url, params=params, timeout=10)
+            response.raise_for_status()
+            
+            data = response.json()
+            return data.get('consejos', [])
+            
+        except requests.RequestException as e:
+            print(f"Error obteniendo consejos de salud: {e}")
+            return []
     
     def get_urgencias_disponibles(self, ciudad: str) -> List[Dict]:
         """Obtener urgencias disponibles en una ciudad"""

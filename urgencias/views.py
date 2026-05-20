@@ -4,8 +4,8 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
 from .models import Urgencia
 from .forms import UrgenciaForm, UrgenciaVeterinarioForm
-# from channels.layers import get_channel_layer
-# from asgiref.sync import async_to_sync  # Temporalmente desactivado
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
 # =============================================
 # VISTA PRINCIPAL: Lista todas las urgencias

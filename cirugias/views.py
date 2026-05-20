@@ -4,8 +4,8 @@ from django.contrib.auth.decorators import login_required, permission_required, 
 from django.contrib import messages
 from .models import Cirugia
 from .forms import CirugiaForm
-# from channels.layers import get_channel_layer
-# from asgiref.sync import async_to_sync  # Temporalmente desactivado
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
 # Función para verificar si el usuario es administrativo (staff)
 def es_administrativo(user):

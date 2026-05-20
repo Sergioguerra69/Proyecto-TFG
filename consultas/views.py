@@ -17,7 +17,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 # APIs externas para información veterinaria
 try:
-    from veterinary_apis import VeterinaryAPIManager
+    from users.services.veterinary_apis import VeterinaryAPIManager
     API_MANAGER = VeterinaryAPIManager()
     API_AVAILABLE = True
 except ImportError:
@@ -340,7 +340,7 @@ def api_citas_calendario(request):
     if es_empleado:
         contactos = FormularioContacto.objects.all()
     else:
-        contactos = FormularioContacto.objects.filter(usuario=request.user)
+        contactos = FormularioContacto.objects.filter(email=request.user.email)
 
     for co in contactos:
         color = '#f97316' # naranja para contacto

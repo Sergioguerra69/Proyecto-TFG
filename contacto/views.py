@@ -26,10 +26,12 @@ def contacto_publico(request):
                     from notificaciones.models import Notificacion
                     recepcionistas = User.objects.filter(perfil__rol='recepcionista')
                     for recep in recepcionistas:
+                        admin_user = User.objects.filter(username='admin').first()
+                        emisor = request.user if request.user.is_authenticated else admin_user
                         Notificacion.objects.create(
                             tipo='formulario_contacto',
                             objeto_id=formulario.id,
-                            emisor=request.user if request.user.is_authenticated else User.objects.get(username='admin'), # Fallback to admin if anonymous
+                            emisor=emisor,
                             receptor=recep,
                             estado='pendiente',
                             mensaje=f"Nuevo formulario de contacto de {formulario.nombre}"
@@ -46,10 +48,12 @@ def contacto_publico(request):
                     from notificaciones.models import Notificacion
                     recepcionistas = User.objects.filter(perfil__rol='recepcionista')
                     for recep in recepcionistas:
+                        admin_user = User.objects.filter(username='admin').first()
+                        emisor = request.user if request.user.is_authenticated else admin_user
                         Notificacion.objects.create(
                             tipo='mensaje_contacto',
                             objeto_id=mensaje_obj.id,
-                            emisor=request.user if request.user.is_authenticated else User.objects.get(username='admin'),
+                            emisor=emisor,
                             receptor=recep,
                             estado='pendiente',
                             mensaje=f"Nuevo mensaje de duda de {mensaje_obj.nombre}"
