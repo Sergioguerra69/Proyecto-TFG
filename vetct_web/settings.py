@@ -177,6 +177,16 @@ CHANNEL_LAYERS = {
     }
 }
 
+# Configuración de Daphne para WebSockets
+ASGI_APPLICATION = 'vetct_web.asgi.application'
+
+# Configuración adicional para Channels/Daphne
+CHANNELS = {
+    "default": {
+        "BACKEND": "channels.inmemory.InMemoryChannelLayer",
+    }
+}
+
 # Usar Redis solo en producción
 redis_url = config('REDIS_URL', default=None)
 if redis_url and 'redis:' in redis_url and config('DEBUG', default=True, cast=bool) == False:
